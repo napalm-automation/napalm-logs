@@ -8,6 +8,11 @@ from __future__ import unicode_literals
 # Import thrid party libs
 import zmq
 
+# Import napalm-logs pkgs
+from napalm_logs.transport import zeromq
+# from napalm_logs.transport import kafka
+# from napalm_logs.transport import rabbitmq
+
 
 class NapalmLogs:
     def __init__(self,
@@ -20,8 +25,9 @@ class NapalmLogs:
 
         :param hostname: The address to bind the syslog client. Default: 0.0.0.0.
         :param port: Listen port. Default: 514.
-        :param publish_hostname: The address to bing the ZMQ pub. Default: 0.0.0.0.
-        :param publish_port: ZMQ publish port. Default: 49017.
+        :param publish_hostname: The address to bing when publishing the OC
+                                 objects. Default: 0.0.0.0.
+        :param publish_port: Publish port. Default: 49017.
         '''
         pass
 
@@ -62,7 +68,7 @@ class NapalmLogs:
 
     def _publish_oc_obj(obj):
         '''
-        Publish the OC object on a ZeroMQ channel.
+        Publish the OC object.
         '''
         pass
 
