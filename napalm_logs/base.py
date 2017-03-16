@@ -5,9 +5,6 @@ napalm-logs base
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-# Import thrid party libs
-import zmq
-
 # Import napalm-logs pkgs
 from napalm_logs.transport import zeromq
 # from napalm_logs.transport import kafka
