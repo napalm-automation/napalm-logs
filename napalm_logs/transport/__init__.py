@@ -5,13 +5,33 @@ napalm-logs pluggable publisher.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+# Import napalm-logs pkgs
+from napalm_logs.transport.base import TransportBase
+from napalm_logs.transport.zeromq import ZMQTransport
+from napalm_logs.transport.cli import CLITransport
+# from napalm_logs.transport.log import LogTransport
+# from napalm_logs.transport.kafka import KafkaTransport
+# from napalm_logs.transport.rabbitmq import RabbitMQTransport
 
-class TransportBase:
-    '''
-    The base class for the transport.
-    '''
-    def __init__(self, addr, port):
-        pass
+TRANSPORT_LOOKUP = {
+    'zeromq': ZMQTransport,
+    'zmq': ZMQTransport,
+    'cli': CLITransport,
+    'print': CLITransport,
+    'console': CLITransport,
+    # 'kafka': KafkaTransport,
+    # 'rmq': RabbitMQransport,
+    # 'rabbitmq': RabbitMQransport,
+    '*': ZMQTransport  # default transport
+}
 
-    def publish(self, obj):
-        pass
+
+def get_transport(name):
+    '''
+    Return the transport class.
+    '''
+    return TRANSPORT_LOOKUP.get(name, TRANSPORT_LOOKUP['*'])
+
+__all__ = (
+    'get_transport',
+)
