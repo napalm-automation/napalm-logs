@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 # Import std lib
 import os
 import yaml
+import time
 import logging
 
 # Import napalm-logs pkgs
@@ -50,6 +51,15 @@ class NapalmLogs:
                                          self.publish_port)
         self._build_config()
         self._precompile_regex()
+        self.__up = False  # Require explicit `start_engine`
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.stop_engine()
+        if exc_type is not None:
+            self.__raise_clean_exception(exc_type, exc_value, exc_traceback)
+
+    def __del__(self):
+        self.stop_engine()
 
     def _load_config(self, path):
         '''
@@ -68,14 +78,14 @@ class NapalmLogs:
         # Read all files under the config dir
         for file in files:
             # And allow only .yml and .yaml extensions
-            if not file.ednswith('.yml') and not file.endswith('.yaml'):
+            if not file.endswith('.yml') and not file.endswith('.yaml'):
                 continue
             filename, _ = file.split('.')
             # The filename is also the network OS name
             filepath = os.path.join(path, file)
             try:
                 with open(filepath, 'r') as fstream:
-                    config[filename] = yaml.load(stream)
+                    config[filename] = yaml.load(fstream)
             except yaml.YAMLError as yamlexc:
                 log.error('Invalid YAML file: {}'.format(filepath))
                 log.error(yamlexc)
@@ -111,7 +121,7 @@ class NapalmLogs:
             # No extension config, no extra build
             return
         for nos, nos_config in self.extension_config_dict.items():
-            if nos not in self.config_dict:
+            if nos not in self.config_dict and nos_config:
                 self.config_dict[nos] = nos_config
                 continue
             self.config_dict[nos].update(nos_config)
@@ -137,7 +147,7 @@ class NapalmLogs:
         '''
         pass
 
-    def _emit_oc(self, **kwargs):
+    def _emit_oc(self, model, **kwargs):
         '''
         Emit an OpenConfig object given a certain combination of
         fields mappeed in the config to the corresponding hierarchy.
@@ -150,8 +160,35 @@ class NapalmLogs:
         '''
         self.transport.publish(obj)
 
+    def _listen(self):
+        '''
+        Listen to messages and send them to be served by the right process.
+        '''
+        while self.__up:
+            # TODO: identify the OS and send the message to the right child process
+            pass
+
     def start_engine(self):
         '''
-        Start listening to syslog messages.
+        Start the child processes (one per device OS),
+        open the socket to start receiving messages.
         '''
-        pass
+        log.info('Preparing the transport')
+        self.transport.start()
+        log.info('Starting child processes for each device type')
+        # TODO
+        log.info('Start listening to syslog messages')
+        # TODO
+        log.info('Starting the listener')
+        self.__up = True
+        try:
+            self._listen()
+        except KeyboardInterrupt:
+            # Greceful exit.
+            log.info('Exiting on Ctrl-C')
+            self.stop_engine()
+
+    def stop_engine(self):
+        log.info('Shutting down the engine')
+        self.__up = False
+        self.transport.tear_down()

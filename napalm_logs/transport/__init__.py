@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 from napalm_logs.transport.base import TransportBase
 from napalm_logs.transport.zeromq import ZMQTransport
 from napalm_logs.transport.cli import CLITransport
-# from napalm_logs.transport.log import LogTransport
+from napalm_logs.transport.log import LogTransport
 # from napalm_logs.transport.kafka import KafkaTransport
 # from napalm_logs.transport.rabbitmq import RabbitMQTransport
 
@@ -19,6 +19,7 @@ TRANSPORT_LOOKUP = {
     'cli': CLITransport,
     'print': CLITransport,
     'console': CLITransport,
+    'log': LogTransport,
     # 'kafka': KafkaTransport,
     # 'rmq': RabbitMQransport,
     # 'rabbitmq': RabbitMQransport,
