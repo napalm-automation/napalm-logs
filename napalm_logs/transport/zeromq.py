@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 import zmq
 
 # Import napalm-logs pkgs
-from napalm_logs.transport import TransportBase
+from napalm_logs.transport.base import TransportBase
 
 
 class ZMQTransport(TransportBase):
