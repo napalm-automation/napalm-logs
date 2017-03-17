@@ -17,7 +17,12 @@ class ZMQTransport(TransportBase):
     ZMQ transport class.
     '''
     def __init__(self, addr, port):
-        pass
+        self.context = zmq.Context()
+        self.socket = context.socket(zmq.PUB)
+        self.socket.bind('tcp://{addr}:{port}'.format(
+            addr=addr,
+            port=port)
+        )
 
     def publish(self, obj):
-        pass
+        self.socket.send(obj)
