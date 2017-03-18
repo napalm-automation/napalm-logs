@@ -13,6 +13,7 @@ import logging
 
 # Import napalm-logs pkgs
 import napalm_logs.exceptions
+from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.transport import get_transport
 
 log = logging.getLogger(__name__)
@@ -51,6 +52,7 @@ class NapalmLogs:
                                          self.publish_port)
         self._build_config()
         self._precompile_regex()
+        self.device_proc = {}
         self.__up = False  # Require explicit `start_engine`
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
@@ -140,33 +142,19 @@ class NapalmLogs:
         '''
         pass
 
-    def _parse_message(self, msg):
-        '''
-        Parse a syslog message and check what OpenConfig object should
-        be generated.
-        '''
-        pass
-
-    def _emit_oc(self, model, **kwargs):
-        '''
-        Emit an OpenConfig object given a certain combination of
-        fields mappeed in the config to the corresponding hierarchy.
-        '''
-        pass
-
-    def _publish_oc_obj(self, obj):
-        '''
-        Publish the OC object.
-        '''
-        self.transport.publish(obj)
-
     def _listen(self):
         '''
         Listen to messages and send them to be served by the right process.
         '''
-        while self.__up:
-            # TODO: identify the OS and send the message to the right child process
-            pass
+        self.__up = True
+        try:
+            while self.__up:
+                # TODO: identify the OS and send the message to the right child process
+                self.transport.publish('Test')
+        except KeyboardInterrupt:
+            # Greceful exit.
+            log.info('Exiting on Ctrl-C')
+            self.stop_engine()
 
     def start_engine(self):
         '''
@@ -176,17 +164,17 @@ class NapalmLogs:
         log.info('Preparing the transport')
         self.transport.start()
         log.info('Starting child processes for each device type')
-        # TODO
+        for device_os, device_config in self.config_dict.items():
+            dpid = os.fork()
+            if dpid == 0:
+                log.info('Starting the child process for {dos}'.format(dos=device_os))
+                dos = NapalmLogsProc(device_os,
+                                     device_config,
+                                     self.transport)
+                dos.start()
+                os._exit(0)
         log.info('Start listening to syslog messages')
-        # TODO
-        log.info('Starting the listener')
-        self.__up = True
-        try:
-            self._listen()
-        except KeyboardInterrupt:
-            # Greceful exit.
-            log.info('Exiting on Ctrl-C')
-            self.stop_engine()
+        self._listen()
 
     def stop_engine(self):
         log.info('Shutting down the engine')
