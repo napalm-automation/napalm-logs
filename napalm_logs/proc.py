@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 '''
-napalm-logs base
+napalm-logs base worker process
 '''
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-# python stdlib
-from Queue import Queue
+# Import python stdlib
+from queue import Queue
 
 
 class NapalmLogsProc:
@@ -19,7 +19,6 @@ class NapalmLogsProc:
         self._config = config
         self._transport = transport
         self._log = log
-        self._q = Queue()
         self.__running = False
 
     def _parse(self, msg):
@@ -42,21 +41,21 @@ class NapalmLogsProc:
         '''
         self._transport.publish(obj)
 
-    def queue(self, msg):
-        self._q.put(msg)
-
-    def start(self):
+    def start(self, q):
         '''
         Start the worker process.
         '''
+        self._q = q
         self.__running = True
-        while self.__running:
-            self._publish(self._name)
-            # msg = self._q.get(block=True)
-            # # Will wait till a message is available
-            # kwargs = self._parse(self, msg)
-            # oc_obj = self._emit(self, **kwargs)
-            # self._publish(oc_obj)
+        try:
+            while self.__running:
+                msg = self._q.get(block=True)
+                # # Will wait till a message is available
+                # kwargs = self._parse(self, msg)
+                # oc_obj = self._emit(self, **kwargs)
+                # self._publish(oc_obj)
+        except KeyboardInterrupt:
+            self.stop()
 
     def stop(self):
         '''

@@ -10,6 +10,7 @@ import os
 import yaml
 import time
 import logging
+from multiprocessing import Process, Queue
 
 # Import napalm-logs pkgs
 import napalm_logs.exceptions
@@ -52,7 +53,8 @@ class NapalmLogs:
                                          self.publish_port)
         self._build_config()
         self._precompile_regex()
-        self.device_proc = {}
+        self.os_q_map = {}
+        self.main_q = Queue()
         self.__up = False  # Require explicit `start_engine`
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
@@ -144,15 +146,28 @@ class NapalmLogs:
 
     def _listen(self):
         '''
-        Listen to messages and send them to be served by the right process.
+        Listen to messages and queue them.
         '''
-        self.__up = True
         try:
             while self.__up:
-                # TODO: identify the OS and send the message to the right child process
-                self.transport.publish('Test')
+                # TODO only take the message and queue it directly
         except KeyboardInterrupt:
             # Greceful exit.
+            log.info('Exiting on Ctrl-C')
+            self.stop_engine()
+
+    def _serve(self):
+        '''
+        Serve messages from the queue.
+        '''
+        try:
+            while self.__up:
+                msg = self.main_q.get(block=True)
+                # Take messages from the main queue
+                # TODO identify OS and queue the message to the right driver, e.g.:
+                # self.os_q_map[dev].put(msg)
+        except KeyboardInterrupt:
+            # Graceful exit.
             log.info('Exiting on Ctrl-C')
             self.stop_engine()
 
@@ -161,20 +176,23 @@ class NapalmLogs:
         Start the child processes (one per device OS),
         open the socket to start receiving messages.
         '''
+        # TODO prepare the binding to be able to listen to syslog messages
         log.info('Preparing the transport')
         self.transport.start()
         log.info('Starting child processes for each device type')
         for device_os, device_config in self.config_dict.items():
-            dpid = os.fork()
-            if dpid == 0:
-                log.info('Starting the child process for {dos}'.format(dos=device_os))
-                dos = NapalmLogsProc(device_os,
-                                     device_config,
-                                     self.transport)
-                dos.start()
-                os._exit(0)
+            log.info('Starting the child process for {dos}'.format(dos=device_os))
+            dos = NapalmLogsProc(device_os,
+                                 device_config,
+                                 self.transport,
+                                 log=log)
+            dos_q = Queue()
+            self.os_q_map[device_os] = dos_q
+            Process(target=dos.start, args=(dos_q,)).start()
         log.info('Start listening to syslog messages')
-        self._listen()
+        self.__up = True
+        Process(target=self._listen).start()
+        Process(target=self._serve).start()
 
     def stop_engine(self):
         log.info('Shutting down the engine')
