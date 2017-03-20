@@ -9,13 +9,16 @@ from __future__ import unicode_literals
 import os
 import yaml
 import time
+import socket
 import logging
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Pipe
 
 # Import napalm-logs pkgs
 import napalm_logs.exceptions
-from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.transport import get_transport
+from napalm_logs.device import NapalmLogsDeviceProc
+from napalm_logs.server import NapalmLogsServerProc
+from napalm_logs.listener import NapalmLogsListenerProc
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +33,9 @@ class NapalmLogs:
                  config_path=None,
                  config_dict=None,
                  extension_config_path=None,
-                 extension_config_dict=None):
+                 extension_config_dict=None,
+                 log_level='warning',
+                 log_fmt='%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'):
         '''
         Init the napalm-logs engine.
 
@@ -46,24 +51,49 @@ class NapalmLogs:
         self.publish_port = publish_port
         self.config_path = config_path
         self.config_dict = config_dict
+        self._transport_type = transport
         self.extension_config_path = extension_config_path
         self.extension_config_dict = extension_config_dict
-        transport_class = get_transport(transport)
-        self.transport = transport_class(self.publish_hostname,
-                                         self.publish_port)
+        self.log_level = log_level
+        self.log_fmt = log_fmt
+        # Setup the environment
+        self._setup_log()
+        self._setup_transport()
         self._build_config()
         self._precompile_regex()
-        self.os_q_map = {}
-        self.main_q = Queue()
-        self.__up = False  # Require explicit `start_engine`
+        # Private vars
+        self.__os_proc_map = {}
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self.stop_engine()
         if exc_type is not None:
+            log.error('Exiting due to unhandled exception', exc_info=True)
             self.__raise_clean_exception(exc_type, exc_value, exc_traceback)
 
     def __del__(self):
         self.stop_engine()
+
+    def _setup_log(self):
+        '''
+        Setup the log object.
+        '''
+        logging_level = {
+            'debug': logging.DEBUG,
+            'info': logging.INFO,
+            'warning': logging.WARNING,
+            'error': logging.ERROR,
+            'critical': logging.CRITICAL
+        }.get(self.log_level.lower())
+        logging.basicConfig(format=self.log_fmt,
+                            level=logging_level)
+
+    def _setup_transport(self):
+        '''
+        Setup the transport.
+        '''
+        transport_class = get_transport(self._transport_type)
+        self.transport = transport_class(self.publish_hostname,
+                                         self.publish_port)
 
     def _load_config(self, path):
         '''
@@ -91,8 +121,7 @@ class NapalmLogs:
                 with open(filepath, 'r') as fstream:
                     config[filename] = yaml.load(fstream)
             except yaml.YAMLError as yamlexc:
-                log.error('Invalid YAML file: {}'.format(filepath))
-                log.error(yamlexc)
+                log.error('Invalid YAML file: {}'.format(filepath), exc_info=True)
                 raise IOError(yamlexc)
         if not config:
             msg = 'Unable to find proper configuration files under {path}'.format(path=path)
@@ -137,64 +166,65 @@ class NapalmLogs:
         '''
         pass
 
-    def _identify_os(self, msg):
-        '''
-        Using the prefix of the syslog message,
-        we are able to identify the operating system and then continue parsing.
-        '''
-        pass
-
-    def _listen(self):
-        '''
-        Listen to messages and queue them.
-        '''
-        try:
-            while self.__up:
-                # TODO only take the message and queue it directly
-        except KeyboardInterrupt:
-            # Greceful exit.
-            log.info('Exiting on Ctrl-C')
-            self.stop_engine()
-
-    def _serve(self):
-        '''
-        Serve messages from the queue.
-        '''
-        try:
-            while self.__up:
-                msg = self.main_q.get(block=True)
-                # Take messages from the main queue
-                # TODO identify OS and queue the message to the right driver, e.g.:
-                # self.os_q_map[dev].put(msg)
-        except KeyboardInterrupt:
-            # Graceful exit.
-            log.info('Exiting on Ctrl-C')
-            self.stop_engine()
-
     def start_engine(self):
         '''
         Start the child processes (one per device OS),
         open the socket to start receiving messages.
         '''
         # TODO prepare the binding to be able to listen to syslog messages
+        skt = None
+        # TODO
         log.info('Preparing the transport')
         self.transport.start()
         log.info('Starting child processes for each device type')
+        os_pipe_map = {}
         for device_os, device_config in self.config_dict.items():
+            child_pipe, parent_pipe = Pipe(duplex=False)
+            log.debug('Initialized pipe for {dos}'.format(dos=device_os))
+            log.debug('Parent handle is {phandle} ({phash})'.format(phandle=str(parent_pipe),
+                                                                    phash=hash(parent_pipe)))
+            log.debug('Child handle is {chandle} ({chash})'.format(chandle=str(child_pipe),
+                                                                    chash=hash(child_pipe)))
             log.info('Starting the child process for {dos}'.format(dos=device_os))
-            dos = NapalmLogsProc(device_os,
-                                 device_config,
-                                 self.transport,
-                                 log=log)
-            dos_q = Queue()
-            self.os_q_map[device_os] = dos_q
-            Process(target=dos.start, args=(dos_q,)).start()
-        log.info('Start listening to syslog messages')
-        self.__up = True
-        Process(target=self._listen).start()
-        Process(target=self._serve).start()
+            dos = NapalmLogsDeviceProc(device_os,
+                                       device_config,
+                                       self.transport,
+                                       child_pipe)
+            os_pipe_map[device_os] = parent_pipe
+            os_proc = Process(target=dos.start)
+            os_proc.start()
+            log.debug('Started process {pname} for {dos}, having PID {pid}'.format(
+                    pname=os_proc._name,
+                    dos=device_os,
+                    pid=os_proc.pid
+                )
+            )
+            self.__os_proc_map[device_os] = os_proc
+        log.debug('Setting up the syslog pipe')
+        serve_pipe, listen_pipe = Pipe(duplex=False)
+        log.debug('Starting the server process')
+        server = NapalmLogsServerProc(serve_pipe,
+                                      os_pipe_map,
+                                      self.config_dict)
+        self.pserve = Process(target=server.start)
+        self.pserve.start()
+        log.debug('Started server process as {pname} with PID {pid}'.format(
+                pname=self.pserve._name,
+                pid=self.pserve.pid
+            )
+        )
+        log.debug('Starting the listener process')
+        listener = NapalmLogsListenerProc(skt,  # Socket object
+                                          listen_pipe)
+        self.plisten = Process(target=listener.start)
+        self.plisten.start()
+        log.debug('Started listener process as {pname} with PID {pid}'.format(
+                pname=self.plisten._name,
+                pid=self.plisten.pid
+            )
+        )
 
     def stop_engine(self):
         log.info('Shutting down the engine')
-        self.__up = False
-        self.transport.tear_down()
+        if hasattr(self, 'transport'):
+            self.transport.tear_down()

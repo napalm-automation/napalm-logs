@@ -1,3 +1,4 @@
 pyzmq
+pyyaml
 napalm-yang
 
