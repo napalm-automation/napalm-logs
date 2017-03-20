@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 '''
-napalm-logs listener worker process
+Listener worker process
 '''
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # Import pythond stdlib
 import os
-import threading
 import logging
+import threading
 
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
@@ -17,6 +17,9 @@ log = logging.getLogger(__name__)
 
 
 class NapalmLogsListenerProc(NapalmLogsProc):
+    '''
+    Listener sub-process class.
+    '''
     def __init__(self,
                  hostname,
                  port,
@@ -39,3 +42,6 @@ class NapalmLogsListenerProc(NapalmLogsProc):
             msg = 'crap'
             self.__pipe.send(msg)
             # TODO only take the message and queue it directly
+
+    def stop(self):
+        self.__up = False

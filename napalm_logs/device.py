@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 '''
-napalm-logs device worker process
+Device worker process
 '''
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # Import python stdlib
 import os
-import threading
 import logging
+import threading
 
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
@@ -17,6 +17,9 @@ log = logging.getLogger(__name__)
 
 
 class NapalmLogsDeviceProc(NapalmLogsProc):
+    '''
+    Device sub-process class.
+    '''
     def __init__(self,
                  name,
                  config,
@@ -26,7 +29,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         self._config = config
         self._transport = transport
         self._pipe = pipe
-        self.__running = False
+        self.__up = False
 
     def __del__(self):
         self.stop()
@@ -61,8 +64,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
-        self.__running = True
-        while self.__running:
+        self.__up = True
+        while self.__up:
             msg = self._pipe.recv()
             # # Will wait till a message is available
             # kwargs = self._parse(self, msg)
@@ -73,4 +76,4 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         '''
         Stop the worker process.
         '''
-        self.__running = False
+        self.__up = False

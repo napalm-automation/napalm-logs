@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-napalm-logs base worker process
+Base worker process
 '''
 from __future__ import absolute_import
 from __future__ import unicode_literals
@@ -14,6 +14,9 @@ log = logging.getLogger(__name__)
 
 
 class NapalmLogsProc:
+    '''
+    Sub-process base class.
+    '''
     def _suicide_when_without_parent(self, parent_pid):
         '''
         Kill this process when the parent died.

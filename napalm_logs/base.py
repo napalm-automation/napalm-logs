@@ -176,7 +176,7 @@ class NapalmLogs:
         log.info('Starting child processes for each device type')
         os_pipe_map = {}
         for device_os, device_config in self.config_dict.items():
-            parent_pipe, child_pipe = Pipe()
+            child_pipe, parent_pipe = Pipe(duplex=False)
             log.debug('Initialized pipe for {dos}'.format(dos=device_os))
             log.debug('Parent handle is {phandle} ({phash})'.format(phandle=str(parent_pipe),
                                                                     phash=hash(parent_pipe)))
@@ -198,27 +198,27 @@ class NapalmLogs:
             )
             self.__os_proc_map[device_os] = os_proc
         log.debug('Setting up the syslog pipe')
-        listen_pipe, serve_pipe = Pipe()
+        serve_pipe, listen_pipe = Pipe(duplex=False)
         log.debug('Starting the server process')
         server = NapalmLogsServerProc(serve_pipe,
                                       os_pipe_map,
                                       self.config_dict)
-        pserve = Process(target=server.start)
-        pserve.start()
+        self.pserve = Process(target=server.start)
+        self.pserve.start()
         log.debug('Started server process as {pname} with PID {pid}'.format(
-                pname=pserve._name,
-                pid=pserve.pid
+                pname=self.pserve._name,
+                pid=self.pserve.pid
             )
         )
         log.debug('Starting the listener process')
         listener = NapalmLogsListenerProc(self.hostname,
                                           self.port,
                                           listen_pipe)
-        plisten = Process(target=listener.start)
-        plisten.start()
+        self.plisten = Process(target=listener.start)
+        self.plisten.start()
         log.debug('Started listener process as {pname} with PID {pid}'.format(
-                pname=plisten._name,
-                pid=pserve.pid
+                pname=self.plisten._name,
+                pid=self.plisten.pid
             )
         )
 
