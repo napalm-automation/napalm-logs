@@ -8,19 +8,20 @@ from __future__ import unicode_literals
 # Import pythond stdlib
 import os
 import threading
+import logging
 
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
+
+log = logging.getLogger(__name__)
 
 
 class NapalmLogsServerProc(NapalmLogsProc):
     def __init__(self,
                  pipe,
                  os_pipe_map,
-                 config,
-                 log):
+                 config):
         self.config = config
-        self.log = log
         self.__pipe = pipe
         self.__os_pipe_map = os_pipe_map
         self.__up = False
@@ -30,7 +31,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
         Using the prefix of the syslog message,
         we are able to identify the operating system and then continue parsing.
         '''
-        return ()
+        return ('junos', 'crap')
 
     def start(self):
         '''

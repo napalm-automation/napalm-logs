@@ -32,7 +32,9 @@ class NapalmLogs:
                  config_path=None,
                  config_dict=None,
                  extension_config_path=None,
-                 extension_config_dict=None):
+                 extension_config_dict=None,
+                 log_level='warning',
+                 log_fmt='%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'):
         '''
         Init the napalm-logs engine.
 
@@ -48,14 +50,14 @@ class NapalmLogs:
         self.publish_port = publish_port
         self.config_path = config_path
         self.config_dict = config_dict
+        self._transport_type = transport
         self.extension_config_path = extension_config_path
         self.extension_config_dict = extension_config_dict
-        # Setup logging
-        self.log = log  # TODO: proper log setup
-        #
-        transport_class = get_transport(transport)
-        self.transport = transport_class(self.publish_hostname,
-                                         self.publish_port)
+        self.log_level = log_level
+        self.log_fmt = log_fmt
+        # Setup the environment
+        self._setup_log()
+        self._setup_transport()
         self._build_config()
         self._precompile_regex()
         # Private vars
@@ -64,10 +66,33 @@ class NapalmLogs:
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self.stop_engine()
         if exc_type is not None:
+            log.error('Exiting due to unhandled exception', exc_info=True)
             self.__raise_clean_exception(exc_type, exc_value, exc_traceback)
 
     def __del__(self):
         self.stop_engine()
+
+    def _setup_log(self):
+        '''
+        Setup the log object.
+        '''
+        logging_level = {
+            'debug': logging.DEBUG,
+            'info': logging.INFO,
+            'warning': logging.WARNING,
+            'error': logging.ERROR,
+            'critical': logging.CRITICAL
+        }.get(self.log_level.lower())
+        logging.basicConfig(format=self.log_fmt,
+                            level=logging_level)
+
+    def _setup_transport(self):
+        '''
+        Setup the transport.
+        '''
+        transport_class = get_transport(self._transport_type)
+        self.transport = transport_class(self.publish_hostname,
+                                         self.publish_port)
 
     def _load_config(self, path):
         '''
@@ -80,7 +105,7 @@ class NapalmLogs:
                 'Unable to read from {path}: '
                 'the directory does not exist!'
             ).format(path=path)
-            self.log.error(msg)
+            log.error(msg)
             raise IOError(msg)
         files = os.listdir(path)
         # Read all files under the config dir
@@ -95,12 +120,11 @@ class NapalmLogs:
                 with open(filepath, 'r') as fstream:
                     config[filename] = yaml.load(fstream)
             except yaml.YAMLError as yamlexc:
-                self.log.error('Invalid YAML file: {}'.format(filepath))
-                self.log.error(yamlexc)
+                log.error('Invalid YAML file: {}'.format(filepath), exc_info=True)
                 raise IOError(yamlexc)
         if not config:
             msg = 'Unable to find proper configuration files under {path}'.format(path=path)
-            self.log.error(msg)
+            log.error(msg)
             raise IOError(msg)
         return config
 
@@ -116,12 +140,12 @@ class NapalmLogs:
                     os.path.dirname(os.path.realpath(__file__)),
                     'config'
                 )
-            self.log.info('Reading the configuration from {path}'.format(path=self.config_path))
+            log.info('Reading the configuration from {path}'.format(path=self.config_path))
             self.config_dict = self._load_config(self.config_path)
         if not self.extension_config_dict and self.extension_config_path:
             # When extension config is not sent as dict
             # But `extension_config_path` is specified
-            self.log.info('Reading extension configuration from {path}'.format(path=self.extension_config_path))
+            log.info('Reading extension configuration from {path}'.format(path=self.extension_config_path))
             self.extension_config_dict = self._load_config(self.extension_config_path)
         elif not self.extension_config_dict:
             self.extension_config_dict = {}
@@ -147,60 +171,58 @@ class NapalmLogs:
         open the socket to start receiving messages.
         '''
         # TODO prepare the binding to be able to listen to syslog messages
-        self.log.info('Preparing the transport')
+        log.info('Preparing the transport')
         self.transport.start()
-        self.log.info('Starting child processes for each device type')
+        log.info('Starting child processes for each device type')
         os_pipe_map = {}
         for device_os, device_config in self.config_dict.items():
             parent_pipe, child_pipe = Pipe()
-            self.log.debug('Initialized pipe for {dos}'.format(dos=device_os))
-            self.log.debug('Parent handle is {phandle} ({phash})'.format(phandle=str(parent_pipe),
+            log.debug('Initialized pipe for {dos}'.format(dos=device_os))
+            log.debug('Parent handle is {phandle} ({phash})'.format(phandle=str(parent_pipe),
                                                                     phash=hash(parent_pipe)))
-            self.log.debug('Child handle is {chandle} ({chash})'.format(chandle=str(child_pipe),
+            log.debug('Child handle is {chandle} ({chash})'.format(chandle=str(child_pipe),
                                                                     chash=hash(child_pipe)))
-            self.log.info('Starting the child process for {dos}'.format(dos=device_os))
+            log.info('Starting the child process for {dos}'.format(dos=device_os))
             dos = NapalmLogsDeviceProc(device_os,
                                        device_config,
                                        self.transport,
-                                       child_pipe,
-                                       self.log)
+                                       child_pipe)
             os_pipe_map[device_os] = parent_pipe
             os_proc = Process(target=dos.start)
             os_proc.start()
-            self.log.debug('Started process {pname} for {dos}, having PID {pid}'.format(
+            log.debug('Started process {pname} for {dos}, having PID {pid}'.format(
                     pname=os_proc._name,
                     dos=device_os,
                     pid=os_proc.pid
                 )
             )
             self.__os_proc_map[device_os] = os_proc
-        self.log.info('Start listening to syslog messages')
+        log.debug('Setting up the syslog pipe')
         listen_pipe, serve_pipe = Pipe()
+        log.debug('Starting the server process')
         server = NapalmLogsServerProc(serve_pipe,
                                       os_pipe_map,
-                                      self.config_dict,
-                                      self.log)
+                                      self.config_dict)
         pserve = Process(target=server.start)
         pserve.start()
-        self.log.debug('Started server process as {pname} with PID {pid}'.format(
+        log.debug('Started server process as {pname} with PID {pid}'.format(
                 pname=pserve._name,
                 pid=pserve.pid
             )
         )
+        log.debug('Starting the listener process')
         listener = NapalmLogsListenerProc(self.hostname,
                                           self.port,
-                                          listen_pipe,
-                                          self.log)
+                                          listen_pipe)
         plisten = Process(target=listener.start)
         plisten.start()
-        self.log.debug('Started listener process as {pname} with PID {pid}'.format(
+        log.debug('Started listener process as {pname} with PID {pid}'.format(
                 pname=plisten._name,
                 pid=pserve.pid
             )
         )
-        pserve.join()
-        plisten.join()
 
     def stop_engine(self):
-        self.log.info('Shutting down the engine')
-        self.transport.tear_down()
+        log.info('Shutting down the engine')
+        if hasattr(self, 'transport'):
+            self.transport.tear_down()

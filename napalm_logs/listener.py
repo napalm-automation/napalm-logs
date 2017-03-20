@@ -8,17 +8,19 @@ from __future__ import unicode_literals
 # Import pythond stdlib
 import os
 import threading
+import logging
 
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
+
+log = logging.getLogger(__name__)
 
 
 class NapalmLogsListenerProc(NapalmLogsProc):
     def __init__(self,
                  hostname,
                  port,
-                 pipe,
-                 log):
+                 pipe):
         self.hostname = hostname
         self.port = port
         self.__pipe = pipe

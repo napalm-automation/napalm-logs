@@ -8,9 +8,12 @@ from __future__ import unicode_literals
 # Import python stdlib
 import os
 import threading
+import logging
 
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
+
+log = logging.getLogger(__name__)
 
 
 class NapalmLogsDeviceProc(NapalmLogsProc):
@@ -18,13 +21,11 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                  name,
                  config,
                  transport,
-                 pipe,
-                 log):
+                 pipe):
         self._name = name
         self._config = config
         self._transport = transport
         self._pipe = pipe
-        self._log = log
         self.__running = False
 
     def __del__(self):

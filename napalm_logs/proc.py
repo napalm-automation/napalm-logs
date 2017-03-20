@@ -8,6 +8,9 @@ from __future__ import unicode_literals
 # Import pythond stdlib
 import os
 import time
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class NapalmLogsProc:
@@ -23,4 +26,5 @@ class NapalmLogsProc:
             except OSError:
                 # Forcibly exit
                 # Regular sys.exit raises an exception
+                log.warning('The parent is not alive, exiting.')
                 os._exit(999)
