@@ -21,11 +21,9 @@ class NapalmLogsListenerProc(NapalmLogsProc):
     Listener sub-process class.
     '''
     def __init__(self,
-                 hostname,
-                 port,
+                 socket,
                  pipe):
-        self.hostname = hostname
-        self.port = port
+        self.socket = socket
         self.__pipe = pipe
         self.__up = False
 

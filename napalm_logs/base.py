@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 import os
 import yaml
 import time
+import socket
 import logging
 from multiprocessing import Process, Pipe
 
@@ -171,6 +172,8 @@ class NapalmLogs:
         open the socket to start receiving messages.
         '''
         # TODO prepare the binding to be able to listen to syslog messages
+        skt = None
+        # TODO
         log.info('Preparing the transport')
         self.transport.start()
         log.info('Starting child processes for each device type')
@@ -211,8 +214,7 @@ class NapalmLogs:
             )
         )
         log.debug('Starting the listener process')
-        listener = NapalmLogsListenerProc(self.hostname,
-                                          self.port,
+        listener = NapalmLogsListenerProc(skt,  # Socket object
                                           listen_pipe)
         self.plisten = Process(target=listener.start)
         self.plisten.start()
