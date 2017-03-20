@@ -80,7 +80,7 @@ class NapalmLogs:
                 'Unable to read from {path}: '
                 'the directory does not exist!'
             ).format(path=path)
-            log.error(msg)
+            self.log.error(msg)
             raise IOError(msg)
         files = os.listdir(path)
         # Read all files under the config dir
@@ -95,12 +95,12 @@ class NapalmLogs:
                 with open(filepath, 'r') as fstream:
                     config[filename] = yaml.load(fstream)
             except yaml.YAMLError as yamlexc:
-                log.error('Invalid YAML file: {}'.format(filepath))
-                log.error(yamlexc)
+                self.log.error('Invalid YAML file: {}'.format(filepath))
+                self.log.error(yamlexc)
                 raise IOError(yamlexc)
         if not config:
             msg = 'Unable to find proper configuration files under {path}'.format(path=path)
-            log.error(msg)
+            self.log.error(msg)
             raise IOError(msg)
         return config
 
@@ -116,12 +116,12 @@ class NapalmLogs:
                     os.path.dirname(os.path.realpath(__file__)),
                     'config'
                 )
-            log.info('Reading the configuration from {path}'.format(path=self.config_path))
+            self.log.info('Reading the configuration from {path}'.format(path=self.config_path))
             self.config_dict = self._load_config(self.config_path)
         if not self.extension_config_dict and self.extension_config_path:
             # When extension config is not sent as dict
             # But `extension_config_path` is specified
-            log.info('Reading extension configuration from {path}'.format(path=self.extension_config_path))
+            self.log.info('Reading extension configuration from {path}'.format(path=self.extension_config_path))
             self.extension_config_dict = self._load_config(self.extension_config_path)
         elif not self.extension_config_dict:
             self.extension_config_dict = {}
@@ -147,18 +147,18 @@ class NapalmLogs:
         open the socket to start receiving messages.
         '''
         # TODO prepare the binding to be able to listen to syslog messages
-        log.info('Preparing the transport')
+        self.log.info('Preparing the transport')
         self.transport.start()
-        log.info('Starting child processes for each device type')
+        self.log.info('Starting child processes for each device type')
         os_pipe_map = {}
         for device_os, device_config in self.config_dict.items():
             parent_pipe, child_pipe = Pipe()
-            log.debug('Initialized pipe for {dos}'.format(dos=device_os))
-            log.debug('Parent handle is {phandle} ({phash})'.format(phandle=str(parent_pipe),
+            self.log.debug('Initialized pipe for {dos}'.format(dos=device_os))
+            self.log.debug('Parent handle is {phandle} ({phash})'.format(phandle=str(parent_pipe),
                                                                     phash=hash(parent_pipe)))
-            log.debug('Child handle is {chandle} ({chash})'.format(chandle=str(child_pipe),
+            self.log.debug('Child handle is {chandle} ({chash})'.format(chandle=str(child_pipe),
                                                                     chash=hash(child_pipe)))
-            log.info('Starting the child process for {dos}'.format(dos=device_os))
+            self.log.info('Starting the child process for {dos}'.format(dos=device_os))
             dos = NapalmLogsDeviceProc(device_os,
                                        device_config,
                                        self.transport,
@@ -167,14 +167,14 @@ class NapalmLogs:
             os_pipe_map[device_os] = parent_pipe
             os_proc = Process(target=dos.start)
             os_proc.start()
-            log.debug('Started process {pname} for {dos}, having PID {pid}'.format(
+            self.log.debug('Started process {pname} for {dos}, having PID {pid}'.format(
                     pname=os_proc._name,
                     dos=device_os,
                     pid=os_proc.pid
                 )
             )
             self.__os_proc_map[device_os] = os_proc
-        log.info('Start listening to syslog messages')
+        self.log.info('Start listening to syslog messages')
         listen_pipe, serve_pipe = Pipe()
         server = NapalmLogsServerProc(serve_pipe,
                                       os_pipe_map,
@@ -182,7 +182,7 @@ class NapalmLogs:
                                       self.log)
         pserve = Process(target=server.start)
         pserve.start()
-        log.debug('Started server process as {pname} with PID {pid}'.format(
+        self.log.debug('Started server process as {pname} with PID {pid}'.format(
                 pname=pserve._name,
                 pid=pserve.pid
             )
@@ -193,7 +193,7 @@ class NapalmLogs:
                                           self.log)
         plisten = Process(target=listener.start)
         plisten.start()
-        log.debug('Started listener process as {pname} with PID {pid}'.format(
+        self.log.debug('Started listener process as {pname} with PID {pid}'.format(
                 pname=plisten._name,
                 pid=pserve.pid
             )
@@ -202,5 +202,5 @@ class NapalmLogs:
         plisten.join()
 
     def stop_engine(self):
-        log.info('Shutting down the engine')
+        self.log.info('Shutting down the engine')
         self.transport.tear_down()
