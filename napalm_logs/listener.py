@@ -5,7 +5,7 @@ napalm-logs listener worker process
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-# Import pythond std
+# Import pythond stdlib
 import os
 import threading
 
