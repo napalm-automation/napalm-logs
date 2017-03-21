@@ -37,7 +37,7 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         self.__up = True
         while self.__up:
             # TODO listen to messages on the syslog socket
-            msg = 'crap'
+            msg, _ = self.socket.recvfrom(1024) # TODO set the buffer size elsewhere
             self.__pipe.send(msg)
             # TODO only take the message and queue it directly
 

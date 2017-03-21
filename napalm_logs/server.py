@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 # Import pythond stdlib
 import os
 import logging
+import re
 import threading
 
 # Import napalm-logs pkgs
@@ -28,13 +29,61 @@ class NapalmLogsServerProc(NapalmLogsProc):
         self.__pipe = pipe
         self.__os_pipe_map = os_pipe_map
         self.__up = False
+        self.compiled_prefixes = None
+
+    def _compile_prefixes(self):
+        '''
+        Create a dict of all OS prefixes and their compiled regexs
+        '''
+        self.compiled_prefixes = {}
+        for dev_os, os_config in self.config.items():
+            if not os_config:
+                continue
+            values = os_config.get('prefix', {}).get('values', {})
+            line = os_config.get('prefix', {}).get('line', '')
+            # We will now figure out which position each value is in so we can use it with the match statement
+            position = {}
+            for key in values.keys():
+                position[line.find('{' + key + '}')] = key
+            sorted_position = {}
+            for i, elem in enumerate(sorted(position.items())):
+                sorted_position[elem[1]] = i + 1
+
+            # Escape the line, then remove the escape for the curly bracets so they can be used when formatting
+            escaped = re.escape(line).replace('\{', '{').replace('\}', '}')
+
+            # Add the message section to the end of the line
+            sorted_position['message'] = i + 1
+            escaped = '{}(.*)'.format(escaped)
+            self.compiled_prefixes[dev_os] = { 
+                'prefix': re.compile(escaped.format(**values)),
+                'prefix_positions': sorted_position,
+                'values': values,
+                'messages': {}
+                }
 
     def _identify_os(self, msg):
         '''
         Using the prefix of the syslog message,
         we are able to identify the operating system and then continue parsing.
         '''
-        return ('junos', 'crap')
+        ret = {}
+        for dev_os, data in self.compiled_prefixes.iteritems():
+            match = data.get('prefix', '').search(msg)
+            if not match:
+                continue
+            positions = data.get('prefix_positions', {}) 
+            mapping = data.get('mapping')
+            values = data.get('values')
+            ret = {}
+            for key in values.keys():
+                ret[key] = match.group(positions.get(key))
+            # TODO Should we stop searching and just return, or should we return all matches OS?
+            print dev_os, ret
+            return dev_os, ret
+
+        log.debug('No OS matched for: {}'.format(msg))
+        return '', ret
 
     def start(self):
         '''
@@ -42,6 +91,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
         inspect and identify the operating system,
         then queue the message correspondingly.
         '''
+        # try to compile the prefix regexs
+        self._compile_prefixes()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
@@ -49,15 +100,14 @@ class NapalmLogsServerProc(NapalmLogsProc):
         while self.__up:
             # Take messages from the main queue
             msg = self.__pipe.recv()
-            id_os = self._identify_os(msg)
-            if not id_os or not isinstance(id_os, tuple):
-                # _identify_os shoudl return a non-empty tuple
+            dev_os, msg_dict = self._identify_os(msg)
+            if not dev_os or not isinstance(msg_dict, dict):
+                # _identify_os shoudl return a string and a dict
                 # providing the info for the device OS
-                # and the core message
+                # and the decoded message prefix
                 continue
-            dev_os, core_msg = id_os
             # Then send the message in the right queue
-            self.__os_pipe_map[dev_os].send(core_msg)
+            self.__os_pipe_map[dev_os].send(msg_dict)
 
     def stop(self):
         self.__up = False

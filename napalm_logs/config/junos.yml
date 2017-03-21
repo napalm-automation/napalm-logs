@@ -1,0 +1,23 @@
+# You should not use special characture in the value keys
+prefix:
+  values:
+    date: (\w+ \d\d)
+    time: (\d\d:\d\d:\d\d)
+    host: ([^ ]+)
+    processName: (\w+)
+    processId: (\d+)
+    error: (\w+)
+  line: '{date} {time}  {host} {processName}[{processId}]: {error}: '
+
+messages:
+  BGP_PREFIX_THRESH_EXCEEDED:
+    values:
+      peer: (\d+\.\d+\.\d+\.\d+)
+      asn: (\d+)
+      limit: (\d+)
+    line: '{peer} (External AS {asn}): Configured maximum prefix-limit threshold({limit}) exceeded for inet-unicast nlri: 137 (instance master)'
+    model: oc-bgp
+    mapping:
+      peer: xxxx
+      asn: xxxx
+      limit: xxxx
