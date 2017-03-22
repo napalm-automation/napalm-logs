@@ -18,3 +18,9 @@ class UnableToBindException(NapalmLogsException):
     When the provided IP string is neither a valid IPv4 address or a valid IPv6 address
     '''
     pass
+
+class MissConfigurationException(NapalmLogsException):
+    '''
+    When the provided IP string is neither a valid IPv4 address or a valid IPv6 address
+    '''
+    pass
