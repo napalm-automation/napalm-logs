@@ -7,7 +7,7 @@ prefix:
     processName: (\w+)
     processId: (\d+)
     error: (\w+)
-  line: '{date} {time}  {host} {processName}[{processId}]: {error}: '
+  line: '{date} {time}  {host} {processName}[{processId}]:  {error}:'
 
 messages:
   BGP_PREFIX_THRESH_EXCEEDED:
