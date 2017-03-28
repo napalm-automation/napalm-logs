@@ -15,6 +15,8 @@ from napalm_logs.proc import NapalmLogsProc
 
 log = logging.getLogger(__name__)
 
+BUFFER_SIZE = 1024
+
 
 class NapalmLogsListenerProc(NapalmLogsProc):
     '''
@@ -36,10 +38,9 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         thread.start()
         self.__up = True
         while self.__up:
-            # TODO listen to messages on the syslog socket
-            msg = 'crap'
-            self.__pipe.send(msg)
-            # TODO only take the message and queue it directly
+            msg, addr = self.socket.recvfrom(BUFFER_SIZE)
+            # Addr contains (IP, port), we only care about the IP
+            self.__pipe.send((msg, addr[0]))
 
     def stop(self):
         self.__up = False

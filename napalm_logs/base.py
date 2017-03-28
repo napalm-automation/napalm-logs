@@ -7,28 +7,47 @@ from __future__ import unicode_literals
 
 # Import std lib
 import os
-import yaml
+import re
 import time
+import yaml
 import socket
 import logging
 from multiprocessing import Process, Pipe
 
 # Import napalm-logs pkgs
-import napalm_logs.exceptions
 from napalm_logs.transport import get_transport
 from napalm_logs.device import NapalmLogsDeviceProc
 from napalm_logs.server import NapalmLogsServerProc
 from napalm_logs.listener import NapalmLogsListenerProc
+from napalm_logs.exceptions import UnableToBindException
+from napalm_logs.exceptions import MissConfigurationException
 
 log = logging.getLogger(__name__)
+
+VALID_CONFIG = {
+    'prefix': {
+        'values': {
+            'error': basestring
+            },
+        'line': basestring
+        },
+    'messages': {
+        '*': {
+            'values': dict,
+            'line': basestring,
+            'model': basestring,
+            'mapping': dict
+            }
+        }
+    }
 
 
 class NapalmLogs:
     def __init__(self,
-                 hostname='0.0.0.0',
+                 address='0.0.0.0',
                  port=514,
                  transport='zmq',
-                 publish_hostname='0.0.0.0',
+                 publish_address='0.0.0.0',
                  publish_port=49017,
                  config_path=None,
                  config_dict=None,
@@ -39,15 +58,15 @@ class NapalmLogs:
         '''
         Init the napalm-logs engine.
 
-        :param hostname: The address to bind the syslog client. Default: 0.0.0.0.
+        :param address: The address to bind the syslog client. Default: 0.0.0.0.
         :param port: Listen port. Default: 514.
-        :param publish_hostname: The address to bing when publishing the OC
+        :param publish_address: The address to bing when publishing the OC
                                  objects. Default: 0.0.0.0.
         :param publish_port: Publish port. Default: 49017.
         '''
-        self.hostname = hostname
+        self.address = address
         self.port = port
-        self.publish_hostname = publish_hostname
+        self.publish_address = publish_address
         self.publish_port = publish_port
         self.config_path = config_path
         self.config_dict = config_dict
@@ -60,6 +79,7 @@ class NapalmLogs:
         self._setup_log()
         self._setup_transport()
         self._build_config()
+        self._verify_config()
         self._precompile_regex()
         # Private vars
         self.__os_proc_map = {}
@@ -92,7 +112,7 @@ class NapalmLogs:
         Setup the transport.
         '''
         transport_class = get_transport(self._transport_type)
-        self.transport = transport_class(self.publish_hostname,
+        self.transport = transport_class(self.publish_address,
                                          self.publish_port)
 
     def _load_config(self, path):
@@ -128,6 +148,61 @@ class NapalmLogs:
             log.error(msg)
             raise IOError(msg)
         return config
+
+    @staticmethod
+    def _raise_config_exception(error_string):
+        log.error(error_string, exc_info=True)
+        raise MissConfigurationException(error_string)
+
+    def _verify_config_key(self, key, value, valid, config, dev_os, key_path):
+        key_path.append(key)
+        if not config.get(key):
+            self._raise_config_exception('Unable to find key "{}" for {}'.format(':'.join(key_path), dev_os))
+        if isinstance(value, type):
+            if not isinstance(config[key], value):
+                self._raise_config_exception('Key "{}" for {} should be {}'.format(':'.join(key_path), dev_os, value))
+        elif isinstance(value, dict):
+            if not isinstance(config[key], dict):
+                self._raise_config_exception('Key "{}" for {} should be of type <dict>'.format(':'.join(key_path), dev_os))
+            self._verify_config_dict(value, config[key], dev_os, key_path)
+            # As we have already checked that the config below this point is correct, we know that "line" and "values"
+            # exists in the config if they are present in the valid config
+            if 'line' in value.keys() and 'values' in value.keys():
+                from_line = re.findall('\{(\w+)\}', config[key]['line'])
+                if set(from_line) != set(config[key]['values']):
+                    self._raise_config_exception('The "values" do not match variables in "line" for {} in {}'.format(':'.join(key_path), dev_os))
+        key_path.remove(key)
+
+    def _verify_config_dict(self, valid, config, dev_os, key_path=None):
+        if not key_path:
+            key_path = []
+        for key, value in valid.items():
+            # If the key is '*' then we should check all keys in the config to make sure they match the allowed values
+            if key == '*':
+                for config_key in config.keys():
+                    self._verify_config_key(config_key, value, valid, config, dev_os, key_path)
+            else:
+                self._verify_config_key(key, value, valid, config, dev_os, key_path)
+
+    def _verify_config(self):
+        '''
+        Verify that the config is correct
+        '''
+        if not self.config_dict:
+            self._raise_config_exception('No config found')
+
+
+        # Check for device conifg, if there isn't anything then just log, do not raise an exception
+        for dev_os, dev_config in self.config_dict.items():
+            if not dev_config:
+                log.error('No config found for {}'.format(dev_os))
+                continue
+
+            # Compare the valid opts with the conifg
+            self._verify_config_dict(VALID_CONFIG, dev_config, dev_os)
+
+        log.debug('Read the config without error \o/')
+
 
     def _build_config(self):
         '''
@@ -171,9 +246,18 @@ class NapalmLogs:
         Start the child processes (one per device OS),
         open the socket to start receiving messages.
         '''
-        # TODO prepare the binding to be able to listen to syslog messages
-        skt = None
-        # TODO
+        if ':' in self.address:
+            skt = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+        else:
+            skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        try:
+            skt.bind((self.address, self.port))
+        except socket.error, msg:
+            error_string = 'Unable to bind to port {} on {}: {}'.format(self.port, self.address, msg)
+            log.error(error_string, exc_info=True)
+            raise UnableToBindException(error_string)
+
         log.info('Preparing the transport')
         self.transport.start()
         log.info('Starting child processes for each device type')
