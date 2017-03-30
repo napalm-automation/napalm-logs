@@ -15,12 +15,24 @@ class NapalmLogsException(Exception):
 
 class UnableToBindException(NapalmLogsException):
     '''
-    When the provided IP string is neither a valid IPv4 address or a valid IPv6 address
+    We are unable to bind to the specified ip / port
     '''
     pass
 
 class MissConfigurationException(NapalmLogsException):
     '''
-    When the provided IP string is neither a valid IPv4 address or a valid IPv6 address
+    The configuration does not match the valid config template
+    '''
+    pass
+
+class UnknownOpenConfigModel(NapalmLogsException):
+    '''
+    We are unable to log a model via napalm-yang
+    '''
+    pass
+
+class OpenConfigPathError(NapalmLogsException):
+    '''
+    We are unable to set the open config path specified
     '''
     pass

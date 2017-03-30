@@ -10,10 +10,14 @@ import os
 import re
 import logging
 import threading
+import napalm_yang
+from datetime import datetime
 
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import DEFAULT_DELIM
+from napalm_logs.exceptions import OpenConfigPathError
+from napalm_logs.exceptions import UnknownOpenConfigModel
 
 log = logging.getLogger(__name__)
 
@@ -49,8 +53,10 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         if not self._config:
             return
         for message_name, data in self._config.get('messages', {}).items():
-            values = data.get('values', {})
-            line = data.get('line', '')
+            values = data['values']
+            line = data['line']
+            model = data['model']
+            mapping = data['mapping']
 
             # We will now figure out which position each value is in so we can use it with the match statement
             position = {}
@@ -66,7 +72,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             self.compiled_messages[message_name] = {
                 'line': re.compile(escaped.format(**values)),
                 'positions': sorted_position,
-                'values': values
+                'values': values,
+                'model': model,
+                'mapping': mapping
                 }
 
     def _parse(self, msg_dict):
@@ -89,7 +97,10 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             return
         positions = regex_data.get('positions', {})
         values = regex_data.get('values')
-        ret = {}
+        ret = {
+            'oc_model': regex_data['model'],
+            'oc_mapping': regex_data['mapping']
+            }
         for key in values.keys():
             ret[key] = match.group(positions.get(key))
         return ret
@@ -169,13 +180,47 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         Emit an OpenConfig object given a certain combination of
         fields mappeed in the config to the corresponding hierarchy.
         '''
-        pass
+        # Load the appropriate OC model
+        oc_obj = napalm_yang.base.Root()
+        try:
+            oc_obj.add_model(getattr(napalm_yang.models, kwargs['oc_model']))
+        except AttributeError:
+            error_string = 'Unable to load openconfig module {}, please make sure the config is correct'.format(kwargs['oc_model'])
+            log.error(error_string, exc_info=True)
+            raise UnknownOpenConfigModel(error_string)
+
+        oc_dict = {}
+        for result_key, mapping in kwargs['oc_mapping'].items():
+            result = kwargs[result_key]
+            oc_dict = self._setval(mapping.format(**kwargs), result, oc_dict)
+        try:
+            oc_obj.load_dict(oc_dict)
+        except AttributeError:
+            error_string = 'Error whilst mapping to open config, please check that the mappings are correct for {}'.format(self._name)
+            log.error(error_string, exc_info=True)
+            raise OpenConfigPathError(error_string)
+
+        return oc_obj.get(filter=True)
 
     def _publish(self, obj):
         '''
         Publish the OC object.
         '''
         self._transport.publish(obj)
+
+    def _format_time(self, time, date):
+        # TODO can we work out the time format from the regex? Probably but this is a task for another day
+        time_format = self._config['prefix'].get('time_format', '')
+        if not time or not date or not time_format:
+            return datetime.now().strftime('%s')
+        # Most syslog do not include the year, so we will add the current year if we are not supplied with one
+        if '%y' in date or '%Y' in date:
+            timestamp = datetime.strptime('{} {}'.format(date, time), time_format)
+        else:
+            year = datetime.now().year
+            timestamp = datetime.strptime('{} {} {}'.format(year, date, time), '%Y {}'.format(time_format))
+        return timestamp.strftime('%s')
+
 
     def start(self):
         '''
@@ -188,9 +233,21 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         while self.__up:
             msg_dict, address = self._pipe.recv()
             # # Will wait till a message is available
-            # oc_obj = self._emit(self, **kwargs)
-            # self._publish(oc_obj)
             kwargs = self._parse(msg_dict)
+            if not kwargs:
+                continue
+            oc_obj = self._emit(**kwargs)
+            host = msg_dict.get('host')
+            timestamp = self._format_time(msg_dict.get('time', ''), msg_dict.get('date', ''))
+            to_publish = {
+                'host': host,
+                'ip': address,
+                'timestamp': timestamp,
+                'open_config': oc_obj,
+                'message_details': msg_dict
+                }
+            self._publish(to_publish)
+                
 
     def stop(self):
         '''
