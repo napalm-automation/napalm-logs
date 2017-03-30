@@ -100,6 +100,7 @@ class NLOptionParser(OptionParser, object):
         self.add_option(
             '-p', '--port',
             dest='port',
+            type=int,
             help=('Listener bind port. Default: {0}'.format(defaults.PORT))
         )
         self.add_option(
@@ -116,6 +117,7 @@ class NLOptionParser(OptionParser, object):
         self.add_option(
             '--publish-port',
             dest='publish_port',
+            type=int,
             help=('Publisher bind port. Default: {0}'.format(defaults.PUBLISH_PORT))
         )
         self.add_option(
