@@ -174,17 +174,13 @@ class NapalmLogs:
         '''
         if not self.config_dict:
             self._raise_config_exception('No config found')
-
-
         # Check for device conifg, if there isn't anything then just log, do not raise an exception
         for dev_os, dev_config in self.config_dict.items():
             if not dev_config:
-                log.error('No config found for {}'.format(dev_os))
+                log.warning('No config found for {}'.format(dev_os))
                 continue
-
             # Compare the valid opts with the conifg
             self._verify_config_dict(VALID_CONFIG, dev_config, dev_os)
-
         log.debug('Read the config without error \o/')
 
 
