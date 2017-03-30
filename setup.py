@@ -15,7 +15,7 @@ reqs = [str(ir.req) for ir in install_reqs]
 
 setup(
     name='napalm-logs',
-    version='0.1.0',
+    version='0.0.1a0.dev5',
     packages=find_packages(),
     author='Mircea Ulinic',
     author_email='mircea.ulinic@gmail.com',
@@ -36,6 +36,7 @@ setup(
     install_requires=reqs,
     entry_points={
         'console_scripts': [
+            'napalm-logs=napalm_logs.scripts.napalm_logs'
         ],
     }
 )
