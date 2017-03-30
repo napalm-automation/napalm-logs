@@ -13,26 +13,32 @@ class NapalmLogsException(Exception):
         super(NapalmLogsException, self).__init__(msg)
         self.strerror = msg
 
-class UnableToBindException(NapalmLogsException):
+
+class BindException(NapalmLogsException):
     '''
-    We are unable to bind to the specified ip / port
+    Exception raised when unable to bind the listener to the specified IP
+    address / port. Either the values are not correct, either another processs
+    is already using them.
     '''
     pass
 
-class MissConfigurationException(NapalmLogsException):
+
+class ConfigurationException(NapalmLogsException):
     '''
-    The configuration does not match the valid config template
+    Exception thrown when the user configuration is not correct.
     '''
     pass
+
 
 class UnknownOpenConfigModel(NapalmLogsException):
     '''
-    We are unable to log a model via napalm-yang
+    Unable to log a model via napalm-yang
     '''
     pass
 
+
 class OpenConfigPathError(NapalmLogsException):
     '''
-    We are unable to set the open config path specified
+    Unable to set the open config path specified.
     '''
     pass

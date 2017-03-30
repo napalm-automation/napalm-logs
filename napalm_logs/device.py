@@ -16,7 +16,7 @@ from datetime import datetime
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import DEFAULT_DELIM
-from napalm_logs.exceptions import OpenConfigPathError
+from napalm_logs.exceptions import OpenConfigPathException
 from napalm_logs.exceptions import UnknownOpenConfigModel
 
 log = logging.getLogger(__name__)
@@ -198,7 +198,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         except AttributeError:
             error_string = 'Error whilst mapping to open config, please check that the mappings are correct for {}'.format(self._name)
             log.error(error_string, exc_info=True)
-            raise OpenConfigPathError(error_string)
+            raise OpenConfigPathException(error_string)
 
         return oc_obj.get(filter=True)
 
@@ -220,7 +220,6 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             year = datetime.now().year
             timestamp = datetime.strptime('{} {} {}'.format(year, date, time), '%Y {}'.format(time_format))
         return timestamp.strftime('%s')
-
 
     def start(self):
         '''
@@ -247,7 +246,6 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'message_details': msg_dict
                 }
             self._publish(to_publish)
-                
 
     def stop(self):
         '''
