@@ -100,6 +100,7 @@ class NLOptionParser(OptionParser, object):
         self.add_option(
             '-p', '--port',
             dest='port',
+            type=int,
             help=('Listener bind port. Default: {0}'.format(defaults.PORT))
         )
         self.add_option(
@@ -116,6 +117,7 @@ class NLOptionParser(OptionParser, object):
         self.add_option(
             '--publish-port',
             dest='publish_port',
+            type=int,
             help=('Publisher bind port. Default: {0}'.format(defaults.PUBLISH_PORT))
         )
         self.add_option(
@@ -180,7 +182,7 @@ class NLOptionParser(OptionParser, object):
         return cfg
 
 
-if __name__ == '__main__':
+def main():
     if '' in sys.path:
         sys.path.remove('')
     # Temporarily will forward the log entries to the screen
@@ -193,3 +195,7 @@ if __name__ == '__main__':
     config = nlop.parse(screen)
     nl = napalm_logs.NapalmLogs(**config)
     nl.start_engine()
+
+if __name__ == '__main__':
+    main()
+
