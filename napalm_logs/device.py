@@ -13,6 +13,7 @@ import threading
 
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
+from napalm_logs.config import DEFAULT_DELIM
 
 log = logging.getLogger(__name__)
 
@@ -93,6 +94,75 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             ret[key] = match.group(positions.get(key))
         return ret
 
+    @staticmethod
+    def _setval(key, val, dict_=None):
+        '''
+        Set a value under the dictionary hierarchy identified
+        under the key. The target 'foo/bar/baz' returns the
+        dictionary hierarchy {'foo': {'bar': {'baz': {}}}}.
+
+        .. note::
+
+            Currently this doesn't work with integers, i.e.
+            cannot build lists dynamically.
+            TODO
+        '''
+        if not dict_:
+            dict_ = {}
+        prev_hier = dict_
+        dict_hier = key.split(DEFAULT_DELIM)
+        for each in dict_hier[:-1]:
+            try:
+                idx = int(each)
+            except ValueError:
+                # not int
+                if each not in prev_hier:
+                    prev_hier[each] = {}
+                prev_hier = prev_hier[each]
+            else:
+                prev_hier[each] = [{}]
+                prev_hier = prev_hier[each]
+        prev_hier[dict_hier[-1]] = val
+        return dict_
+
+    @staticmethod
+    def _traverse(data, key):
+        '''
+        Traverse a dict or list using a slash delimiter target string.
+        The target 'foo/bar/0' will return data['foo']['bar'][0] if
+        this value exists, otherwise will return empty dict.
+        Return None when not found.
+        This can be used to verify if a certain key exists under
+        dictionary hierarchy.
+        '''
+        for each in key.split(DEFAULT_DELIM):
+            if isinstance(data, list):
+                try:
+                    idx = int(each)
+                except ValueError:
+                    embed_match = False
+                    # Index was not numeric, lets look at any embedded dicts
+                    for embedded in (x for x in data if isinstance(x, dict)):
+                        try:
+                            data = embedded[each]
+                            embed_match = True
+                            break
+                        except KeyError:
+                            pass
+                    if not embed_match:
+                        # No embedded dicts matched
+                        return None
+                else:
+                    try:
+                        data = data[idx]
+                    except IndexError:
+                        return None
+            else:
+                try:
+                    data = data[each]
+                except (KeyError, TypeError):
+                    return None
+        return data
 
     def _emit(self, **kwargs):
         '''
@@ -121,7 +191,6 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             # oc_obj = self._emit(self, **kwargs)
             # self._publish(oc_obj)
             kwargs = self._parse(msg_dict)
-
 
     def stop(self):
         '''

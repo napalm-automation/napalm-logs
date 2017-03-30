@@ -15,6 +15,7 @@ import logging
 from multiprocessing import Process, Pipe
 
 # Import napalm-logs pkgs
+from napalm_logs.config import VALID_CONFIG
 from napalm_logs.transport import get_transport
 from napalm_logs.device import NapalmLogsDeviceProc
 from napalm_logs.server import NapalmLogsServerProc
@@ -23,23 +24,6 @@ from napalm_logs.exceptions import UnableToBindException
 from napalm_logs.exceptions import MissConfigurationException
 
 log = logging.getLogger(__name__)
-
-VALID_CONFIG = {
-    'prefix': {
-        'values': {
-            'error': basestring
-            },
-        'line': basestring
-        },
-    'messages': {
-        '*': {
-            'values': dict,
-            'line': basestring,
-            'model': basestring,
-            'mapping': dict
-            }
-        }
-    }
 
 
 class NapalmLogs:
