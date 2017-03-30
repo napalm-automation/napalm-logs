@@ -1,5 +1,6 @@
 # You should not use special characture in the value keys
 prefix:
+  time_format: "%b %d %H:%M:%S"
   values:
     date: (\w+ \d\d)
     time: (\d\d:\d\d:\d\d)
@@ -7,7 +8,7 @@ prefix:
     processName: (\w+)
     processId: (\d+)
     error: (\w+)
-  line: '{date} {time}  {host} {processName}[{processId}]:  {error}:'
+  line: '{date} {time}  {host} {processName}[{processId}]: {error}: '
 
 messages:
   BGP_PREFIX_THRESH_EXCEEDED:
@@ -15,9 +16,12 @@ messages:
       peer: (\d+\.\d+\.\d+\.\d+)
       asn: (\d+)
       limit: (\d+)
-    line: '{peer} (External AS {asn}): Configured maximum prefix-limit threshold({limit}) exceeded for inet-unicast nlri: 137 (instance master)'
-    model: oc-bgp
+      current: (\d+)
+      table: (\w+)
+      type: (\w+)
+    line: '{peer} (External AS {asn}): Configured maximum prefix-limit threshold({limit}) exceeded for {table}-{type} nlri: {current} (instance master)'
+    model: openconfig_bgp
     mapping:
-      peer: xxxx
-      asn: xxxx
-      limit: xxxx
+      asn: bgp/neighbors/neighbor/{peer}/state/peer_as
+      current: bgp/neighbors/neighbor/{peer}/afi_safis/afi_safi/{table}/state/prefixes/received
+      limit: bgp/neighbors/neighbor/{peer}/afi_safis/afi_safi/{table}/ipv4_{type}/prefix_limit/state/max_prefixes
