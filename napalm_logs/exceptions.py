@@ -37,7 +37,7 @@ class UnknownOpenConfigModel(NapalmLogsException):
     pass
 
 
-class OpenConfigPathError(NapalmLogsException):
+class OpenConfigPathException(NapalmLogsException):
     '''
     Unable to set the open config path specified.
     '''
