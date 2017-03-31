@@ -42,3 +42,10 @@ class OpenConfigPathException(NapalmLogsException):
     Unable to set the open config path specified.
     '''
     pass
+
+
+class NapalmLogsExit(NapalmLogsException):
+    '''
+    Raised on unexpected exit.
+    '''
+    pass
