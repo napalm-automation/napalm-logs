@@ -10,8 +10,10 @@ import os
 import re
 import logging
 import threading
-import napalm_yang
 from datetime import datetime
+
+# Import thrid party libs
+import napalm_yang
 
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
@@ -185,7 +187,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         try:
             oc_obj.add_model(getattr(napalm_yang.models, kwargs['oc_model']))
         except AttributeError:
-            error_string = 'Unable to load openconfig module {}, please make sure the config is correct'.format(kwargs['oc_model'])
+            error_string = 'Unable to load openconfig module {0},'
+                           ' please make sure the config is correct'.format(kwargs['oc_model'])
             log.error(error_string, exc_info=True)
             raise UnknownOpenConfigModel(error_string)
 
@@ -196,7 +199,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         try:
             oc_obj.load_dict(oc_dict)
         except AttributeError:
-            error_string = 'Error whilst mapping to open config, please check that the mappings are correct for {}'.format(self._name)
+            error_string = 'Error whilst mapping to open config, '
+                           'please check that the mappings are correct for {0}'.format(self._name)
             log.error(error_string, exc_info=True)
             raise OpenConfigPathException(error_string)
 
@@ -244,7 +248,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'timestamp': timestamp,
                 'open_config': oc_obj,
                 'message_details': msg_dict
-                }
+            }
             self._publish(to_publish)
 
     def stop(self):

@@ -11,11 +11,10 @@ import logging
 import threading
 
 # Import napalm-logs pkgs
+from napalm_logs.config import BUFFER_SIZE
 from napalm_logs.proc import NapalmLogsProc
 
 log = logging.getLogger(__name__)
-
-BUFFER_SIZE = 1024
 
 
 class NapalmLogsListenerProc(NapalmLogsProc):

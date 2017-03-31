@@ -65,7 +65,6 @@ class NapalmLogs:
         self._setup_transport()
         self._build_config()
         self._verify_config()
-        self._precompile_regex()
         # Private vars
         self.__os_proc_map = {}
 
@@ -178,7 +177,6 @@ class NapalmLogs:
             self._verify_config_dict(VALID_CONFIG, dev_config, dev_os)
         log.debug('Read the config without error \o/')
 
-
     def _build_config(self):
         '''
         Build the config of the napalm syslog parser.
@@ -209,11 +207,18 @@ class NapalmLogs:
                 continue
             self.config_dict[nos].update(nos_config)
 
-    def _precompile_regex(self):
+    def _respawn_when_dead(self, pid, start_fun, shut_fun=None):
         '''
-        Go through the configuration and precompile all regular expressions,
-        so the parsing should be faster.
+        Restart a process when dead.
+        Requires a thread checking the status using the PID:
+        if not alive anymore, restart.
+
+        :param pid: The process ID.
+        :param start_fun: The process start function.
+        :param shut_fun: the process shutdown function. Not mandatory.
         '''
+        # TODO
+        # TODO requires a fun per process type: server, listener, device
         pass
 
     def start_engine(self):
@@ -261,6 +266,10 @@ class NapalmLogs:
             self.__os_proc_map[device_os] = os_proc
         log.debug('Setting up the syslog pipe')
         serve_pipe, listen_pipe = Pipe(duplex=False)
+        log.debug('Serve handle is {shandle} ({shash})'.format(shandle=str(serve_pipe),
+                                                               shash=hash(serve_pipe)))
+        log.debug('Listen handle is {lhandle} ({lhash})'.format(lhandle=str(listen_pipe),
+                                                                lhash=hash(listen_pipe)))
         log.debug('Starting the server process')
         server = NapalmLogsServerProc(serve_pipe,
                                       os_pipe_map,
