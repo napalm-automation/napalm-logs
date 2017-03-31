@@ -27,6 +27,8 @@ LOGGING_LEVEL = {
     'critical': logging.CRITICAL
 }
 
+BUFFER_SIZE = 1024
+
 DEFAULT_DELIM = '/'
 
 VALID_CONFIG = {
