@@ -177,7 +177,6 @@ class NapalmLogs:
             self._verify_config_dict(VALID_CONFIG, dev_config, dev_os)
         log.debug('Read the config without error \o/')
 
-
     def _build_config(self):
         '''
         Build the config of the napalm syslog parser.
@@ -207,6 +206,20 @@ class NapalmLogs:
                 self.config_dict[nos] = nos_config
                 continue
             self.config_dict[nos].update(nos_config)
+
+    def _respawn_when_dead(self, pid, start_fun, shut_fun=None):
+        '''
+        Restart a process when dead.
+        Requires a thread checking the status using the PID:
+        if not alive anymore, restart.
+
+        :param pid: The process ID.
+        :param start_fun: The process start function.
+        :param shut_fun: the process shutdown function. Not mandatory.
+        '''
+        # TODO
+        # TODO requires a fun per process type: server, listener, device
+        pass
 
     def start_engine(self):
         '''
