@@ -74,9 +74,6 @@ class NapalmLogs:
             log.error('Exiting due to unhandled exception', exc_info=True)
             self.__raise_clean_exception(exc_type, exc_value, exc_traceback)
 
-    def __del__(self):
-        self.stop_engine()
-
     def _setup_log(self):
         '''
         Setup the log object.

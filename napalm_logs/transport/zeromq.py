@@ -43,9 +43,10 @@ class ZMQTransport(TransportBase):
         return json.dumps(obj)
 
     def publish(self, obj):
-        self.socket.send(
-            self.serialise(obj)
-        )
+        log.debug('Sending object:')
+        serialised_obj = self.serialise(obj)
+        log.debug(serialised_obj)
+        self.socket.send(serialised_obj)
 
     def tear_down(self):
         if hasattr(self, 'socket'):
