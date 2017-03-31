@@ -182,7 +182,7 @@ class NLOptionParser(OptionParser, object):
         return cfg
 
 
-def main():
+def napalm_logs_engine():
     if '' in sys.path:
         sys.path.remove('')
     # Temporarily will forward the log entries to the screen
@@ -196,6 +196,6 @@ def main():
     nl = napalm_logs.NapalmLogs(**config)
     nl.start_engine()
 
-if __name__ == '__main__':
-    main()
 
+if __name__ == '__main__':
+    napalm_logs_engine()

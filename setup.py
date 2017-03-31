@@ -36,7 +36,7 @@ setup(
     install_requires=reqs,
     entry_points={
         'console_scripts': [
-            'napalm-logs=napalm_logs.scripts.cli:main'
+            'napalm-logs=napalm_logs.scripts.cli:napalm_logs_engine'
         ],
     }
 )
