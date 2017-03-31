@@ -4,6 +4,9 @@ napalm-logs is a Python library that listens to syslog messages from network
 devices and returns strucuted data in an [OpenConfig](http://www.openconfig.net/)
 format.
 
+
+<img src="logo.png" data-canonical-src="logo.png" width="300" />
+
 The outgoing objects are published via ZeroMQ or other usual transport
 options. It is easy enough to switch between transports and pluggable to add
 others such as Kafka, ZeroMQ etc.
