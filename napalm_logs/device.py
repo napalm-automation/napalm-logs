@@ -187,7 +187,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         try:
             oc_obj.add_model(getattr(napalm_yang.models, kwargs['oc_model']))
         except AttributeError:
-            error_string = 'Unable to load openconfig module {0},'
+            error_string = 'Unable to load openconfig module {0},' \
                            ' please make sure the config is correct'.format(kwargs['oc_model'])
             log.error(error_string, exc_info=True)
             raise UnknownOpenConfigModel(error_string)
@@ -199,7 +199,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         try:
             oc_obj.load_dict(oc_dict)
         except AttributeError:
-            error_string = 'Error whilst mapping to open config, '
+            error_string = 'Error whilst mapping to open config, ' \
                            'please check that the mappings are correct for {0}'.format(self._name)
             log.error(error_string, exc_info=True)
             raise OpenConfigPathException(error_string)
