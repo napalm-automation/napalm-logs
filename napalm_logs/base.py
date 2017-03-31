@@ -209,13 +209,6 @@ class NapalmLogs:
                 continue
             self.config_dict[nos].update(nos_config)
 
-    def _precompile_regex(self):
-        '''
-        Go through the configuration and precompile all regular expressions,
-        so the parsing should be faster.
-        '''
-        pass
-
     def start_engine(self):
         '''
         Start the child processes (one per device OS),
