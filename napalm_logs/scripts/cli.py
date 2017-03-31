@@ -195,7 +195,11 @@ def napalm_logs_engine():
     nlop = NLOptionParser()
     config = nlop.parse(screen)
     nl = napalm_logs.NapalmLogs(**config)
-    nl.start_engine()
+    try:
+        nl.start_engine()
+    except KeyboardInterrupt:
+        log.warning('Exiting on Ctrl-c')
+        nl.stop_engine()
 
 
 if __name__ == '__main__':
