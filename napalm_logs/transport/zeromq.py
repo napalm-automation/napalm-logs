@@ -7,12 +7,16 @@ from __future__ import unicode_literals
 
 # Import stdlib
 import json
+import logging
 
 # Import third party libs
 import zmq
 
 # Import napalm-logs pkgs
+from napalm_logs.exceptions import BindException
 from napalm_logs.transport.base import TransportBase
+
+log = logging.getLogger(__name__)
 
 
 class ZMQTransport(TransportBase):
@@ -26,10 +30,14 @@ class ZMQTransport(TransportBase):
     def start(self):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.PUB)
-        self.socket.bind('tcp://{addr}:{port}'.format(
-            addr=self.addr,
-            port=self.port)
-        )
+        try:
+            self.socket.bind('tcp://{addr}:{port}'.format(
+                addr=self.addr,
+                port=self.port)
+            )
+        except zmq.error.ZMQError as err:
+            log.error(err, exc_info=True)
+            raise BindException(err)
 
     def serialise(self, obj):
         return json.dumps(obj)

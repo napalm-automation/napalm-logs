@@ -16,12 +16,13 @@ from multiprocessing import Process, Pipe
 
 # Import napalm-logs pkgs
 from napalm_logs.config import VALID_CONFIG
+from napalm_logs.config import LOGGING_LEVEL
 from napalm_logs.transport import get_transport
 from napalm_logs.device import NapalmLogsDeviceProc
 from napalm_logs.server import NapalmLogsServerProc
 from napalm_logs.listener import NapalmLogsListenerProc
-from napalm_logs.exceptions import UnableToBindException
-from napalm_logs.exceptions import MissConfigurationException
+from napalm_logs.exceptions import BindException
+from napalm_logs.exceptions import ConfigurationException
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ class NapalmLogs:
                  extension_config_path=None,
                  extension_config_dict=None,
                  log_level='warning',
-                 log_fmt='%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'):
+                 log_format='%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'):
         '''
         Init the napalm-logs engine.
 
@@ -58,13 +59,12 @@ class NapalmLogs:
         self.extension_config_path = extension_config_path
         self.extension_config_dict = extension_config_dict
         self.log_level = log_level
-        self.log_fmt = log_fmt
+        self.log_format = log_format
         # Setup the environment
         self._setup_log()
         self._setup_transport()
         self._build_config()
         self._verify_config()
-        self._precompile_regex()
         # Private vars
         self.__os_proc_map = {}
 
@@ -81,14 +81,8 @@ class NapalmLogs:
         '''
         Setup the log object.
         '''
-        logging_level = {
-            'debug': logging.DEBUG,
-            'info': logging.INFO,
-            'warning': logging.WARNING,
-            'error': logging.ERROR,
-            'critical': logging.CRITICAL
-        }.get(self.log_level.lower())
-        logging.basicConfig(format=self.log_fmt,
+        logging_level = LOGGING_LEVEL.get(self.log_level.lower())
+        logging.basicConfig(format=self.log_format,
                             level=logging_level)
 
     def _setup_transport(self):
@@ -136,7 +130,7 @@ class NapalmLogs:
     @staticmethod
     def _raise_config_exception(error_string):
         log.error(error_string, exc_info=True)
-        raise MissConfigurationException(error_string)
+        raise ConfigurationException(error_string)
 
     def _verify_config_key(self, key, value, valid, config, dev_os, key_path):
         key_path.append(key)
@@ -174,19 +168,14 @@ class NapalmLogs:
         '''
         if not self.config_dict:
             self._raise_config_exception('No config found')
-
-
         # Check for device conifg, if there isn't anything then just log, do not raise an exception
         for dev_os, dev_config in self.config_dict.items():
             if not dev_config:
-                log.error('No config found for {}'.format(dev_os))
+                log.warning('No config found for {}'.format(dev_os))
                 continue
-
             # Compare the valid opts with the conifg
             self._verify_config_dict(VALID_CONFIG, dev_config, dev_os)
-
         log.debug('Read the config without error \o/')
-
 
     def _build_config(self):
         '''
@@ -218,11 +207,18 @@ class NapalmLogs:
                 continue
             self.config_dict[nos].update(nos_config)
 
-    def _precompile_regex(self):
+    def _respawn_when_dead(self, pid, start_fun, shut_fun=None):
         '''
-        Go through the configuration and precompile all regular expressions,
-        so the parsing should be faster.
+        Restart a process when dead.
+        Requires a thread checking the status using the PID:
+        if not alive anymore, restart.
+
+        :param pid: The process ID.
+        :param start_fun: The process start function.
+        :param shut_fun: the process shutdown function. Not mandatory.
         '''
+        # TODO
+        # TODO requires a fun per process type: server, listener, device
         pass
 
     def start_engine(self):
@@ -240,7 +236,7 @@ class NapalmLogs:
         except socket.error, msg:
             error_string = 'Unable to bind to port {} on {}: {}'.format(self.port, self.address, msg)
             log.error(error_string, exc_info=True)
-            raise UnableToBindException(error_string)
+            raise BindException(error_string)
 
         log.info('Preparing the transport')
         self.transport.start()
@@ -270,6 +266,10 @@ class NapalmLogs:
             self.__os_proc_map[device_os] = os_proc
         log.debug('Setting up the syslog pipe')
         serve_pipe, listen_pipe = Pipe(duplex=False)
+        log.debug('Serve handle is {shandle} ({shash})'.format(shandle=str(serve_pipe),
+                                                               shash=hash(serve_pipe)))
+        log.debug('Listen handle is {lhandle} ({lhash})'.format(lhandle=str(listen_pipe),
+                                                                lhash=hash(listen_pipe)))
         log.debug('Starting the server process')
         server = NapalmLogsServerProc(serve_pipe,
                                       os_pipe_map,

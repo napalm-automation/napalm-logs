@@ -13,14 +13,39 @@ class NapalmLogsException(Exception):
         super(NapalmLogsException, self).__init__(msg)
         self.strerror = msg
 
-class UnableToBindException(NapalmLogsException):
+
+class BindException(NapalmLogsException):
     '''
-    When the provided IP string is neither a valid IPv4 address or a valid IPv6 address
+    Exception raised when unable to bind the listener to the specified IP
+    address / port. Either the values are not correct, either another processs
+    is already using them.
     '''
     pass
 
-class MissConfigurationException(NapalmLogsException):
+
+class ConfigurationException(NapalmLogsException):
     '''
-    When the provided IP string is neither a valid IPv4 address or a valid IPv6 address
+    Exception thrown when the user configuration is not correct.
+    '''
+    pass
+
+
+class UnknownOpenConfigModel(NapalmLogsException):
+    '''
+    Unable to log a model via napalm-yang
+    '''
+    pass
+
+
+class OpenConfigPathException(NapalmLogsException):
+    '''
+    Unable to set the open config path specified.
+    '''
+    pass
+
+
+class NapalmLogsExit(NapalmLogsException):
+    '''
+    Raised on unexpected exit.
     '''
     pass
