@@ -75,13 +75,13 @@ class NLOptionParser(OptionParser, object):
             dest='config_file',
             help=('Config file absolute path. Default: {0}'.format(defaults.CONFIG_FILE))
         )
-        self.add_option(
-            '-d', '--daemon',
-            default=True,
-            dest='daemon',
-            action='store_true',
-            help='Run the {0} as a daemon. Default: %default'.format(self.get_prog_name())
-        )
+        # self.add_option(
+        #     '-d', '--daemon',
+        #     default=True,
+        #     dest='daemon',
+        #     action='store_true',
+        #     help='Run the {0} as a daemon. Default: %default'.format(self.get_prog_name())
+        # )
         self.add_option(
             '-a', '--address',
             dest='address',
