@@ -65,7 +65,6 @@ class NapalmLogs:
         self._setup_transport()
         self._build_config()
         self._verify_config()
-        self._precompile_regex()
         # Private vars
         self.__os_proc_map = {}
 
@@ -254,6 +253,10 @@ class NapalmLogs:
             self.__os_proc_map[device_os] = os_proc
         log.debug('Setting up the syslog pipe')
         serve_pipe, listen_pipe = Pipe(duplex=False)
+        log.debug('Serve handle is {shandle} ({shash})'.format(shandle=str(serve_pipe),
+                                                               shash=hash(serve_pipe)))
+        log.debug('Listen handle is {lhandle} ({lhash})'.format(lhandle=str(listen_pipe),
+                                                                lhash=hash(listen_pipe)))
         log.debug('Starting the server process')
         server = NapalmLogsServerProc(serve_pipe,
                                       os_pipe_map,
