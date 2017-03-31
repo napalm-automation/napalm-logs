@@ -16,3 +16,5 @@ deploy:
     tags: true
     repo: napalm-automation/napalm-logs
     branch: master
+script:
+  - echo "TODO"
