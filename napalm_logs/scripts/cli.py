@@ -156,16 +156,17 @@ class NLOptionParser(OptionParser, object):
         config_file_path = self.options.config_file or defaults.CONFIG_FILE
         file_cfg = self.read_config_file(config_file_path)
         log_file = self.options.log_file or file_cfg.get('log_file') or defaults.LOG_FILE
-        log_file_dir = os.path.dirname(log_file)
-        if not os.path.isdir(log_file_dir):
-            log.warning('{0} does not exist, trying to create'.format(log_file_dir))
-            try:
-                os.mkdir(log_file_dir)
-            except OSError:
-                log.error('Unable to create {0}'.format(log_file_dir), exc_info=True)
-                sys.exit(0)
-        log.removeHandler(screen_handler)  # remove printing to the screen
-        logging.basicConfig(filename=log_file)  # log to file
+        if log_file.lower() not in defaults.LOG_FILE_CLI_OPTIONS:
+            log_file_dir = os.path.dirname(log_file)
+            if not os.path.isdir(log_file_dir):
+                log.warning('{0} does not exist, trying to create'.format(log_file_dir))
+                try:
+                    os.mkdir(log_file_dir)
+                except OSError:
+                    log.error('Unable to create {0}'.format(log_file_dir), exc_info=True)
+                    sys.exit(0)
+            log.removeHandler(screen_handler)  # remove printing to the screen
+            logging.basicConfig(filename=log_file)  # log to file
         cfg = {
             'address': self.options.address or file_cfg.get('address') or defaults.ADDRESS,
             'port': self.options.port or file_cfg.get('port') or defaults.PORT,
