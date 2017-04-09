@@ -17,6 +17,8 @@ from multiprocessing import Process, Pipe
 # Import napalm-logs pkgs
 from napalm_logs.config import VALID_CONFIG
 from napalm_logs.config import LOGGING_LEVEL
+from napalm_logs.transport import get_transport
+from napalm_logs.auth import NapalmLogsAuthProc
 from napalm_logs.device import NapalmLogsDeviceProc
 from napalm_logs.server import NapalmLogsServerProc
 from napalm_logs.listener import NapalmLogsListenerProc
@@ -34,6 +36,8 @@ class NapalmLogs:
                  transport='zmq',
                  publish_address='0.0.0.0',
                  publish_port=49017,
+                 auth_address='0.0.0.0',
+                 auth_port=49018,
                  config_path=None,
                  config_dict=None,
                  extension_config_path=None,
@@ -53,6 +57,8 @@ class NapalmLogs:
         self.port = port
         self.publish_address = publish_address
         self.publish_port = publish_port
+        self.auth_address = auth_address
+        self.auth_port = auth_port
         self.config_path = config_path
         self.config_dict = config_dict
         self._transport_type = transport
@@ -212,6 +218,12 @@ class NapalmLogs:
                 continue
             self.config_dict[nos].update(nos_config)
 
+    def _generate_aes(self):
+        '''
+        Generate the private AES key.
+        '''
+        pass
+
     def _respawn_when_dead(self, pid, start_fun, shut_fun=None):
         '''
         Restart a process when dead.
@@ -231,18 +243,17 @@ class NapalmLogs:
         Start the child processes (one per device OS),
         open the socket to start receiving messages.
         '''
+        log.debug('Creating the listener socket')
         if ':' in self.address:
             skt = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
         else:
             skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
         try:
             skt.bind((self.address, self.port))
         except socket.error, msg:
             error_string = 'Unable to bind to port {} on {}: {}'.format(self.port, self.address, msg)
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
-
         log.info('Starting the published process')
         publisher_child_pipe, publisher_parent_pipe = Pipe(duplex=False)
         publisher = NapalmLogsPublisherProc(self.publish_address,
@@ -256,6 +267,21 @@ class NapalmLogs:
             pid=self.ppublish.pid
             )
         )
+        log.debug('Creating the auth socket')
+        if ':' in self.auth_address:
+            auth_skt = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+        else:
+            auth_skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            auth_skt.bind((self.auth_address, self.auth_port))
+        except socket.error, msg:
+            error_string = 'Unable to bind (auth) to port {} on {}: {}'.format(self.auth_port, self.auth_address, msg)
+            log.error(error_string, exc_info=True)
+            raise BindException(error_string)
+        log.debug('Generating the private AES key')
+        aes_key = self._generate_aes()
+        log.info('Preparing the transport')
+        self.transport.start()
         log.info('Starting child processes for each device type')
         os_pipe_map = {}
         for device_os, device_config in self.config_dict.items():
@@ -280,6 +306,9 @@ class NapalmLogs:
                 )
             )
             self.__os_proc_map[device_os] = os_proc
+        log.debug('Starting the authenticator subprocess')
+        auth = NapalmLogsAuthProc(aes_key, auth_skt)
+        self.pauth = Process(auth.start)
         log.debug('Setting up the syslog pipe')
         serve_pipe, listen_pipe = Pipe(duplex=False)
         log.debug('Serve handle is {shandle} ({shash})'.format(shandle=str(serve_pipe),
