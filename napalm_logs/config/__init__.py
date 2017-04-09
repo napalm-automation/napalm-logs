@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 import os
 import logging
 
+# config
 ROOT_DIR = '/'
 CONFIG_FILE = os.path.join(ROOT_DIR, 'etc', 'napalm', 'logs')
 ADDRESS = '0.0.0.0'
@@ -26,10 +27,6 @@ LOGGING_LEVEL = {
     'error': logging.ERROR,
     'critical': logging.CRITICAL
 }
-
-BUFFER_SIZE = 1024
-
-DEFAULT_DELIM = '/'
 
 VALID_CONFIG = {
     'prefix': {
@@ -51,3 +48,15 @@ VALID_CONFIG = {
         }
     ]
 }
+
+# listener
+BUFFER_SIZE = 1024
+
+# device
+DEFAULT_DELIM = '/'
+
+# auth
+RSA_LENGTH = 1024
+MAGIC_REQ = 'REQ'
+MAGIC_ACK = 'ACK'
+MAGIC_OK = 'OK'
