@@ -8,15 +8,21 @@ from __future__ import unicode_literals
 # Import std lib
 import os
 import re
+import ssl
 import time
 import yaml
+import base64
 import socket
+import hashlib
 import logging
 from multiprocessing import Process, Pipe
 
+# Import third party libs
+from Crypto import Random
+from Crypto.Cipher import AES
+
 # Import napalm-logs pkgs
-from napalm_logs.config import VALID_CONFIG
-from napalm_logs.config import LOGGING_LEVEL
+import napalm_logs.config as CONFIG
 from napalm_logs.transport import get_transport
 from napalm_logs.auth import NapalmLogsAuthProc
 from napalm_logs.device import NapalmLogsDeviceProc
@@ -83,7 +89,7 @@ class NapalmLogs:
         '''
         Setup the log object.
         '''
-        logging_level = LOGGING_LEVEL.get(self.log_level.lower())
+        logging_level = CONFIG.LOGGING_LEVEL.get(self.log_level.lower())
         logging.basicConfig(format=self.log_format,
                             level=logging_level)
 
@@ -185,7 +191,7 @@ class NapalmLogs:
                 log.warning('No config found for {}'.format(dev_os))
                 continue
             # Compare the valid opts with the conifg
-            self._verify_config_dict(VALID_CONFIG, dev_config, dev_os)
+            self._verify_config_dict(CONFIG.VALID_CONFIG, dev_config, dev_os)
         log.debug('Read the config without error \o/')
 
     def _build_config(self):
@@ -218,11 +224,50 @@ class NapalmLogs:
                 continue
             self.config_dict[nos].update(nos_config)
 
-    def _generate_aes(self):
+    def _generate_aes_key(self):
         '''
         Generate the private AES key.
         '''
-        pass
+        rand_str = os.urandom(16)
+        if CONFIG.AES_BS == 16:
+            hash_fun = hashlib.md5
+        else:
+            hash_fun = hashlib.sha256
+        has_obj = hash_fun(rand_str)
+        self.__aes = has_obj.digest()
+
+    @staticmethod
+    def __pad(obj):
+        '''
+        Pad the raw object.
+        '''
+        return obj + (CONFIG.AES_BS - len(obj) % CONFIG.AES_BS) * chr(CONFIG.AES_BS - len(obj) % CONFIG.AES_BS)
+
+    @staticmethod
+    def __unpad(obj):
+        '''
+        Unpad the decrypted object.
+        '''
+        return obj[:-ord(obj[len(obj)-1:])]
+
+    def _encrypt(self, obj):
+        '''
+        Encrypt AES the serialised object.
+        '''
+        obj = self.__pad(obj)
+        iv = Random.new().read(AES.block_size)
+        cipher = AES.new(self.__aes, AES.MODE_CBC, iv)
+        return base64.b64encode(iv + cipher.encrypt(raw))
+
+    def _decrypt(self, obj):
+        '''
+        Decrypt the serialised object encrypted
+        using AES.
+        '''
+        obj = base64.b64decode(obj)
+        iv = obj[:16]
+        cipher = AES.new(self.__aes, AES.MODE_CBC, iv)
+        return self.__unpad(cipher.decrypt(obj[16:]))
 
     def _respawn_when_dead(self, pid, start_fun, shut_fun=None):
         '''
@@ -269,17 +314,22 @@ class NapalmLogs:
         )
         log.debug('Creating the auth socket')
         if ':' in self.auth_address:
-            auth_skt = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+            auth_skt = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         else:
-            auth_skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            auth_skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             auth_skt.bind((self.auth_address, self.auth_port))
         except socket.error, msg:
             error_string = 'Unable to bind (auth) to port {} on {}: {}'.format(self.auth_port, self.auth_address, msg)
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
+        auth_skt.settimeout(CONFIG.AUTH_TIMEOUT)
+        wrapped_auth_skt = ssl.wrap_socket(auth_skt,
+                                           server_side=True,
+                                           ssl_version=ssl.PROTOCOL_TLSv1_2,
+                                           ciphers=CONFIG.AUTH_CIPHER)
         log.debug('Generating the private AES key')
-        aes_key = self._generate_aes()
+        self._generate_aes_key()
         log.info('Preparing the transport')
         self.transport.start()
         log.info('Starting child processes for each device type')
@@ -307,7 +357,7 @@ class NapalmLogs:
             )
             self.__os_proc_map[device_os] = os_proc
         log.debug('Starting the authenticator subprocess')
-        auth = NapalmLogsAuthProc(aes_key, auth_skt)
+        auth = NapalmLogsAuthProc(self.__aes, wrapped_auth_skt)
         self.pauth = Process(auth.start)
         log.debug('Setting up the syslog pipe')
         serve_pipe, listen_pipe = Pipe(duplex=False)
@@ -340,5 +390,6 @@ class NapalmLogs:
 
     def stop_engine(self):
         log.info('Shutting down the engine')
+        # TODO: stop processes, close sockets
         if hasattr(self, 'transport'):
             self.transport.tear_down()
