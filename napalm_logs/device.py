@@ -31,15 +31,15 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
     def __init__(self,
                  name,
                  config,
-                 transport,
-                 pipe):
+                 pipe,
+                 transport_pipe):
         self._name = name
         self._config = config
-        self._transport = transport
         self._pipe = pipe
         self.__up = False
         self.compiled_messages = None
         self._compile_messages()
+        self._transport_pipe = transport_pipe
 
     def __del__(self):
         self.stop()
@@ -210,13 +210,13 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             log.error(error_string, exc_info=True)
             raise OpenConfigPathException(error_string)
 
-        return oc_obj.get(filter=True)
+        return oc_obj.to_dict(filter=True)
 
     def _publish(self, obj):
         '''
         Publish the OC object.
         '''
-        self._transport.publish(obj)
+        self._transport_pipe.send(obj)
 
     def _format_time(self, time, date):
         # TODO can we work out the time format from the regex? Probably but this is a task for another day
