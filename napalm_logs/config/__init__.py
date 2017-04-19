@@ -34,16 +34,20 @@ DEFAULT_DELIM = '/'
 VALID_CONFIG = {
     'prefix': {
         'values': {
-            'error': basestring
+            'tag': basestring
         },
         'line': basestring
     },
-    'messages': {
-        '*': {
+    'messages': [
+        {
+            # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+            # This may change if we are able to find a more well defined naming system.
+            'error': basestring,
+            'tag': basestring,
             'values': dict,
             'line': basestring,
             'model': basestring,
             'mapping': dict
         }
-    }
+    ]
 }

@@ -129,6 +129,25 @@ class NapalmLogs:
         log.error(error_string, exc_info=True)
         raise ConfigurationException(error_string)
 
+    def _compare_values(self, value, config, dev_os, key_path):
+        if 'line' not in value.keys() or 'values' not in value.keys():
+            return
+        from_line = re.findall('\{(\w+)\}', config['line'])
+        if set(from_line) == set(config['values']):
+            return
+        if config.get('error'):
+            error = 'The "values" do not match variables in "line" for {}:{} in {}'.format(
+                ':'.join(key_path),
+                config.get('error'),
+                dev_os
+                )
+        else:
+            error = 'The "values" do not match variables in "line" for {} in {}'.format(
+                ':'.join(key_path),
+                dev_os
+                )
+        self._raise_config_exception(error)
+
     def _verify_config_key(self, key, value, valid, config, dev_os, key_path):
         key_path.append(key)
         if not config.get(key):
@@ -142,22 +161,20 @@ class NapalmLogs:
             self._verify_config_dict(value, config[key], dev_os, key_path)
             # As we have already checked that the config below this point is correct, we know that "line" and "values"
             # exists in the config if they are present in the valid config
-            if 'line' in value.keys() and 'values' in value.keys():
-                from_line = re.findall('\{(\w+)\}', config[key]['line'])
-                if set(from_line) != set(config[key]['values']):
-                    self._raise_config_exception('The "values" do not match variables in "line" for {} in {}'.format(':'.join(key_path), dev_os))
+            self._compare_values(value, config[key], dev_os, key_path)
+        elif isinstance(value, list):
+            if not isinstance(config[key], list):
+                self._raise_config_exception('Key "{}" for {} should be of type <list>'.format(':'.join(key_path), dev_os))
+            for item in config[key]:
+                self._verify_config_dict(value[0], item, dev_os, key_path)
+                self._compare_values(value[0], item, dev_os, key_path)
         key_path.remove(key)
 
     def _verify_config_dict(self, valid, config, dev_os, key_path=None):
         if not key_path:
             key_path = []
         for key, value in valid.items():
-            # If the key is '*' then we should check all keys in the config to make sure they match the allowed values
-            if key == '*':
-                for config_key in config.keys():
-                    self._verify_config_key(config_key, value, valid, config, dev_os, key_path)
-            else:
-                self._verify_config_key(key, value, valid, config, dev_os, key_path)
+            self._verify_config_key(key, value, valid, config, dev_os, key_path)
 
     def _verify_config(self):
         '''

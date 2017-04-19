@@ -49,16 +49,18 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
 
     def _compile_messages(self):
         '''
-        Create a dict of all OS messages and their compiled regexs
+        Create a list of all OS messages and their compiled regexs
         '''
-        self.compiled_messages = {}
+        self.compiled_messages = []
         if not self._config:
             return
-        for message_name, data in self._config.get('messages', {}).items():
-            values = data['values']
-            line = data['line']
-            model = data['model']
-            mapping = data['mapping']
+        for message_dict in self._config.get('messages', {}):
+            error = message_dict['error']
+            tag = message_dict['tag']
+            values = message_dict['values']
+            line = message_dict['line']
+            model = message_dict['model']
+            mapping = message_dict['mapping']
 
             # We will now figure out which position each value is in so we can use it with the match statement
             position = {}
@@ -71,41 +73,45 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             # Escape the line, then remove the escape for the curly bracets so they can be used when formatting
             escaped = re.escape(line).replace('\{', '{').replace('\}', '}')
 
-            self.compiled_messages[message_name] = {
-                'line': re.compile(escaped.format(**values)),
-                'positions': sorted_position,
-                'values': values,
-                'model': model,
-                'mapping': mapping
-                }
+            self.compiled_messages.append(
+                {
+                    'error': error,
+                    'tag': tag,
+                    'line': re.compile(escaped.format(**values)),
+                    'positions': sorted_position,
+                    'values': values,
+                    'model': model,
+                    'mapping': mapping
+                    }
+                )
 
     def _parse(self, msg_dict):
         '''
         Parse a syslog message and check what OpenConfig object should
         be generated.
         '''
-        regex_data = self.compiled_messages.get(msg_dict['error'])
-        if not regex_data:
-            log.debug('Unable to find entry for os: {} error {}'.format(self._name, msg_dict.get('error', '')))
-            return
-        match = regex_data.get('line', '').search(msg_dict['message'])
-        if not match:
-            log.debug(
-                'Configured regex did not match for os: {} error {}'.format(
-                    self._name,
-                    msg_dict.get('error', '')
-                    )
+        for message in self.compiled_messages:
+            if message['tag'] != msg_dict['tag']:
+                continue
+            match = message['line'].search(msg_dict['message'])
+            if not match:
+                continue
+            positions = message.get('positions', {})
+            values = message.get('values')
+            ret = {
+                'oc_model': message['model'],
+                'oc_mapping': message['mapping'],
+                'error': message['error']
+                }
+            for key in values.keys():
+                ret[key] = match.group(positions.get(key))
+            return ret
+        log.debug(
+            'Configured regex did not match for os: {} tag {}'.format(
+                self._name,
+                msg_dict.get('tag', '')
                 )
-            return
-        positions = regex_data.get('positions', {})
-        values = regex_data.get('values')
-        ret = {
-            'oc_model': regex_data['model'],
-            'oc_mapping': regex_data['mapping']
-            }
-        for key in values.keys():
-            ret[key] = match.group(positions.get(key))
-        return ret
+            )
 
     @staticmethod
     def _setval(key, val, dict_=None):
@@ -240,14 +246,19 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             if not kwargs:
                 continue
             oc_obj = self._emit(**kwargs)
+            error = kwargs.get('error')
+            model_name = kwargs.get('oc_model')
             host = msg_dict.get('host')
             timestamp = self._format_time(msg_dict.get('time', ''), msg_dict.get('date', ''))
             to_publish = {
+                'error': error,
                 'host': host,
                 'ip': address,
                 'timestamp': timestamp,
                 'open_config': oc_obj,
-                'message_details': msg_dict
+                'message_details': msg_dict,
+                'model_name': model_name,
+                'os': self._name
             }
             self._publish(to_publish)
 
