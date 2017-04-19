@@ -7,11 +7,14 @@ prefix:
     time: (\d\d:\d\d:\d\d\.\d\d\d \w\w\w)
     processName: (\w+)
     processId: (\d+)
-    error: ([\w-]+)
-  line: '{messageId}: {host}:{date} {time}: {processName}[{processId}]: %{error}'
+    tag: ([\w-]+)
+  line: '{messageId}: {host}:{date} {time}: {processName}[{processId}]: %{tag}'
 
 messages:
-  ROUTING-BGP-5-MAXPFX:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: ROUTING-BGP-5-MAXPFX
+    tag: BGP_PREFIX_THRESH_EXCEEDED
     values:
       peer: (\d+\.\d+\.\d+\.\d+)
       current: (\d+)

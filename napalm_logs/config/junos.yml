@@ -7,11 +7,14 @@ prefix:
     host: ([^ ]+)
     processName: (\w+)
     processId: (\d+)
-    error: (\w+)
-  line: '{date} {time}  {host} {processName}[{processId}]: {error}: '
+    tag: (\w+)
+  line: '{date} {time}  {host} {processName}[{processId}]: {tag}: '
 
 messages:
-  BGP_PREFIX_THRESH_EXCEEDED:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: BGP_PREFIX_THRESH_EXCEEDED
+    tag: BGP_PREFIX_THRESH_EXCEEDED
     values:
       peer: (\d+\.\d+\.\d+\.\d+)
       asn: (\d+)
