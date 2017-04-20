@@ -47,7 +47,10 @@ VALID_CONFIG = {
             'values': dict,
             'line': basestring,
             'model': basestring,
-            'mapping': dict
+            'mapping': {
+                'variables': dict,
+                'static': dict
+                }
         }
     ]
 }

@@ -199,8 +199,10 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             raise UnknownOpenConfigModel(error_string)
 
         oc_dict = {}
-        for result_key, mapping in kwargs['oc_mapping'].items():
+        for mapping, result_key in kwargs['oc_mapping']['variables'].items():
             result = kwargs[result_key]
+            oc_dict = self._setval(mapping.format(**kwargs), result, oc_dict)
+        for mapping, result in kwargs['oc_mapping']['static'].items():
             oc_dict = self._setval(mapping.format(**kwargs), result, oc_dict)
         try:
             oc_obj.load_dict(oc_dict)

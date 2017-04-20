@@ -20,4 +20,7 @@ messages:
     line: 'received from neighbor {peer} (AS {asn}) 6/1 (Cease/maximum number of prefixes reached) 0 bytes'
     model: openconfig_bgp
     mapping:
-      asn: bgp/neighbors/neighbor/{peer}/state/peer_as
+      variables:
+        bgp/neighbors/neighbor/{peer}/state/peer_as: asn
+      static:
+        bgp/neighbors/neighbor/{peer}/state/session_state: IDLE
