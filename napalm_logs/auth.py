@@ -31,7 +31,8 @@ class NapalmLogsAuthProc(NapalmLogsProc):
     is that the clients to trust the messages arrived in,
     not the opposite.
     The communication should be established through SSL
-    sockets only, therefore safe agains MITM etc.
+    sockets only, ideally using certificates,
+    therefore safe agains MITM etc.
 
     Algorithm:
 
