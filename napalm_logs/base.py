@@ -17,11 +17,11 @@ from multiprocessing import Process, Pipe
 # Import napalm-logs pkgs
 from napalm_logs.config import VALID_CONFIG
 from napalm_logs.config import LOGGING_LEVEL
-from napalm_logs.transport import get_transport
 from napalm_logs.device import NapalmLogsDeviceProc
 from napalm_logs.server import NapalmLogsServerProc
 from napalm_logs.listener import NapalmLogsListenerProc
 from napalm_logs.exceptions import BindException
+from napalm_logs.publisher import NapalmLogsPublisherProc
 from napalm_logs.exceptions import ConfigurationException
 
 log = logging.getLogger(__name__)
@@ -62,7 +62,6 @@ class NapalmLogs:
         self.log_format = log_format
         # Setup the environment
         self._setup_log()
-        self._setup_transport()
         self._build_config()
         self._verify_config()
         # Private vars
@@ -81,14 +80,6 @@ class NapalmLogs:
         logging_level = LOGGING_LEVEL.get(self.log_level.lower())
         logging.basicConfig(format=self.log_format,
                             level=logging_level)
-
-    def _setup_transport(self):
-        '''
-        Setup the transport.
-        '''
-        transport_class = get_transport(self._transport_type)
-        self.transport = transport_class(self.publish_address,
-                                         self.publish_port)
 
     def _load_config(self, path):
         '''
@@ -252,8 +243,19 @@ class NapalmLogs:
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
 
-        log.info('Preparing the transport')
-        self.transport.start()
+        log.info('Starting the published process')
+        publisher_child_pipe, publisher_parent_pipe = Pipe(duplex=False)
+        publisher = NapalmLogsPublisherProc(self.publish_address,
+                                            self.publish_port,
+                                            self._transport_type,
+                                            publisher_child_pipe)
+        self.ppublish = Process(target=publisher.start)
+        self.ppublish.start()
+        log.debug('Started publisher process as {pname} with PID {pid}'.format(
+            pname=self.ppublish._name,
+            pid=self.ppublish.pid
+            )
+        )
         log.info('Starting child processes for each device type')
         os_pipe_map = {}
         for device_os, device_config in self.config_dict.items():
@@ -266,8 +268,8 @@ class NapalmLogs:
             log.info('Starting the child process for {dos}'.format(dos=device_os))
             dos = NapalmLogsDeviceProc(device_os,
                                        device_config,
-                                       self.transport,
-                                       child_pipe)
+                                       child_pipe,
+                                       publisher_parent_pipe)
             os_pipe_map[device_os] = parent_pipe
             os_proc = Process(target=dos.start)
             os_proc.start()
@@ -305,6 +307,7 @@ class NapalmLogs:
                 pid=self.plisten.pid
             )
         )
+
 
     def stop_engine(self):
         log.info('Shutting down the engine')
