@@ -13,8 +13,8 @@ prefix:
 messages:
   # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
   # This may change if we are able to find a more well defined naming system.
-  - error: ROUTING-BGP-5-MAXPFX
-    tag: BGP_PREFIX_THRESH_EXCEEDED
+  - error: BGP_PREFIX_THRESH_EXCEEDED
+    tag: ROUTING-BGP-5-MAXPFX
     values:
       peer: (\d+\.\d+\.\d+\.\d+)
       current: (\d+)
