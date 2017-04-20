@@ -60,14 +60,14 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         log.debug('Received message {0} from {1}'.format(msg, addr))
         if msg != MAGIC_REQ:
             log.warning('{0} is not a valid REQ message from {1}'.format(msg, addr))
-            continue
+            return
         log.debug('Sending the AES key')
         conn.send(self.__aes)
         # wait for explicit ACK
         log.debug('Waiting for the client to confirm')
         msg = conn.recv(len(MAGIC_ACK))
         if msg != MAGIC_ACK:
-            continue
+            return
         log.info('{1} is now authenticated'.format(addr))
         log.debug('Closing the connection with {0}'.format(addr))
         conn.close()
