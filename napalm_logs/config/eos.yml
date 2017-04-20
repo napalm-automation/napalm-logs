@@ -1,0 +1,23 @@
+# You should not use special characture in the value keys
+prefix:
+  time_format: "%b %d %H:%M:%S"
+  values:
+    date: (\w+ +\d+)
+    time: (\d\d:\d\d:\d\d)
+    host: ([^ ]+)
+    processName: (\w+)
+    tag: ([\w-]+)
+  line: '{date} {time} {host} {processName}: %{tag}'
+
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: BGP_PREFIX_THRESH_EXCEEDED
+    tag: BGP-3-NOTIFICATION
+    values:
+      peer: (\d+\.\d+\.\d+\.\d+)
+      asn: (\d+)
+    line: 'received from neighbor {peer} (AS {asn}) 6/1 (Cease/maximum number of prefixes reached) 0 bytes'
+    model: openconfig_bgp
+    mapping:
+      asn: bgp/neighbors/neighbor/{peer}/state/peer_as
