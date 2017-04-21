@@ -44,6 +44,7 @@ VALID_CONFIG = {
             'error': basestring,
             'tag': basestring,
             'values': dict,
+            'replace': dict,
             'line': basestring,
             'model': basestring,
             'mapping': {
@@ -58,7 +59,7 @@ VALID_CONFIG = {
 BUFFER_SIZE = 1024
 
 # device
-DEFAULT_DELIM = '/'
+DEFAULT_DELIM = '//'
 
 # auth
 AUTH_MAX_CONN = 5
@@ -66,3 +67,9 @@ AUTH_TIMEOUT = 5
 MAGIC_ACK = 'ACK'
 MAGIC_REQ = 'INIT'
 AUTH_CIPHER = 'ECDHE-RSA-AES256-GCM-SHA384'
+
+# replacement lambdas
+REPLACEMENTS = {
+    'uppercase': lambda var: var.upper(),
+    'lowercase': lambda var: var.lower()
+    }
