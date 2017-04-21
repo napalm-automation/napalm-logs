@@ -22,6 +22,6 @@ messages:
     model: openconfig_bgp
     mapping:
       variables:
-        bgp/neighbors/neighbor/{peer}/state/peer_as: asn
+        bgp//neighbors//neighbor//{peer}//state//peer_as: asn
       static:
-        bgp/neighbors/neighbor/{peer}/state/session_state: IDLE
+        bgp//neighbors//neighbor//{peer}//state//session_state: IDLE
