@@ -37,6 +37,7 @@ log = logging.getLogger(__name__)
 
 class NapalmLogs:
     def __init__(self,
+                 certificate,
                  address='0.0.0.0',
                  port=514,
                  transport='zmq',
@@ -44,7 +45,6 @@ class NapalmLogs:
                  publish_port=49017,
                  auth_address='0.0.0.0',
                  auth_port=49018,
-                 certificate=None,
                  keyfile=None,
                  config_path=None,
                  config_dict=None,
@@ -164,16 +164,14 @@ class NapalmLogs:
                 self._raise_config_exception('Key "{}" for {} should be {}'.format(':'.join(key_path), dev_os, value))
         elif isinstance(value, dict):
             if not isinstance(config[key], dict):
-                self._raise_config_exception(
-                    'Key "{}" for {} should be of type <dict>'.format(':'.join(key_path), dev_os))
+                self._raise_config_exception('Key "{}" for {} should be of type <dict>'.format(':'.join(key_path), dev_os))
             self._verify_config_dict(value, config[key], dev_os, key_path)
             # As we have already checked that the config below this point is correct, we know that "line" and "values"
             # exists in the config if they are present in the valid config
             self._compare_values(value, config[key], dev_os, key_path)
         elif isinstance(value, list):
             if not isinstance(config[key], list):
-                self._raise_config_exception(
-                    'Key "{}" for {} should be of type <list>'.format(':'.join(key_path), dev_os))
+                self._raise_config_exception('Key "{}" for {} should be of type <list>'.format(':'.join(key_path), dev_os))
             for item in config[key]:
                 self._verify_config_dict(value[0], item, dev_os, key_path)
                 self._compare_values(value[0], item, dev_os, key_path)
@@ -330,19 +328,13 @@ class NapalmLogs:
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
         auth_skt.settimeout(CONFIG.AUTH_TIMEOUT)
-        auth_skt_params = {
-            'server_side': True,
-            'ssl_version': ssl.PROTOCOL_TLSv1_2,
-            'ciphers': CONFIG.AUTH_CIPHER
-        }
-        if self.certificate and self.keyfile:
-            auth_skt_params['certfile'] = self.certificate
-            auth_skt_params['keyfile'] = self.keyfile
-        else:
-            log.warning('=-'*60)
-            log.warning('You server does not use SSL certificates, this might lead to security issues')
-            log.warning('=-'*60)
-        wrapped_auth_skt = ssl.wrap_socket(auth_skt, **auth_skt_params)
+        wrapped_auth_skt = ssl.wrap_socket(auth_skt,
+                                           server_side=True,
+                                           ssl_version=ssl.PROTOCOL_SSLv23,
+                                           ciphers=CONFIG.AUTH_CIPHER,
+                                           certfile=self.certificate,
+                                           keyfile=self.keyfile,
+                                           cert_reqs=ssl.CERT_REQUIRED)
         log.debug('Generating the private AES key')
         self._generate_aes_key()
         log.info('Preparing the transport')
