@@ -11,9 +11,7 @@ import re
 import ssl
 import time
 import yaml
-import base64
 import socket
-import hashlib
 import logging
 from multiprocessing import Process, Pipe
 
@@ -360,7 +358,6 @@ class NapalmLogs:
             pid=self.ppublish.pid
             )
         )
-
 
     def stop_engine(self):
         log.info('Shutting down the engine')
