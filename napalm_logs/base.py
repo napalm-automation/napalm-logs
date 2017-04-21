@@ -141,7 +141,7 @@ class NapalmLogs:
 
     def _verify_config_key(self, key, value, valid, config, dev_os, key_path):
         key_path.append(key)
-        if not config.get(key):
+        if config.get(key, False) is False:
             self._raise_config_exception('Unable to find key "{}" for {}'.format(':'.join(key_path), dev_os))
         if isinstance(value, type):
             if not isinstance(config[key], value):

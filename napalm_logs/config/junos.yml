@@ -5,10 +5,11 @@ prefix:
     date: (\w+ \d\d)
     time: (\d\d:\d\d:\d\d)
     host: ([^ ]+)
-    processName: (\w+)
-    processId: (\d+)
+    processName: /?(\w+)
+    # Most log lines have a process ID, however some do not
+    processId: \[?(\d+)?\]?
     tag: (\w+)
-  line: '{date} {time}  {host} {processName}[{processId}]: {tag}: '
+  line: '{date} {time}  {host} {processName}{processId}: {tag}: '
 
 messages:
   # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
@@ -25,6 +26,18 @@ messages:
     line: '{peer} (External AS {asn}): Configured maximum prefix-limit threshold({limit}) exceeded for {table}-{type} nlri: {current} (instance master)'
     model: openconfig_bgp
     mapping:
-      asn: bgp/neighbors/neighbor/{peer}/state/peer_as
-      current: bgp/neighbors/neighbor/{peer}/afi_safis/afi_safi/{table}/state/prefixes/received
-      limit: bgp/neighbors/neighbor/{peer}/afi_safis/afi_safi/{table}/ipv4_{type}/prefix_limit/state/max_prefixes
+      variables:
+        bgp/neighbors/neighbor/{peer}/state/peer_as: asn
+        bgp/neighbors/neighbor/{peer}/afi_safis/afi_safi/{table}/state/prefixes/received: current
+        bgp/neighbors/neighbor/{peer}/afi_safis/afi_safi/{table}/ipv4_{type}/prefix_limit/state/max_prefixes: limit
+      static: {}
+  - error: BGP_MD5_INCORRECT
+    tag: tcp_auth_ok
+    values:
+      peer: (\d+\.\d+\.\d+\.\d+)
+    line: 'Packet from {peer}:179 missing MD5 digest'
+    model: openconfig_bgp
+    mapping:
+      variables: {}
+      static:
+        bgp/neighbors/neighbor/{peer}/state/session_state: CONNECT
