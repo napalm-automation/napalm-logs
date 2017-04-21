@@ -17,8 +17,8 @@ from multiprocessing import Process, Pipe
 
 # Import third party libs
 ### crypto
-import nacl.secret
 import nacl.utils
+import nacl.secret
 import nacl.signing
 import nacl.encoding
 
