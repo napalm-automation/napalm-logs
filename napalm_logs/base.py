@@ -261,19 +261,6 @@ class NapalmLogs:
             error_string = 'Unable to bind to port {} on {}: {}'.format(self.port, self.address, msg)
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
-        log.info('Starting the published process')
-        publisher_child_pipe, publisher_parent_pipe = Pipe(duplex=False)
-        publisher = NapalmLogsPublisherProc(self.publish_address,
-                                            self.publish_port,
-                                            self._transport_type,
-                                            publisher_child_pipe)
-        self.ppublish = Process(target=publisher.start)
-        self.ppublish.start()
-        log.debug('Started publisher process as {pname} with PID {pid}'.format(
-            pname=self.ppublish._name,
-            pid=self.ppublish.pid
-            )
-        )
         log.debug('Creating the auth socket')
         if ':' in self.auth_address:
             auth_skt = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
@@ -356,6 +343,21 @@ class NapalmLogs:
         log.debug('Started listener process as {pname} with PID {pid}'.format(
                 pname=self.plisten._name,
                 pid=self.plisten.pid
+            )
+        )
+        log.info('Starting the publisher process')
+        publisher_child_pipe, publisher_parent_pipe = Pipe(duplex=False)
+        publisher = NapalmLogsPublisherProc(self.publish_address,
+                                            self.publish_port,
+                                            self._transport_type,
+                                            priv_key,
+                                            signing_key,
+                                            publisher_child_pipe)
+        self.ppublish = Process(target=publisher.start)
+        self.ppublish.start()
+        log.debug('Started publisher process as {pname} with PID {pid}'.format(
+            pname=self.ppublish._name,
+            pid=self.ppublish.pid
             )
         )
 

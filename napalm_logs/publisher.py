@@ -7,8 +7,14 @@ from __future__ import unicode_literals
 
 # Import pythond stdlib
 import os
+import time
 import logging
 import threading
+
+# Import python stdlib
+import umsgpack
+import nacl.utils
+import nacl.secret
 
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
@@ -25,12 +31,16 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                  address,
                  port,
                  transport_type,
+                 private_key,
+                 signing_key,
                  pipe):
         self.__pipe = pipe
         self.__up = False
         self.address = address
         self.port = port
         self._transport_type = transport_type
+        self.__safe = nacl.secret.SecretBox(private_key)
+        self.__signing_key = signing_key
         self._setup_transport()
 
     def _setup_transport(self):
@@ -40,6 +50,20 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         transport_class = get_transport(self._transport_type)
         self.transport = transport_class(self.address,
                                         self.port)
+
+    def _prepare(self, obj):
+        '''
+        Prepare the object to be sent over the untrusted channel.
+        '''
+        # binary serialization with MessagePack
+        bin_obj = umsgpack.packb(obj)
+        # generating a nonce
+        nonce = nacl.utils.random(nacl.secret.SecretBox.NONCE_SIZE)
+        # encrypting using the nonce
+        encrypted = self.__safe.encrypt(bin_obj, nonce)
+        # sign the message
+        signed = self.__signing_key.sign(encrypted)
+        return signed
 
     def start(self):
         '''
@@ -51,8 +75,9 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.transport.start()
         self.__up = True
         while self.__up:
-	    to_publish = self.__pipe.recv()
-	    self.transport.publish(to_publish)
+            to_publish = self.__pipe.recv()
+            prepared_obj = self._prepare(to_publish)
+            self.transport.publish(prepared_obj)
 
     def stop(self):
         self.__up = False
