@@ -7,11 +7,10 @@ from __future__ import unicode_literals
 
 # Import pythond stdlib
 import os
-import select
+import ssl
+import socket
 import logging
-import hashlib
 import threading
-from ssl import SSLError
 
 # Import napalm-logs pkgs
 from napalm_logs.config import MAGIC_REQ
@@ -47,9 +46,13 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         | <------------ ACK ----------- |
     '''
     def __init__(self,
+                 certificate,
+                 keyfile,
                  private_key,
                  signature_hex,
                  skt):
+        self.certificate = certificate
+        self.keyfile = keyfile
         self.__key = private_key
         self.__sgn = signature_hex
         self.socket = skt
@@ -60,7 +63,7 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         Ensures that the client receives the AES key.
         '''
         # waiting for the magic request message
-        msg, addr = conn.recv(len(MAGIC_REQ))
+        msg = conn.recv(len(MAGIC_REQ))
         log.debug('Received message {0} from {1}'.format(msg, addr))
         if msg != MAGIC_REQ:
             log.warning('{0} is not a valid REQ message from {1}'.format(msg, addr))
@@ -81,6 +84,7 @@ class NapalmLogsAuthProc(NapalmLogsProc):
             return
         log.info('{1} is now authenticated'.format(addr))
         log.debug('Closing the connection with {0}'.format(addr))
+        conn.shutdown(socket.SHUT_DRWD)
         conn.close()
 
     def start(self):
@@ -96,13 +100,17 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         while self.__up:
             try:
                 (clientsocket, address) = self.socket.accept()
-            except SSLError:
+                wrapped_auth_skt = ssl.wrap_socket(clientsocket,
+                                                   server_side=True,
+                                                   certfile=self.certificate,
+                                                   keyfile=self.keyfile)
+            except ssl.SSLError:
                 log.exception('SSL error', exc_info=True)
                 continue
             log.info('{0} connected'.format(address))
             log.debug('Starting the handshake')
             client_thread = threading.Thread(target=self._handshake,
-                                             args=(clientsocket, address))
+                                             args=(wrapped_auth_skt, address))
             client_thread.start()
 
     def stop(self):

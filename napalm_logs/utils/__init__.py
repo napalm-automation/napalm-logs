@@ -40,7 +40,6 @@ def authenticate(certificate,
         skt_ver = socket.AF_INET
     skt = socket.socket(skt_ver, socket.SOCK_STREAM)
     ssl_skt = ssl.wrap_socket(skt,
-                              ssl_version=ssl.PROTOCOL_TLSv1_2,
                               ca_certs=certificate,
                               cert_reqs=ssl.CERT_REQUIRED)
     ssl_skt.connect((address, port))
