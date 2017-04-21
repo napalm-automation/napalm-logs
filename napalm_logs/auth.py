@@ -82,10 +82,12 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         msg = conn.recv(len(MAGIC_ACK))
         if msg != MAGIC_ACK:
             return
-        log.info('{1} is now authenticated'.format(addr))
+        log.info('{0} is now authenticated'.format(addr))
+        log.debug('Shutting down the connection with {0}'.format(addr))
+        conn.shutdown(socket.SHUT_RDWR)
         log.debug('Closing the connection with {0}'.format(addr))
-        conn.shutdown(socket.SHUT_DRWD)
         conn.close()
+        # https://msdn.microsoft.com/en-us/library/ms738547(VS.85).aspx
 
     def start(self):
         '''
