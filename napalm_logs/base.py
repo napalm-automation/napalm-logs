@@ -24,13 +24,14 @@ import nacl.encoding
 
 # Import napalm-logs pkgs
 import napalm_logs.config as CONFIG
-from napalm_logs.transport import get_transport
+# processes
 from napalm_logs.auth import NapalmLogsAuthProc
 from napalm_logs.device import NapalmLogsDeviceProc
 from napalm_logs.server import NapalmLogsServerProc
 from napalm_logs.listener import NapalmLogsListenerProc
-from napalm_logs.exceptions import BindException
 from napalm_logs.publisher import NapalmLogsPublisherProc
+# exceptions
+from napalm_logs.exceptions import BindException
 from napalm_logs.exceptions import ConfigurationException
 
 log = logging.getLogger(__name__)
