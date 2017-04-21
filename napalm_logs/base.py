@@ -271,16 +271,40 @@ class NapalmLogs:
             error_string = 'Unable to bind (auth) to port {} on {}: {}'.format(self.auth_port, self.auth_address, msg)
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
-        auth_skt.settimeout(CONFIG.AUTH_TIMEOUT)
+        # auth_skt.settimeout(CONFIG.AUTH_TIMEOUT)
         wrapped_auth_skt = ssl.wrap_socket(auth_skt,
                                            server_side=True,
-                                           ssl_version=ssl.PROTOCOL_SSLv23,
-                                           ciphers=CONFIG.AUTH_CIPHER,
+                                           ssl_version=ssl.PROTOCOL_TLSv1_2,
                                            certfile=self.certificate,
                                            keyfile=self.keyfile,
                                            cert_reqs=ssl.CERT_REQUIRED)
-        log.info('Preparing the transport')
-        self.transport.start()
+        log.debug('Generating the private key')
+        priv_key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
+        log.debug('Genrating the signing key')
+        signing_key = nacl.signing.SigningKey.generate()
+        verify_key = signing_key.verify_key
+        sgn_verify_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
+        log.debug('Starting the authenticator subprocess')
+        auth = NapalmLogsAuthProc(priv_key,
+                                  sgn_verify_hex,
+                                  wrapped_auth_skt)
+        self.pauth = Process(target=auth.start)
+        self.pauth.start()
+        log.info('Starting the publisher process')
+        publisher_child_pipe, publisher_parent_pipe = Pipe(duplex=False)
+        publisher = NapalmLogsPublisherProc(self.publish_address,
+                                            self.publish_port,
+                                            self._transport_type,
+                                            priv_key,
+                                            signing_key,
+                                            publisher_child_pipe)
+        self.ppublish = Process(target=publisher.start)
+        self.ppublish.start()
+        log.debug('Started publisher process as {pname} with PID {pid}'.format(
+            pname=self.ppublish._name,
+            pid=self.ppublish.pid
+            )
+        )
         log.info('Starting child processes for each device type')
         os_pipe_map = {}
         for device_os, device_config in self.config_dict.items():
@@ -305,18 +329,6 @@ class NapalmLogs:
                 )
             )
             self.__os_proc_map[device_os] = os_proc
-        log.debug('Generating the private key')
-        priv_key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
-        log.debug('Genrating the signing key')
-        signing_key = nacl.signing.SigningKey.generate()
-        verify_key = signing_key.verify_key
-        sgn_verify_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
-        log.debug('Starting the authenticator subprocess')
-        auth = NapalmLogsAuthProc(priv_key,
-                                  sgn_verify_hex,
-                                  wrapped_auth_skt)
-        self.pauth = Process(target=auth.start)
-        self.pauth.start()
         log.debug('Setting up the syslog pipe')
         serve_pipe, listen_pipe = Pipe(duplex=False)
         log.debug('Serve handle is {shandle} ({shash})'.format(shandle=str(serve_pipe),
@@ -344,21 +356,7 @@ class NapalmLogs:
                 pid=self.plisten.pid
             )
         )
-        log.info('Starting the publisher process')
-        publisher_child_pipe, publisher_parent_pipe = Pipe(duplex=False)
-        publisher = NapalmLogsPublisherProc(self.publish_address,
-                                            self.publish_port,
-                                            self._transport_type,
-                                            priv_key,
-                                            signing_key,
-                                            publisher_child_pipe)
-        self.ppublish = Process(target=publisher.start)
-        self.ppublish.start()
-        log.debug('Started publisher process as {pname} with PID {pid}'.format(
-            pname=self.ppublish._name,
-            pid=self.ppublish.pid
-            )
-        )
+
 
     def stop_engine(self):
         log.info('Shutting down the engine')
