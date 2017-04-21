@@ -15,6 +15,7 @@ import threading
 # Import napalm-logs pkgs
 from napalm_logs.config import MAGIC_REQ
 from napalm_logs.config import MAGIC_ACK
+from napalm_logs.config import AUTH_MAX_CONN
 from napalm_logs.proc import NapalmLogsProc
 
 log = logging.getLogger(__name__)
@@ -45,7 +46,7 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         | <------------ ACK ----------- |
     '''
     def __init__(self,
-                 private_key
+                 private_key,
                  signature_hex,
                  skt):
         self.__key = private_key
@@ -90,8 +91,9 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         self.__up = True
+        self.socket.listen(AUTH_MAX_CONN)
         while self.__up:
-            (clientsocket, address) = serversocket.accept()
+            (clientsocket, address) = self.socket.accept()
             log.info('{0} connected'.format(address))
             log.debug('Starting the handshake')
             client_thread = threading.Thread(target=self._handshake,
