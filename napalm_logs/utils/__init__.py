@@ -42,19 +42,19 @@ def authenticate(certificate,
     ssl_skt = ssl.wrap_socket(skt,
                               ca_certs=certificate,
                               cert_reqs=ssl.CERT_REQUIRED)
-    ssl_sock.connect((address, port))
+    ssl_skt.connect((address, port))
     # Explicit INIT
-    ssl_sock.write(defaults.MAGIC_REQ)
+    ssl_skt.write(defaults.MAGIC_REQ)
     # Receive the private key
-    private_key = ssl_sock.read()
+    private_key = ssl_skt.read()
     # Send back explicit ACK
-    ssl_sock.write(defaults.MAGIC_ACK)
+    ssl_skt.write(defaults.MAGIC_ACK)
     # Read the hex of the verification key
-    verify_key_hex = ssl_sock.read()
+    verify_key_hex = ssl_skt.read()
     # Send back explicit ACK
-    ssl_sock.write(defaults.MAGIC_ACK)
+    ssl_skt.write(defaults.MAGIC_ACK)
     # Close the socket
-    ssl_sock.close()
+    ssl_skt.close()
     private_key_obj = nacl.secret.SecretBox(private_key)
     verify_key_obj = nacl.signing.VerifyKey(verify_key_hex, encoder=nacl.encoding.HexEncoder)
     return private_key_obj, verify_key_obj
