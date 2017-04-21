@@ -1,5 +1,4 @@
 pyzmq
 pyyaml
-pycrypto
-napalm-yang
-cryptography
+pynacl
+u-msgpack-python
