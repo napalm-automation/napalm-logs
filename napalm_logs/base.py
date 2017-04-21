@@ -363,4 +363,4 @@ class NapalmLogs:
         log.info('Shutting down the engine')
         # TODO: stop processes, close sockets
         if hasattr(self, 'transport'):
-            self.transport.tear_down()
+            self.transport.stop()

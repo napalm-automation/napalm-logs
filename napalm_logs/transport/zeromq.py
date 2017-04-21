@@ -39,16 +39,11 @@ class ZMQTransport(TransportBase):
             log.error(err, exc_info=True)
             raise BindException(err)
 
-    def serialise(self, obj):
-        return json.dumps(obj)
-
     def publish(self, obj):
         log.debug('Sending object:')
-        serialised_obj = self.serialise(obj)
-        log.debug(serialised_obj)
-        self.socket.send(serialised_obj)
+        self.socket.send(obj)
 
-    def tear_down(self):
+    def stop(self):
         if hasattr(self, 'socket'):
             self.socket.close()
         if hasattr(self, 'context'):
