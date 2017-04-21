@@ -11,6 +11,7 @@ import select
 import logging
 import hashlib
 import threading
+from ssl import SSLError
 
 # Import napalm-logs pkgs
 from napalm_logs.config import MAGIC_REQ
@@ -93,7 +94,11 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         self.__up = True
         self.socket.listen(AUTH_MAX_CONN)
         while self.__up:
-            (clientsocket, address) = self.socket.accept()
+            try:
+                (clientsocket, address) = self.socket.accept()
+            except SSLError:
+                log.exception('SSL error', exc_info=True)
+                continue
             log.info('{0} connected'.format(address))
             log.debug('Starting the handshake')
             client_thread = threading.Thread(target=self._handshake,
