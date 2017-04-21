@@ -40,7 +40,6 @@ class ZMQTransport(TransportBase):
             raise BindException(err)
 
     def publish(self, obj):
-        log.debug('Sending object:')
         self.socket.send(obj)
 
     def stop(self):

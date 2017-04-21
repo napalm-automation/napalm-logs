@@ -76,6 +76,8 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.__up = True
         while self.__up:
             to_publish = self.__pipe.recv()
+            log.debug('Publishing object:')
+            log.debug(to_publish)
             prepared_obj = self._prepare(to_publish)
             self.transport.publish(prepared_obj)
 
