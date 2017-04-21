@@ -24,15 +24,10 @@ class NapalmLogsAuthProc(NapalmLogsProc):
     '''
     Authenticator sub-process class.
     This process waits for the clients to request
-    the private AES key. The current process (i.e. server)
-    does not require authentication, as the client initiates
-    the connection.
-    The purpose of setting up of the authentication
-    is that the clients to trust the messages arrived in,
-    not the opposite.
+    the private and signing keys.
     The communication should be established through SSL
-    sockets only, ideally using certificates,
-    therefore safe agains MITM etc.
+    sockets only, the identify being verificated
+    using the TLS certificate.
 
     Algorithm:
 
