@@ -47,11 +47,11 @@ def authenticate(certificate,
     # Explicit INIT
     ssl_skt.write(defaults.MAGIC_REQ)
     # Receive the private key
-    private_key = ssl_skt.read()
+    private_key = ssl_skt.recv(defaults.BUFFER_SIZE)
     # Send back explicit ACK
     ssl_skt.write(defaults.MAGIC_ACK)
     # Read the hex of the verification key
-    verify_key_hex = ssl_skt.read()
+    verify_key_hex = ssl_skt.recv(defaults.BUFFER_SIZE)
     # Send back explicit ACK
     ssl_skt.write(defaults.MAGIC_ACK)
     # Close the socket
