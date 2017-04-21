@@ -18,6 +18,7 @@ import napalm_yang
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import DEFAULT_DELIM
+from napalm_logs.config import REPLACEMENTS
 from napalm_logs.exceptions import OpenConfigPathException
 from napalm_logs.exceptions import UnknownOpenConfigModel
 
@@ -58,6 +59,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             error = message_dict['error']
             tag = message_dict['tag']
             values = message_dict['values']
+            replace = message_dict['replace']
             line = message_dict['line']
             model = message_dict['model']
             mapping = message_dict['mapping']
@@ -80,6 +82,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     'line': re.compile(escaped.format(**values)),
                     'positions': sorted_position,
                     'values': values,
+                    'replace': replace,
                     'model': model,
                     'mapping': mapping
                     }
@@ -90,9 +93,11 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         Parse a syslog message and check what OpenConfig object should
         be generated.
         '''
+        error_present = False
         for message in self.compiled_messages:
             if message['tag'] != msg_dict['tag']:
                 continue
+            error_present = True
             match = message['line'].search(msg_dict['message'])
             if not match:
                 continue
@@ -101,17 +106,33 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             ret = {
                 'oc_model': message['model'],
                 'oc_mapping': message['mapping'],
+                'replace': message['replace'],
                 'error': message['error']
                 }
             for key in values.keys():
-                ret[key] = match.group(positions.get(key))
+                # Check if the value needs to be replaced
+                if message['replace'].get(key):
+                    fun = REPLACEMENTS.get(message['replace'].get(key))
+                    result = fun(match.group(positions.get(key)))
+                else:
+                    result = match.group(positions.get(key))
+
+                ret[key] = result
             return ret
-        log.debug(
-            'Configured regex did not match for os: {} tag {}'.format(
-                self._name,
-                msg_dict.get('tag', '')
+        if error_present is True:
+            log.info(
+                'Configured regex did not match for os: {} tag {}'.format(
+                    self._name,
+                    msg_dict.get('tag', '')
+                    )
                 )
-            )
+        else:
+            log.info(
+                'Syslog message not configured for os: {} tag {}'.format(
+                    self._name,
+                    msg_dict.get('tag', '')
+                    )
+                )
 
     @staticmethod
     def _setval(key, val, dict_=None):
