@@ -60,8 +60,5 @@ DEFAULT_DELIM = '/'
 # auth
 AUTH_MAX_CONN = 5
 AUTH_TIMEOUT = 5
-AUTH_CIPHER = 'AES256-GCM-SHA384'
 MAGIC_ACK = 'ACK'
 MAGIC_REQ = 'INIT'
-AES_BS = 32  # AES block size
-# must be 16 or 32 bytes long
