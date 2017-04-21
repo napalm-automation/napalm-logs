@@ -1,4 +1,5 @@
 pyzmq
 pyyaml
+pycrypto
 napalm-yang
-
+cryptography
