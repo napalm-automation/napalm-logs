@@ -18,8 +18,11 @@ import logging
 from multiprocessing import Process, Pipe
 
 # Import third party libs
-from Crypto import Random
-from Crypto.Cipher import AES
+### crypto
+import nacl.secret
+import nacl.utils
+import nacl.signing
+import nacl.encoding
 
 # Import napalm-logs pkgs
 import napalm_logs.config as CONFIG
@@ -228,51 +231,6 @@ class NapalmLogs:
                 continue
             self.config_dict[nos].update(nos_config)
 
-    def _generate_aes_key(self):
-        '''
-        Generate the private AES key.
-        '''
-        rand_str = os.urandom(16)
-        if CONFIG.AES_BS == 16:
-            hash_fun = hashlib.md5
-        else:
-            hash_fun = hashlib.sha256
-        has_obj = hash_fun(rand_str)
-        self.__aes = has_obj.digest()
-
-    @staticmethod
-    def __pad(obj):
-        '''
-        Pad the raw object.
-        '''
-        return obj + (CONFIG.AES_BS - len(obj) % CONFIG.AES_BS) * chr(CONFIG.AES_BS - len(obj) % CONFIG.AES_BS)
-
-    @staticmethod
-    def __unpad(obj):
-        '''
-        Unpad the decrypted object.
-        '''
-        return obj[:-ord(obj[len(obj)-1:])]
-
-    def _encrypt(self, obj):
-        '''
-        Encrypt AES the serialised object.
-        '''
-        obj = self.__pad(obj)
-        iv = Random.new().read(AES.block_size)
-        cipher = AES.new(self.__aes, AES.MODE_CBC, iv)
-        return base64.b64encode(iv + cipher.encrypt(raw))
-
-    def _decrypt(self, obj):
-        '''
-        Decrypt the serialised object encrypted
-        using AES.
-        '''
-        obj = base64.b64decode(obj)
-        iv = obj[:16]
-        cipher = AES.new(self.__aes, AES.MODE_CBC, iv)
-        return self.__unpad(cipher.decrypt(obj[16:]))
-
     def _respawn_when_dead(self, pid, start_fun, shut_fun=None):
         '''
         Restart a process when dead.
@@ -335,8 +293,6 @@ class NapalmLogs:
                                            certfile=self.certificate,
                                            keyfile=self.keyfile,
                                            cert_reqs=ssl.CERT_REQUIRED)
-        log.debug('Generating the private AES key')
-        self._generate_aes_key()
         log.info('Preparing the transport')
         self.transport.start()
         log.info('Starting child processes for each device type')
@@ -363,9 +319,18 @@ class NapalmLogs:
                 )
             )
             self.__os_proc_map[device_os] = os_proc
+        log.debug('Generating the private key')
+        priv_key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
+        log.debug('Genrating the signing key')
+        signing_key = nacl.signing.SigningKey.generate()
+        verify_key = signing_key.verify_key
+        sgn_verify_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
         log.debug('Starting the authenticator subprocess')
-        auth = NapalmLogsAuthProc(self.__aes, wrapped_auth_skt)
-        self.pauth = Process(auth.start)
+        auth = NapalmLogsAuthProc(priv_key,
+                                  sgn_verify_hex,
+                                  wrapped_auth_skt)
+        self.pauth = Process(target=auth.start)
+        self.pauth.start()
         log.debug('Setting up the syslog pipe')
         serve_pipe, listen_pipe = Pipe(duplex=False)
         log.debug('Serve handle is {shandle} ({shash})'.format(shandle=str(serve_pipe),

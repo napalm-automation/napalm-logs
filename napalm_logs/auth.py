@@ -41,13 +41,20 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         |                               |
         | <----------- INIT ----------- |
         |                               |
-        | ------- send AES key -------> |
+        | ------- send PRV key -------> |
         |                               |
         | <------------ ACK ----------- |
         |                               |
+        | ------- send SGN HEX -------> |
+        |                               |
+        | <------------ ACK ----------- |
     '''
-    def __init__(self, aes, skt):
-        self.__aes = aes
+    def __init__(self,
+                 private_key
+                 signature_hex,
+                 skt):
+        self.__key = private_key
+        self.__sgn = signature_hex
         self.socket = skt
         self.__up = False
 
@@ -61,8 +68,15 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         if msg != MAGIC_REQ:
             log.warning('{0} is not a valid REQ message from {1}'.format(msg, addr))
             return
-        log.debug('Sending the AES key')
-        conn.send(self.__aes)
+        log.debug('Sending the private key')
+        conn.send(self.__key)
+        # wait for explicit ACK
+        log.debug('Waiting for the client to confirm')
+        msg = conn.recv(len(MAGIC_ACK))
+        if msg != MAGIC_ACK:
+            return
+        log.debug('Sending the signature key')
+        conn.send(self.__sgn)
         # wait for explicit ACK
         log.debug('Waiting for the client to confirm')
         msg = conn.recv(len(MAGIC_ACK))
