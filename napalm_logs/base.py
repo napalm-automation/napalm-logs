@@ -8,20 +8,30 @@ from __future__ import unicode_literals
 # Import std lib
 import os
 import re
+import ssl
 import time
 import yaml
 import socket
 import logging
 from multiprocessing import Process, Pipe
 
+# Import third party libs
+### crypto
+import nacl.utils
+import nacl.secret
+import nacl.signing
+import nacl.encoding
+
 # Import napalm-logs pkgs
-from napalm_logs.config import VALID_CONFIG
-from napalm_logs.config import LOGGING_LEVEL
+import napalm_logs.config as CONFIG
+# processes
+from napalm_logs.auth import NapalmLogsAuthProc
 from napalm_logs.device import NapalmLogsDeviceProc
 from napalm_logs.server import NapalmLogsServerProc
 from napalm_logs.listener import NapalmLogsListenerProc
-from napalm_logs.exceptions import BindException
 from napalm_logs.publisher import NapalmLogsPublisherProc
+# exceptions
+from napalm_logs.exceptions import BindException
 from napalm_logs.exceptions import ConfigurationException
 
 log = logging.getLogger(__name__)
@@ -29,11 +39,15 @@ log = logging.getLogger(__name__)
 
 class NapalmLogs:
     def __init__(self,
+                 certificate,
                  address='0.0.0.0',
                  port=514,
                  transport='zmq',
                  publish_address='0.0.0.0',
                  publish_port=49017,
+                 auth_address='0.0.0.0',
+                 auth_port=49018,
+                 keyfile=None,
                  config_path=None,
                  config_dict=None,
                  extension_config_path=None,
@@ -53,6 +67,10 @@ class NapalmLogs:
         self.port = port
         self.publish_address = publish_address
         self.publish_port = publish_port
+        self.auth_address = auth_address
+        self.auth_port = auth_port
+        self.certificate = certificate
+        self.keyfile = keyfile
         self.config_path = config_path
         self.config_dict = config_dict
         self._transport_type = transport
@@ -77,7 +95,7 @@ class NapalmLogs:
         '''
         Setup the log object.
         '''
-        logging_level = LOGGING_LEVEL.get(self.log_level.lower())
+        logging_level = CONFIG.LOGGING_LEVEL.get(self.log_level.lower())
         logging.basicConfig(format=self.log_format,
                             level=logging_level)
 
@@ -179,7 +197,7 @@ class NapalmLogs:
                 log.warning('No config found for {}'.format(dev_os))
                 continue
             # Compare the valid opts with the conifg
-            self._verify_config_dict(VALID_CONFIG, dev_config, dev_os)
+            self._verify_config_dict(CONFIG.VALID_CONFIG, dev_config, dev_os)
         log.debug('Read the config without error \o/')
 
     def _build_config(self):
@@ -231,23 +249,49 @@ class NapalmLogs:
         Start the child processes (one per device OS),
         open the socket to start receiving messages.
         '''
+        log.debug('Creating the listener socket')
         if ':' in self.address:
             skt = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
         else:
             skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
         try:
             skt.bind((self.address, self.port))
         except socket.error, msg:
             error_string = 'Unable to bind to port {} on {}: {}'.format(self.port, self.address, msg)
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
-
-        log.info('Starting the published process')
+        log.debug('Creating the auth socket')
+        if ':' in self.auth_address:
+            auth_skt = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        else:
+            auth_skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            auth_skt.bind((self.auth_address, self.auth_port))
+        except socket.error, msg:
+            error_string = 'Unable to bind (auth) to port {} on {}: {}'.format(self.auth_port, self.auth_address, msg)
+            log.error(error_string, exc_info=True)
+            raise BindException(error_string)
+        log.debug('Generating the private key')
+        priv_key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
+        log.debug('Genrating the signing key')
+        signing_key = nacl.signing.SigningKey.generate()
+        verify_key = signing_key.verify_key
+        sgn_verify_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
+        log.debug('Starting the authenticator subprocess')
+        auth = NapalmLogsAuthProc(self.certificate,
+                                  self.keyfile,
+                                  priv_key,
+                                  sgn_verify_hex,
+                                  auth_skt)
+        self.pauth = Process(target=auth.start)
+        self.pauth.start()
+        log.info('Starting the publisher process')
         publisher_child_pipe, publisher_parent_pipe = Pipe(duplex=False)
         publisher = NapalmLogsPublisherProc(self.publish_address,
                                             self.publish_port,
                                             self._transport_type,
+                                            priv_key,
+                                            signing_key,
                                             publisher_child_pipe)
         self.ppublish = Process(target=publisher.start)
         self.ppublish.start()
@@ -311,5 +355,6 @@ class NapalmLogs:
 
     def stop_engine(self):
         log.info('Shutting down the engine')
+        # TODO: stop processes, close sockets
         if hasattr(self, 'transport'):
-            self.transport.tear_down()
+            self.transport.stop()

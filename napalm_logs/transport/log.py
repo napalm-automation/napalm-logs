@@ -31,10 +31,5 @@ class LogTransport(TransportBase):
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
 
-    def serialise(self, obj):
-        return json.dumps(obj)
-
     def publish(self, obj):
-        self.logger.info(
-            self.serialise(obj)
-        )
+        self.logger.info(obj)

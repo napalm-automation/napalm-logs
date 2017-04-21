@@ -14,11 +14,8 @@ class TransportBase:
     def start(self):
         pass
 
-    def serialise(self, obj):
-        pass
-
     def publish(self, obj):
         pass
 
-    def tear_down(self):
+    def stop(self):
         pass

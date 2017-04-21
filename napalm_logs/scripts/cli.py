@@ -121,6 +121,27 @@ class NLOptionParser(OptionParser, object):
             help=('Publisher bind port. Default: {0}'.format(defaults.PUBLISH_PORT))
         )
         self.add_option(
+            '--auth-address',
+            dest='auth_address',
+            help=('Authenticator bind address. Default: {0}'.format(defaults.AUTH_ADDRESS))
+        )
+        self.add_option(
+            '--auth-port',
+            dest='auth_port',
+            type=int,
+            help=('Authenticator bind port. Default: {0}'.format(defaults.AUTH_PORT))
+        )
+        self.add_option(
+            '--certificate',
+            dest='certificate',
+            help=('[REQUIRED] Absolute path to the SSL certificate used for client authentication.')
+        )
+        self.add_option(
+            '--keyfile',
+            dest='keyfile',
+            help=('Absolute path to the SSL keyfile')
+        )
+        self.add_option(
             '-l', '--log-level',
             default='warning',
             dest='log_level',
@@ -167,6 +188,10 @@ class NLOptionParser(OptionParser, object):
                     sys.exit(0)
             log.removeHandler(screen_handler)  # remove printing to the screen
             logging.basicConfig(filename=log_file)  # log to file
+        cert = self.options.certificate or file_cfg.get('certificate')
+        if not cert:
+            log.error('certfile must be specified for server-side operations')
+            raise ValueError('Please specify a valid SSL certificate.')
         cfg = {
             'address': self.options.address or file_cfg.get('address') or defaults.ADDRESS,
             'port': self.options.port or file_cfg.get('port') or defaults.PORT,
@@ -175,6 +200,12 @@ class NLOptionParser(OptionParser, object):
                                or defaults.PUBLISH_ADDRESS,
             'publish_port': self.options.publish_port or file_cfg.get('publish_port')\
                             or defaults.PUBLISH_PORT,
+            'auth_address': self.options.auth_address or file_cfg.get('auth_address')\
+                               or defaults.AUTH_ADDRESS,
+            'auth_port': self.options.auth_port or file_cfg.get('auth_port')\
+                            or defaults.AUTH_PORT,
+            'certificate': cert,
+            'keyfile': self.options.keyfile or file_cfg.get('keyfile'),
             'config_path': self.options.config_path or file_cfg.get('config_path'),
             'extension_config_path': self.options.extension_config_path or file_cfg.get('extension_config_path'),
             'log_level': self.options.log_level or file_cfg.get('log_level') or defaults.LOG_LEVEL,
@@ -189,11 +220,11 @@ def napalm_logs_engine():
     # Temporarily will forward the log entries to the screen
     # After reading the config and all good, will write into the right
     # log file.
-    screen = logging.StreamHandler(sys.stdout)
-    screen.setFormatter(logging.Formatter(defaults.LOG_FORMAT))
-    log.addHandler(screen)
+    screen_logger = logging.StreamHandler(sys.stdout)
+    screen_logger.setFormatter(logging.Formatter(defaults.LOG_FORMAT))
+    log.addHandler(screen_logger)
     nlop = NLOptionParser()
-    config = nlop.parse(screen)
+    config = nlop.parse(screen_logger)
     nl = napalm_logs.NapalmLogs(**config)
     try:
         nl.start_engine()

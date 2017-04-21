@@ -8,12 +8,15 @@ from __future__ import unicode_literals
 import os
 import logging
 
+# config
 ROOT_DIR = '/'
 CONFIG_FILE = os.path.join(ROOT_DIR, 'etc', 'napalm', 'logs')
 ADDRESS = '0.0.0.0'
 PORT = 514
 PUBLISH_ADDRESS = '0.0.0.0'
 PUBLISH_PORT = 49017
+AUTH_ADDRESS = '0.0.0.0'
+AUTH_PORT = 49018
 LOG_LEVEL = 'warning'
 LOG_FORMAT = '%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'
 LOG_FILE = os.path.join(ROOT_DIR, 'var', 'log', 'napalm', 'logs')
@@ -26,10 +29,6 @@ LOGGING_LEVEL = {
     'error': logging.ERROR,
     'critical': logging.CRITICAL
 }
-
-BUFFER_SIZE = 1024
-
-DEFAULT_DELIM = '/'
 
 VALID_CONFIG = {
     'prefix': {
@@ -54,3 +53,16 @@ VALID_CONFIG = {
         }
     ]
 }
+
+# listener
+BUFFER_SIZE = 1024
+
+# device
+DEFAULT_DELIM = '/'
+
+# auth
+AUTH_MAX_CONN = 5
+AUTH_TIMEOUT = 5
+MAGIC_ACK = 'ACK'
+MAGIC_REQ = 'INIT'
+AUTH_CIPHER = 'ECDHE-RSA-AES256-GCM-SHA384'

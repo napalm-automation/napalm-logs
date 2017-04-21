@@ -1,4 +1,4 @@
 pyzmq
 pyyaml
-napalm-yang
-
+pynacl
+u-msgpack-python

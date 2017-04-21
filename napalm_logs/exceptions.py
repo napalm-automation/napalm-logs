@@ -49,3 +49,17 @@ class NapalmLogsExit(NapalmLogsException):
     Raised on unexpected exit.
     '''
     pass
+
+
+class CryptoException(NapalmLogsException):
+    '''
+    Raised when unable to decrypt.
+    '''
+    pass
+
+
+class BadSignatureException(NapalmLogsException):
+    '''
+    Raised when the signature was forged or corrupted.
+    '''
+    pass
