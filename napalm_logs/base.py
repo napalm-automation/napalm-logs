@@ -48,6 +48,7 @@ class NapalmLogs:
                  auth_address='0.0.0.0',
                  auth_port=49018,
                  keyfile=None,
+                 disable_security=False,
                  config_path=None,
                  config_dict=None,
                  extension_config_path=None,
@@ -71,6 +72,7 @@ class NapalmLogs:
         self.auth_port = auth_port
         self.certificate = certificate
         self.keyfile = keyfile
+        self.disable_security = disable_security
         self.config_path = config_path
         self.config_dict = config_dict
         self._transport_type = transport
@@ -277,14 +279,17 @@ class NapalmLogs:
         signing_key = nacl.signing.SigningKey.generate()
         verify_key = signing_key.verify_key
         sgn_verify_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
-        log.debug('Starting the authenticator subprocess')
-        auth = NapalmLogsAuthProc(self.certificate,
-                                  self.keyfile,
-                                  priv_key,
-                                  sgn_verify_hex,
-                                  auth_skt)
-        self.pauth = Process(target=auth.start)
-        self.pauth.start()
+        if self.disable_security is True:
+            log.warning('***Not starting the authenticator process due to disable_security being set to True***')
+        else:
+            log.debug('Starting the authenticator subprocess')
+            auth = NapalmLogsAuthProc(self.certificate,
+                                      self.keyfile,
+                                      priv_key,
+                                      sgn_verify_hex,
+                                      auth_skt)
+            self.pauth = Process(target=auth.start)
+            self.pauth.start()
         log.info('Starting the publisher process')
         publisher_child_pipe, publisher_parent_pipe = Pipe(duplex=False)
         publisher = NapalmLogsPublisherProc(self.publish_address,
@@ -292,7 +297,8 @@ class NapalmLogs:
                                             self._transport_type,
                                             priv_key,
                                             signing_key,
-                                            publisher_child_pipe)
+                                            publisher_child_pipe,
+                                            disable_security=self.disable_security)
         self.ppublish = Process(target=publisher.start)
         self.ppublish.start()
         log.debug('Started publisher process as {pname} with PID {pid}'.format(

@@ -78,3 +78,11 @@ def decrypt(binary, verify_key_obj, private_key_obj):
         log.error('Unable to decrypt', exc_info=True)
         raise CryptoException('Unable to decrypt')
     return umsgpack.unpackb(packed)
+
+def unserialize(binary):
+    '''
+    Unpack the original OpenConfig object,
+    serialized using MessagePack.
+    This is to be used when disable_security is set.
+    '''
+    return umsgpack.unpackb(binary)

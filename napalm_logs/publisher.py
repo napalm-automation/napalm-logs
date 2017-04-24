@@ -33,11 +33,13 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                  transport_type,
                  private_key,
                  signing_key,
-                 pipe):
+                 pipe,
+                 disable_security=False):
         self.__pipe = pipe
         self.__up = False
         self.address = address
         self.port = port
+        self.disable_security = disable_security
         self._transport_type = transport_type
         self.__safe = nacl.secret.SecretBox(private_key)
         self.__signing_key = signing_key
@@ -78,7 +80,10 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
             to_publish = self.__pipe.recv()
             log.debug('Publishing object:')
             log.debug(to_publish)
-            prepared_obj = self._prepare(to_publish)
+            if self.disable_security is True:
+                prepared_obj = umsgpack.packb(to_publish)
+            else:
+                prepared_obj = self._prepare(to_publish)
             self.transport.publish(prepared_obj)
 
     def stop(self):

@@ -134,12 +134,19 @@ class NLOptionParser(OptionParser, object):
         self.add_option(
             '--certificate',
             dest='certificate',
-            help=('[REQUIRED] Absolute path to the SSL certificate used for client authentication.')
+            help=('Absolute path to the SSL certificate used for client authentication.')
         )
         self.add_option(
             '--keyfile',
             dest='keyfile',
             help=('Absolute path to the SSL keyfile')
+        )
+        self.add_option(
+            '--disable-security',
+            dest='disable_security',
+            action="store_true",
+            default=False,
+            help=('Disable encryption and data signing when publishing.')
         )
         self.add_option(
             '-l', '--log-level',
@@ -189,7 +196,7 @@ class NLOptionParser(OptionParser, object):
             log.removeHandler(screen_handler)  # remove printing to the screen
             logging.basicConfig(filename=log_file)  # log to file
         cert = self.options.certificate or file_cfg.get('certificate')
-        if not cert:
+        if not cert and self.options.disable_security is False:
             log.error('certfile must be specified for server-side operations')
             raise ValueError('Please specify a valid SSL certificate.')
         cfg = {
@@ -206,6 +213,7 @@ class NLOptionParser(OptionParser, object):
                             or defaults.AUTH_PORT,
             'certificate': cert,
             'keyfile': self.options.keyfile or file_cfg.get('keyfile'),
+            'disable_security': self.options.disable_security or file_cfg.get('disable_security'),
             'config_path': self.options.config_path or file_cfg.get('config_path'),
             'extension_config_path': self.options.extension_config_path or file_cfg.get('extension_config_path'),
             'log_level': self.options.log_level or file_cfg.get('log_level') or defaults.LOG_LEVEL,
