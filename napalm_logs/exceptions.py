@@ -63,3 +63,10 @@ class BadSignatureException(NapalmLogsException):
     Raised when the signature was forged or corrupted.
     '''
     pass
+
+
+class SSLMismatchException(NapalmLogsException):
+    '''
+    Raised when the SSL certificate and key do not match
+    '''
+    pass

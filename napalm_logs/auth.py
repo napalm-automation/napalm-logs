@@ -15,8 +15,9 @@ import threading
 # Import napalm-logs pkgs
 from napalm_logs.config import MAGIC_REQ
 from napalm_logs.config import MAGIC_ACK
-from napalm_logs.config import AUTH_MAX_CONN
 from napalm_logs.proc import NapalmLogsProc
+from napalm_logs.config import AUTH_MAX_CONN
+from napalm_logs.exceptions import SSLMismatchException
 
 log = logging.getLogger(__name__)
 
@@ -88,6 +89,20 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         log.debug('Closing the connection with {0}'.format(addr))
         conn.close()
         # https://msdn.microsoft.com/en-us/library/ms738547(VS.85).aspx
+
+    def verify_cert(self):
+        '''
+        Checks that the provided cert and key are valid and usable
+        '''
+        try:
+            ssl.create_default_context().load_cert_chain(self.certificate, keyfile=self.keyfile)
+        except ssl.SSLError:
+            error_string = 'SSL certificate and key do not match'
+            log.error(error_string)
+            raise SSLMismatchException(error_string)
+        except IOError:
+            log.error('Unable to open either certificate or key file')
+            raise
 
     def start(self):
         '''
