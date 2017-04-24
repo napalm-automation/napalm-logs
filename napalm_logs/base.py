@@ -288,6 +288,7 @@ class NapalmLogs:
                                       priv_key,
                                       sgn_verify_hex,
                                       auth_skt)
+            auth.verify_cert()
             self.pauth = Process(target=auth.start)
             self.pauth.start()
         log.info('Starting the publisher process')
