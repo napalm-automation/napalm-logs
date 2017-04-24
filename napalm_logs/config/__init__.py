@@ -61,6 +61,9 @@ BUFFER_SIZE = 1024
 # device
 DEFAULT_DELIM = '//'
 
+# proc
+PROC_DEAD_FLAGS = ('T', 'X', 'Z')
+
 # auth
 AUTH_MAX_CONN = 5
 AUTH_TIMEOUT = 5
@@ -72,4 +75,4 @@ AUTH_CIPHER = 'ECDHE-RSA-AES256-GCM-SHA384'
 REPLACEMENTS = {
     'uppercase': lambda var: var.upper(),
     'lowercase': lambda var: var.lower()
-    }
+}

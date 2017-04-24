@@ -13,6 +13,7 @@ import time
 import yaml
 import socket
 import logging
+import threading
 from multiprocessing import Process, Pipe
 
 # Import third party libs
@@ -232,18 +233,71 @@ class NapalmLogs:
                 continue
             self.config_dict[nos].update(nos_config)
 
-    def _respawn_when_dead(self, pid, start_fun, shut_fun=None):
+    def _respawn_when_dead(self, start_fun, *args, **kwargs):
         '''
-        Restart a process when dead.
-        Requires a thread checking the status using the PID:
-        if not alive anymore, restart.
+        Start a process and restart when dead.
+        '''
+        proc = start_fun(*args, **kwargs)
+        pid = proc.pid
+        log.debug('Starting keepalive for {pname} ({pid})'.format(
+                pname=proc._name,
+                pid=pid
+            )
+        )
+        while True:
+            time.sleep(5)
+            proc_flag = open(os.path.join('/proc', str(pid), 'stat')).readline().split()[2]
+            if proc_flag in CONFIG.PROC_DEAD_FLAGS:
+                log.warning('Process {pname} with {pid} is dead, restarting'.format(
+                        pname=proc._name,
+                        pid=pid
+                    )
+                )
+                log.debug('Killing the previous process')
+                try:
+                    os.kill(pid, 9)
+                except OSError as err:
+                    log.error('Unable to kill {0}'.format(pid), exc_info=True)
+                    if err.strerror == 'No such process':
+                        pass
+                # Restarting proc
+                proc = start_fun(*args, **kwargs)
+                log.warning('{pname} {prev_pid} restarted as PID {pid}'.format(
+                        pname=proc._name,
+                        prev_pid=pid,
+                        pid=proc.pid
+                    )
+                )
+                pid = proc.pid
 
-        :param pid: The process ID.
-        :param start_fun: The process start function.
-        :param shut_fun: the process shutdown function. Not mandatory.
+    def _start_auth_proc(self):
         '''
-        # TODO
-        # TODO requires a fun per process type: server, listener, device
+        Start the authenticator process.
+        '''
+        pass
+
+    def _start_lst_proc(self):
+        '''
+        Start the listener process.
+        '''
+        pass
+
+    def _start_srv_proc(self):
+        '''
+        Start the server process.
+        '''
+        pass
+
+    def _start_pub_proc(self):
+        '''
+        Start the publisher process.
+        '''
+        pass
+
+    def _start_dev_proc(self):
+        '''
+        Start the device worker process.
+        '''
         pass
 
     def start_engine(self):
@@ -273,15 +327,17 @@ class NapalmLogs:
             error_string = 'Unable to bind (auth) to port {} on {}: {}'.format(self.auth_port, self.auth_address, msg)
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
-        log.debug('Generating the private key')
-        priv_key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
-        log.debug('Genrating the signing key')
-        signing_key = nacl.signing.SigningKey.generate()
-        verify_key = signing_key.verify_key
-        sgn_verify_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
+        priv_key = None
+        signing_key = None
         if self.disable_security is True:
             log.warning('***Not starting the authenticator process due to disable_security being set to True***')
         else:
+            log.debug('Generating the private key')
+            priv_key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
+            log.debug('Genrating the signing key')
+            signing_key = nacl.signing.SigningKey.generate()
+            verify_key = signing_key.verify_key
+            sgn_verify_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
             log.debug('Starting the authenticator subprocess')
             auth = NapalmLogsAuthProc(self.certificate,
                                       self.keyfile,
@@ -291,6 +347,8 @@ class NapalmLogs:
             auth.verify_cert()
             self.pauth = Process(target=auth.start)
             self.pauth.start()
+            auth_thread = threading.Thread(target=self._respawn_when_dead, args=(self.pauth,))
+            auth_thread.start()
         log.info('Starting the publisher process')
         publisher_child_pipe, publisher_parent_pipe = Pipe(duplex=False)
         publisher = NapalmLogsPublisherProc(self.publish_address,
@@ -302,6 +360,8 @@ class NapalmLogs:
                                             disable_security=self.disable_security)
         self.ppublish = Process(target=publisher.start)
         self.ppublish.start()
+        pub_thread = threading.Thread(target=self._respawn_when_dead, args=(self.ppublish,))
+        pub_thread.start()
         log.debug('Started publisher process as {pname} with PID {pid}'.format(
             pname=self.ppublish._name,
             pid=self.ppublish.pid
@@ -324,6 +384,8 @@ class NapalmLogs:
             os_pipe_map[device_os] = parent_pipe
             os_proc = Process(target=dos.start)
             os_proc.start()
+            os_thread = threading.Thread(target=self._respawn_when_dead, args=(os_proc,))
+            os_thread.start()
             log.debug('Started process {pname} for {dos}, having PID {pid}'.format(
                     pname=os_proc._name,
                     dos=device_os,
@@ -343,6 +405,8 @@ class NapalmLogs:
                                       self.config_dict)
         self.pserve = Process(target=server.start)
         self.pserve.start()
+        srv_thread = threading.Thread(target=self._respawn_when_dead, args=(self.pserve,))
+        srv_thread.start()
         log.debug('Started server process as {pname} with PID {pid}'.format(
                 pname=self.pserve._name,
                 pid=self.pserve.pid
@@ -353,12 +417,13 @@ class NapalmLogs:
                                           listen_pipe)
         self.plisten = Process(target=listener.start)
         self.plisten.start()
+        lst_thread = threading.Thread(target=self._respawn_when_dead, args=(self.plisten,))
+        lst_thread.start()
         log.debug('Started listener process as {pname} with PID {pid}'.format(
                 pname=self.plisten._name,
                 pid=self.plisten.pid
             )
         )
-
 
     def stop_engine(self):
         log.info('Shutting down the engine')

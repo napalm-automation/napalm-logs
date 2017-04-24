@@ -41,8 +41,9 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.port = port
         self.disable_security = disable_security
         self._transport_type = transport_type
-        self.__safe = nacl.secret.SecretBox(private_key)
-        self.__signing_key = signing_key
+        if not disable_security:
+            self.__safe = nacl.secret.SecretBox(private_key)
+            self.__signing_key = signing_key
         self._setup_transport()
 
     def _setup_transport(self):
@@ -51,7 +52,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         transport_class = get_transport(self._transport_type)
         self.transport = transport_class(self.address,
-                                        self.port)
+                                         self.port)
 
     def _prepare(self, obj):
         '''
