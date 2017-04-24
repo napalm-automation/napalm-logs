@@ -44,7 +44,7 @@ messages:
       variables: {}
       static:
         bgp//neighbors//neighbor//{peer}//state//session_state: CONNECT
-  - error: SNMP_TRAP_LINK_DOWN
+  - error: INTERFACE_DOWN
     tag: SNMP_TRAP_LINK_DOWN
     values:
       snmpID: (\d+)
