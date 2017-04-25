@@ -247,7 +247,13 @@ class NapalmLogs:
         )
         while True:
             time.sleep(5)
-            proc_flag = open(os.path.join('/proc', str(pid), 'stat')).readline().split()[2]
+            proc_file = os.path.join('/proc', str(pid), 'stat')
+            try:
+                proc_flag = open(proc_file).readline().split()[2]
+            except IOError:
+                log.warning('The following error may not be critical:')
+                log.warning('Unable to read {0}'.format(proc_file), exc_info=True)
+                proc_flag = 'X'
             if proc_flag in CONFIG.PROC_DEAD_FLAGS:
                 log.warning('Process {pname} with {pid} is dead, restarting'.format(
                         pname=proc._name,
@@ -258,9 +264,10 @@ class NapalmLogs:
                 try:
                     os.kill(pid, 9)
                 except OSError as err:
-                    log.error('Unable to kill {0}'.format(pid), exc_info=True)
+                    log.error('Unable to kill {0}'.format(pid))
                     if err.strerror == 'No such process':
-                        pass
+                        log.warning('The following error may not be critical:')
+                        log.warning('Unable to kill PID {0}'.format(pid), exc_info=True)
                 # Restarting proc
                 proc = start_fun(*args, **kwargs)
                 log.warning('{pname} {prev_pid} restarted as PID {pid}'.format(
