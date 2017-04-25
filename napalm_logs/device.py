@@ -13,10 +13,14 @@ import threading
 from datetime import datetime
 
 # Import thrid party libs
+import zmq
+import umsgpack
 import napalm_yang
 
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
+from napalm_logs.config import PUB_IPC_URL
+from napalm_logs.config import DEV_IPC_URL
 from napalm_logs.config import DEFAULT_DELIM
 from napalm_logs.config import REPLACEMENTS
 from napalm_logs.exceptions import OpenConfigPathException
@@ -29,24 +33,29 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
     '''
     Device sub-process class.
     '''
-    def __init__(self,
-                 name,
-                 config,
-                 pipe,
-                 transport_pipe):
+    def __init__(self, name, config):
         self._name = name
         self._config = config
-        self._pipe = pipe
         self.__up = False
         self.compiled_messages = None
         self._compile_messages()
-        self._transport_pipe = transport_pipe
+        self._setup_ipc()
 
-    def __del__(self):
-        self.stop()
-        # Make sure to close the pipe
-        self._pipe.close()
-        delattr(self, '_pipe')
+    def _setup_ipc(self):
+        '''
+        Subscribe to the right topic
+        in the device IPC and publish to the
+        publisher proxy.
+        '''
+        ctx = zmq.Context()
+        # subscribe to device IPC
+        self.sub = ctx.socket(zmq.SUB)
+        # subscribe to the <name> topic
+        self.sub.subscribe(self._name)
+        self.sub.connect(DEV_IPC_URL)
+        # publish to the publisher IPC
+        self.pub = ctx.socket(zmq.PUB)
+        self.pub.connect(PUB_IPC_URL)
 
     def _compile_messages(self):
         '''
@@ -63,7 +72,6 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             line = message_dict['line']
             model = message_dict['model']
             mapping = message_dict['mapping']
-
             # We will now figure out which position each value is in so we can use it with the match statement
             position = {}
             for key in values.keys():
@@ -71,10 +79,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             sorted_position = {}
             for i, elem in enumerate(sorted(position.items())):
                 sorted_position[elem[1]] = i + 1
-
             # Escape the line, then remove the escape for the curly bracets so they can be used when formatting
             escaped = re.escape(line).replace('\{', '{').replace('\}', '}')
-
             self.compiled_messages.append(
                 {
                     'error': error,
@@ -85,8 +91,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     'replace': replace,
                     'model': model,
                     'mapping': mapping
-                    }
-                )
+                }
+            )
 
     def _parse(self, msg_dict):
         '''
@@ -108,7 +114,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'oc_mapping': message['mapping'],
                 'replace': message['replace'],
                 'error': message['error']
-                }
+            }
             for key in values.keys():
                 # Check if the value needs to be replaced
                 if message['replace'].get(key):
@@ -116,7 +122,6 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     result = fun(match.group(positions.get(key)))
                 else:
                     result = match.group(positions.get(key))
-
                 ret[key] = result
             return ret
         if error_present is True:
@@ -124,15 +129,15 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'Configured regex did not match for os: {} tag {}'.format(
                     self._name,
                     msg_dict.get('tag', '')
-                    )
                 )
+            )
         else:
             log.info(
                 'Syslog message not configured for os: {} tag {}'.format(
                     self._name,
                     msg_dict.get('tag', '')
-                    )
                 )
+            )
 
     @staticmethod
     def _setval(key, val, dict_=None):
@@ -218,7 +223,6 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                            ' please make sure the config is correct'.format(kwargs['oc_model'])
             log.error(error_string, exc_info=True)
             raise UnknownOpenConfigModel(error_string)
-
         oc_dict = {}
         for mapping, result_key in kwargs['oc_mapping']['variables'].items():
             result = kwargs[result_key]
@@ -232,14 +236,14 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                            'please check that the mappings are correct for {0}'.format(self._name)
             log.error(error_string, exc_info=True)
             raise OpenConfigPathException(error_string)
-
         return oc_obj.to_dict(filter=True)
 
     def _publish(self, obj):
         '''
         Publish the OC object.
         '''
-        self._transport_pipe.send(obj)
+        bin_obj = umsgpack.packb(obj)
+        self.pub.send(bin_obj)
 
     def _format_time(self, time, date):
         # TODO can we work out the time format from the regex? Probably but this is a task for another day
@@ -263,7 +267,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         thread.start()
         self.__up = True
         while self.__up:
-            msg_dict, address = self._pipe.recv()
+            string = self.sub.recv_string()
+            dev_os, bin_obj = string.split()
+            msg_dict, address = umsgpack.unpackb(bin_obj, use_list=False)
             # # Will wait till a message is available
             kwargs = self._parse(msg_dict)
             if not kwargs:
