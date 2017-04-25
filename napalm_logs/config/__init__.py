@@ -73,11 +73,8 @@ SRV_IPC_URL = 'ipc:///tmp/napalm-logs-srv'
 # the devices send the messages to the proxy
 # and the publisher subscribes to the proxy and
 # publishes them on the desired transport
-DEV_IPC_URL = 'ipc:///tmp/napalm-logs-dev'
-# the server publishes to the same IPC,
-# but setting a certain topic
-# the device thread then subscribes to that
-# topic only
+DEV_IPC_URL_TPL = 'ipc:///tmp/napalm-logs-dev-{os}'
+# the server publishes to a separate IPC per device
 PUB_IPC_URL = 'ipc:///tmp/napalm-logs-pub'
 
 # auth

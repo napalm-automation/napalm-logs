@@ -19,7 +19,7 @@ import napalm_yang
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import PUB_IPC_URL
-from napalm_logs.config import DEV_IPC_URL
+from napalm_logs.config import DEV_IPC_URL_TPL
 from napalm_logs.config import DEFAULT_DELIM
 from napalm_logs.config import REPLACEMENTS
 from napalm_logs.exceptions import OpenConfigPathException
@@ -48,9 +48,10 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         ctx = zmq.Context()
         # subscribe to device IPC
         self.sub = ctx.socket(zmq.SUB)
-        self.sub.bind(DEV_IPC_URL)
-        # subscribe to the <name> topic
-        self.sub.setsockopt(zmq.SUBSCRIBE, self._name)
+        # subscribe to the corresponding IPC pipe
+        ipc_url = DEV_IPC_URL_TPL.format(os=self._name)
+        self.sub.bind(ipc_url)
+        self.sub.setsockopt(zmq.SUBSCRIBE, '')
         # publish to the publisher IPC
         self.pub = ctx.socket(zmq.PUB)
         self.pub.connect(PUB_IPC_URL)
@@ -266,8 +267,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         thread.start()
         self.__up = True
         while self.__up:
-            string = self.sub.recv()
-            bin_obj = string.replace('{0} '.format(self._name), '', 1)
+            bin_obj = self.sub.recv()
             msg_dict, address = umsgpack.unpackb(bin_obj, use_list=False)
             kwargs = self._parse(msg_dict)
             if not kwargs:

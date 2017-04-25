@@ -16,7 +16,7 @@ import umsgpack
 
 # Import napalm-logs pkgs
 from napalm_logs.config import LST_IPC_URL
-from napalm_logs.config import DEV_IPC_URL
+from napalm_logs.config import DEV_IPC_URL_TPL
 from napalm_logs.proc import NapalmLogsProc
 
 log = logging.getLogger(__name__)
@@ -29,6 +29,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
     def __init__(self, config):
         self.config = config
         self.__up = False
+        self.pubs = {}
         self.compiled_prefixes = None
         self._compile_prefixes()
 
@@ -43,9 +44,13 @@ class NapalmLogsServerProc(NapalmLogsProc):
         self.sub = ctx.socket(zmq.SUB)
         self.sub.bind(LST_IPC_URL)
         self.sub.setsockopt(zmq.SUBSCRIBE, '')
-        # publish to device
-        self.pub = ctx.socket(zmq.PUB)
-        self.pub.connect(DEV_IPC_URL)
+        # device publishers
+        os_types = self.config.keys()
+        for dev_os in os_types:
+            pub = ctx.socket(zmq.PUB)
+            ipc_url = DEV_IPC_URL_TPL.format(os=dev_os)
+            pub.connect(ipc_url)
+            self.pubs[dev_os] = pub
 
     def _compile_prefixes(self):
         '''
@@ -121,11 +126,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
             # Then send the message in the right queue
             obj = (msg_dict, address)
             bin_obj = umsgpack.packb(obj)
-            # send device messages to the same IPC
-            # but they have a separate topic
-            # the device process subscribes
-            # to the corresponding topic only
-            self.pub.send(b'%s %s' % (dev_os, bin_obj))
+            self.pubs[dev_os].send(bin_obj)
 
     def stop(self):
         self.__up = False
