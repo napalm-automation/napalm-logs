@@ -4,8 +4,6 @@ __pycache__/
 *$py.class
 
 # Certificates
-*.crt
-*.key
 *.csr
 
 # C extensions
