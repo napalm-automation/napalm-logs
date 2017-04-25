@@ -17,4 +17,8 @@ deploy:
     repo: napalm-automation/napalm-logs
     branch: master
 script:
-  - echo "TODO"
+  - cp examples/server.crt /tmp/__napalm_logs.crt
+  - cp examples/server.key /tmp/__napalm_logs.key
+  - napalm-logs --log-file cli -l debug --certificate /tmp/__napalm_logs.crt --keyfile /tmp/__napalm_logs.key &
+  - cd tests/
+  - python profile.py
