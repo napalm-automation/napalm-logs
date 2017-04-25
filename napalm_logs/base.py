@@ -40,7 +40,6 @@ log = logging.getLogger(__name__)
 
 class NapalmLogs:
     def __init__(self,
-                 certificate,
                  address='0.0.0.0',
                  port=514,
                  transport='zmq',
@@ -48,6 +47,7 @@ class NapalmLogs:
                  publish_port=49017,
                  auth_address='0.0.0.0',
                  auth_port=49018,
+                 certificate=None,
                  keyfile=None,
                  disable_security=False,
                  config_path=None,
@@ -76,7 +76,7 @@ class NapalmLogs:
         self.disable_security = disable_security
         self.config_path = config_path
         self.config_dict = config_dict
-        self._transport_type = transport
+        self.transport = transport
         self.extension_config_path = extension_config_path
         self.extension_config_dict = extension_config_dict
         self.log_level = log_level
@@ -342,7 +342,7 @@ class NapalmLogs:
         log.info('Starting the publisher process')
         publisher = NapalmLogsPublisherProc(self.publish_address,
                                             self.publish_port,
-                                            self._transport_type,
+                                            self.transport,
                                             self.__priv_key,
                                             self.__signing_key,
                                             publisher_child_pipe,

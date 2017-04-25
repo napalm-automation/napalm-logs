@@ -50,7 +50,7 @@ VALID_CONFIG = {
             'mapping': {
                 'variables': dict,
                 'static': dict
-                }
+            }
         }
     ]
 }
