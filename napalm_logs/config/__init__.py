@@ -64,6 +64,18 @@ DEFAULT_DELIM = '//'
 # proc
 PROC_DEAD_FLAGS = ('T', 'X', 'Z')
 
+# zmq proxies
+AUTH_IPC_URL = 'napalm-logs-auth'
+# the auth proxy is not used
+LST_IPC_URL = 'napalm-logs-lst'
+SRV_IPC_URL = 'napalm-logs-srv'
+# the publisher IPC is used as proxy
+# the devices send the messages to the proxy
+# and the publisher subscribes to the proxy and
+# publishes them on the desired transport
+DEV_IPC_URL = 'napalm-logs-dev-{os}'
+PUB_IPC_URL = 'napalm-logs-pub'
+
 # auth
 AUTH_MAX_CONN = 5
 AUTH_TIMEOUT = 5
