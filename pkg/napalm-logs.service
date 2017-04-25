@@ -1,0 +1,12 @@
+[Unit]
+Description=NAPALM logs daemon
+After=network.target
+
+[Service]
+LimitNOFILE=2048
+Type=notify
+NotifyAccess=all
+ExecStart=/usr/bin/napalm-logs
+
+[Install]
+WantedBy=multi-user.target
