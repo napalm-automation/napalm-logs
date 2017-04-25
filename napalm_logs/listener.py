@@ -50,6 +50,7 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         while self.__up:
             msg, addr = self.socket.recvfrom(BUFFER_SIZE)
             # Addr contains (IP, port), we only care about the IP
+            log.debug('Received {0} from {1}'.format(msg, addr))
             obj = (msg, addr[0])
             bin_obj = umsgpack.packb(obj)
             self.pub.send(bin_obj)
