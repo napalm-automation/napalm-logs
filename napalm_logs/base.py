@@ -308,12 +308,12 @@ class NapalmLogs:
         )
         return proc
 
-    def _start_lst_proc(self, skt, listen_pipe):
+    def _start_lst_proc(self, skt):
         '''
         Start the listener process.
         '''
         log.debug('Starting the listener process')
-        listener = NapalmLogsListenerProc(skt, listen_pipe)
+        listener = NapalmLogsListenerProc(skt)
         proc = Process(target=listener.start)
         proc.start()
         log.debug('Started listener process as {pname} with PID {pid}'.format(
@@ -456,21 +456,13 @@ class NapalmLogs:
                                                publisher_parent_pipe))
             os_thread.start()
         # server section
-        log.debug('Setting up the syslog pipe')
-        serve_pipe, listen_pipe = Pipe(duplex=False)
-        log.debug('Serve handle is {shandle} ({shash})'.format(shandle=str(serve_pipe),
-                                                               shash=hash(serve_pipe)))
-        log.debug('Listen handle is {lhandle} ({lhash})'.format(lhandle=str(listen_pipe),
-                                                                lhash=hash(listen_pipe)))
         srv_thread = threading.Thread(target=self._respawn_when_dead,
                                       args=(self._start_srv_proc,
-                                            serve_pipe,
                                             os_pipe_map))
         srv_thread.start()
         # listener section
         lst_thread = threading.Thread(target=self._respawn_when_dead,
-                                      args=(self._start_lst_proc,
-                                            skt, listen_pipe))
+                                      args=(self._start_lst_proc,))
         lst_thread.start()
 
     def stop_engine(self):
