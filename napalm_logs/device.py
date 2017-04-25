@@ -48,9 +48,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         ctx = zmq.Context()
         # subscribe to device IPC
         self.sub = ctx.socket(zmq.SUB)
+        # subscribe to the corresponding IPC pipe
         ipc_url = DEV_IPC_URL_TPL.format(os=self._name)
         self.sub.bind(ipc_url)
-        # subscribe to the <name> topic
         self.sub.setsockopt(zmq.SUBSCRIBE, '')
         # publish to the publisher IPC
         self.pub = ctx.socket(zmq.PUB)
