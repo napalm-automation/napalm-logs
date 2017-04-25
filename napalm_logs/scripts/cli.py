@@ -184,6 +184,8 @@ class NLOptionParser(OptionParser, object):
         config_file_path = self.options.config_file or defaults.CONFIG_FILE
         file_cfg = self.read_config_file(config_file_path)
         log_file = self.options.log_file or file_cfg.get('log_file') or defaults.LOG_FILE
+        log_lvl = self.options.log_level or file_cfg.get('log_level') or defaults.LOG_LEVEL
+        log_fmt = self.options.log_format or file_cfg.get('log_format') or defaults.LOG_FORMAT
         if log_file.lower() not in defaults.LOG_FILE_CLI_OPTIONS:
             log_file_dir = os.path.dirname(log_file)
             if not os.path.isdir(log_file_dir):
@@ -194,7 +196,9 @@ class NLOptionParser(OptionParser, object):
                     log.error('Unable to create {0}'.format(log_file_dir), exc_info=True)
                     sys.exit(0)
             log.removeHandler(screen_handler)  # remove printing to the screen
-            logging.basicConfig(filename=log_file)  # log to file
+            logging.basicConfig(filename=log_file,
+                                level=defaults.LOGGING_LEVEL.get(log_lvl.lower(), 'warning'),
+                                format=log_fmt)  # log to filecm
         cert = self.options.certificate or file_cfg.get('certificate')
         if not cert and self.options.disable_security is False:
             log.error('certfile must be specified for server-side operations')
@@ -216,8 +220,8 @@ class NLOptionParser(OptionParser, object):
             'disable_security': self.options.disable_security or file_cfg.get('disable_security'),
             'config_path': self.options.config_path or file_cfg.get('config_path'),
             'extension_config_path': self.options.extension_config_path or file_cfg.get('extension_config_path'),
-            'log_level': self.options.log_level or file_cfg.get('log_level') or defaults.LOG_LEVEL,
-            'log_format': self.options.log_format or file_cfg.get('log_format') or defaults.LOG_FORMAT
+            'log_level': log_lvl,
+            'log_format': log_fmt
         }
         return cfg
 

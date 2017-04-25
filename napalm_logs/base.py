@@ -3,7 +3,6 @@
 napalm-logs base
 '''
 from __future__ import absolute_import
-from __future__ import unicode_literals
 
 # Import std lib
 import os
@@ -40,7 +39,6 @@ log = logging.getLogger(__name__)
 
 class NapalmLogs:
     def __init__(self,
-                 certificate,
                  address='0.0.0.0',
                  port=514,
                  transport='zmq',
@@ -48,6 +46,7 @@ class NapalmLogs:
                  publish_port=49017,
                  auth_address='0.0.0.0',
                  auth_port=49018,
+                 certificate=None,
                  keyfile=None,
                  disable_security=False,
                  config_path=None,
@@ -76,7 +75,7 @@ class NapalmLogs:
         self.disable_security = disable_security
         self.config_path = config_path
         self.config_dict = config_dict
-        self._transport_type = transport
+        self.transport = transport
         self.extension_config_path = extension_config_path
         self.extension_config_dict = extension_config_dict
         self.log_level = log_level
@@ -164,26 +163,33 @@ class NapalmLogs:
     def _verify_config_key(self, key, value, valid, config, dev_os, key_path):
         key_path.append(key)
         if config.get(key, False) is False:
-            self._raise_config_exception('Unable to find key "{}" for {}'.format(':'.join(key_path), dev_os))
+            self._raise_config_exception(
+                'Unable to find key "{}" for {}'.format(':'.join(key_path), dev_os))
         if isinstance(value, type):
             if not isinstance(config[key], value):
-                self._raise_config_exception('Key "{}" for {} should be {}'.format(':'.join(key_path), dev_os, value))
+                self._raise_config_exception(
+                    'Key "{}" for {} should be {}'.format(':'.join(key_path), dev_os, value))
         elif isinstance(value, dict):
             if not isinstance(config[key], dict):
-                self._raise_config_exception('Key "{}" for {} should be of type <dict>'.format(':'.join(key_path), dev_os))
+                self._raise_config_exception(
+                    'Key "{}" for {} should be of type <dict>'.format(':'.join(key_path), dev_os))
             self._verify_config_dict(value, config[key], dev_os, key_path)
             # As we have already checked that the config below this point is correct, we know that "line" and "values"
             # exists in the config if they are present in the valid config
             self._compare_values(value, config[key], dev_os, key_path)
         elif isinstance(value, list):
             if not isinstance(config[key], list):
-                self._raise_config_exception('Key "{}" for {} should be of type <list>'.format(':'.join(key_path), dev_os))
+                self._raise_config_exception(
+                    'Key "{}" for {} should be of type <list>'.format(':'.join(key_path), dev_os))
             for item in config[key]:
                 self._verify_config_dict(value[0], item, dev_os, key_path)
                 self._compare_values(value[0], item, dev_os, key_path)
         key_path.remove(key)
 
     def _verify_config_dict(self, valid, config, dev_os, key_path=None):
+        '''
+        Verify if the config dict is valid.
+        '''
         if not key_path:
             key_path = []
         for key, value in valid.items():
@@ -301,12 +307,12 @@ class NapalmLogs:
         )
         return proc
 
-    def _start_lst_proc(self, skt, listen_pipe):
+    def _start_lst_proc(self, skt):
         '''
         Start the listener process.
         '''
         log.debug('Starting the listener process')
-        listener = NapalmLogsListenerProc(skt, listen_pipe)
+        listener = NapalmLogsListenerProc(skt)
         proc = Process(target=listener.start)
         proc.start()
         log.debug('Started listener process as {pname} with PID {pid}'.format(
@@ -316,16 +322,12 @@ class NapalmLogs:
         )
         return proc
 
-    def _start_srv_proc(self,
-                        serve_pipe,
-                        os_pipe_map):
+    def _start_srv_proc(self):
         '''
         Start the server process.
         '''
         log.debug('Starting the server process')
-        server = NapalmLogsServerProc(serve_pipe,
-                                      os_pipe_map,
-                                      self.config_dict)
+        server = NapalmLogsServerProc(self.config_dict)
         proc = Process(target=server.start)
         proc.start()
         log.debug('Started server process as {pname} with PID {pid}'.format(
@@ -335,17 +337,16 @@ class NapalmLogs:
         )
         return proc
 
-    def _start_pub_proc(self, publisher_child_pipe):
+    def _start_pub_proc(self):
         '''
         Start the publisher process.
         '''
         log.info('Starting the publisher process')
         publisher = NapalmLogsPublisherProc(self.publish_address,
                                             self.publish_port,
-                                            self._transport_type,
+                                            self.transport,
                                             self.__priv_key,
                                             self.__signing_key,
-                                            publisher_child_pipe,
                                             disable_security=self.disable_security)
         proc = Process(target=publisher.start)
         proc.start()
@@ -358,18 +359,13 @@ class NapalmLogs:
 
     def _start_dev_proc(self,
                         device_os,
-                        device_config,
-                        child_pipe,
-                        publisher_parent_pipe):
+                        device_config):
         '''
         Start the device worker process.
         '''
         # TODO remove the pipe overhead when migrating to zmq IPC
         log.info('Starting the child process for {dos}'.format(dos=device_os))
-        dos = NapalmLogsDeviceProc(device_os,
-                                   device_config,
-                                   child_pipe,
-                                   publisher_parent_pipe)
+        dos = NapalmLogsDeviceProc(device_os, device_config)
         os_proc = Process(target=dos.start)
         os_proc.start()
         log.debug('Started process {pname} for {dos}, having PID {pid}'.format(
@@ -417,54 +413,34 @@ class NapalmLogs:
             log.debug('Generating the signing key')
             self.__signing_key = nacl.signing.SigningKey.generate()
             # start the keepalive thread for the auth sub-process
-            auth_thread = threading.Thread(target=self._respawn_when_dead,
-                                           args=(self._start_auth_proc, auth_skt))
-            auth_thread.start()
+            self._start_auth_proc(auth_skt)
+            # auth_thread = threading.Thread(target=self._respawn_when_dead,
+            #                                args=(self._start_auth_proc, auth_skt))
+            # auth_thread.start()
         # publisher section
-        log.debug('Initialising the publisher pipe')
-        publisher_child_pipe, publisher_parent_pipe = Pipe(duplex=False)
-        log.debug('Parent handle is {phandle} ({phash})'.format(phandle=str(publisher_parent_pipe),
-                                                                phash=hash(publisher_parent_pipe)))
-        log.debug('Child handle is {chandle} ({chash})'.format(chandle=str(publisher_child_pipe),
-                                                               chash=hash(publisher_child_pipe)))
-        pub_thread = threading.Thread(target=self._respawn_when_dead,
-                                      args=(self._start_pub_proc, publisher_child_pipe))
-        pub_thread.start()
+        # pub_thread = threading.Thread(target=self._respawn_when_dead,
+        #                               args=(self._start_pub_proc,))
+        # pub_thread.start()
+        self._start_pub_proc()
         # device process start
         log.info('Starting child processes for each device type')
-        os_pipe_map = {}
         for device_os, device_config in self.config_dict.items():
-            child_pipe, parent_pipe = Pipe(duplex=False)
-            log.debug('Initialized pipe for {dos}'.format(dos=device_os))
-            log.debug('Parent handle is {phandle} ({phash})'.format(phandle=str(parent_pipe),
-                                                                    phash=hash(parent_pipe)))
-            log.debug('Child handle is {chandle} ({chash})'.format(chandle=str(child_pipe),
-                                                                    chash=hash(child_pipe)))
-            os_pipe_map[device_os] = parent_pipe
-            os_thread = threading.Thread(target=self._respawn_when_dead,
-                                         args=(self._start_dev_proc,
-                                               device_os,
-                                               device_config,
-                                               child_pipe,
-                                               publisher_parent_pipe))
-            os_thread.start()
+            self._start_dev_proc(device_os, device_config)
+            # os_thread = threading.Thread(target=self._respawn_when_dead,
+            #                              args=(self._start_dev_proc,
+            #                                    device_os,
+            #                                    device_config))
+            # os_thread.start()
         # server section
-        log.debug('Setting up the syslog pipe')
-        serve_pipe, listen_pipe = Pipe(duplex=False)
-        log.debug('Serve handle is {shandle} ({shash})'.format(shandle=str(serve_pipe),
-                                                               shash=hash(serve_pipe)))
-        log.debug('Listen handle is {lhandle} ({lhash})'.format(lhandle=str(listen_pipe),
-                                                                lhash=hash(listen_pipe)))
-        srv_thread = threading.Thread(target=self._respawn_when_dead,
-                                      args=(self._start_srv_proc,
-                                            serve_pipe,
-                                            os_pipe_map))
-        srv_thread.start()
+        # srv_thread = threading.Thread(target=self._respawn_when_dead,
+        #                               args=(self._start_srv_proc,))
+        # srv_thread.start()
+        self._start_srv_proc()
         # listener section
-        lst_thread = threading.Thread(target=self._respawn_when_dead,
-                                      args=(self._start_lst_proc,
-                                            skt, listen_pipe))
-        lst_thread.start()
+        # lst_thread = threading.Thread(target=self._respawn_when_dead,
+        #                               args=(self._start_lst_proc, skt))
+        # lst_thread.start()
+        self._start_lst_proc(skt)
 
     def stop_engine(self):
         log.info('Shutting down the engine')

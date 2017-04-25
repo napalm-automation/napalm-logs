@@ -3,7 +3,6 @@
 Listener worker process
 '''
 from __future__ import absolute_import
-from __future__ import unicode_literals
 
 # Import pythond stdlib
 import os
@@ -11,12 +10,14 @@ import time
 import logging
 import threading
 
-# Import python stdlib
+# Import third party libs
+import zmq
 import umsgpack
 import nacl.utils
 import nacl.secret
 
 # Import napalm-logs pkgs
+from napalm_logs.config import PUB_IPC_URL
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.transport import get_transport
 
@@ -33,9 +34,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                  transport_type,
                  private_key,
                  signing_key,
-                 pipe,
                  disable_security=False):
-        self.__pipe = pipe
         self.__up = False
         self.address = address
         self.port = port
@@ -45,6 +44,17 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
             self.__safe = nacl.secret.SecretBox(private_key)
             self.__signing_key = signing_key
         self._setup_transport()
+
+    def _setup_ipc(self):
+        '''
+        Subscribe to the pub IPC
+        and publish the messages
+        on the right transport.
+        '''
+        ctx = zmq.Context()
+        self.sub = ctx.socket(zmq.SUB)
+        self.sub.bind(PUB_IPC_URL)
+        self.sub.setsockopt(zmq.SUBSCRIBE, '')
 
     def _setup_transport(self):
         '''
@@ -58,8 +68,6 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         Prepare the object to be sent over the untrusted channel.
         '''
-        # binary serialization with MessagePack
-        bin_obj = umsgpack.packb(obj)
         # generating a nonce
         nonce = nacl.utils.random(nacl.secret.SecretBox.NONCE_SIZE)
         # encrypting using the nonce
@@ -72,20 +80,18 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         Listen to messages and publish them.
         '''
+        self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         self.transport.start()
         self.__up = True
         while self.__up:
-            to_publish = self.__pipe.recv()
-            log.debug('Publishing object:')
-            log.debug(to_publish)
-            if self.disable_security is True:
-                prepared_obj = umsgpack.packb(to_publish)
-            else:
-                prepared_obj = self._prepare(to_publish)
-            self.transport.publish(prepared_obj)
+            bin_obj = self.sub.recv()  # already serialized
+            if not self.disable_security:
+                bin_obj = self._prepare(bin_obj)
+            self.transport.publish(bin_obj)
 
     def stop(self):
         self.__up = False
+        self.sub.close()
