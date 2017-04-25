@@ -164,26 +164,33 @@ class NapalmLogs:
     def _verify_config_key(self, key, value, valid, config, dev_os, key_path):
         key_path.append(key)
         if config.get(key, False) is False:
-            self._raise_config_exception('Unable to find key "{}" for {}'.format(':'.join(key_path), dev_os))
+            self._raise_config_exception(
+                'Unable to find key "{}" for {}'.format(':'.join(key_path), dev_os))
         if isinstance(value, type):
             if not isinstance(config[key], value):
-                self._raise_config_exception('Key "{}" for {} should be {}'.format(':'.join(key_path), dev_os, value))
+                self._raise_config_exception(
+                    'Key "{}" for {} should be {}'.format(':'.join(key_path), dev_os, value))
         elif isinstance(value, dict):
             if not isinstance(config[key], dict):
-                self._raise_config_exception('Key "{}" for {} should be of type <dict>'.format(':'.join(key_path), dev_os))
+                self._raise_config_exception(
+                    'Key "{}" for {} should be of type <dict>'.format(':'.join(key_path), dev_os))
             self._verify_config_dict(value, config[key], dev_os, key_path)
             # As we have already checked that the config below this point is correct, we know that "line" and "values"
             # exists in the config if they are present in the valid config
             self._compare_values(value, config[key], dev_os, key_path)
         elif isinstance(value, list):
             if not isinstance(config[key], list):
-                self._raise_config_exception('Key "{}" for {} should be of type <list>'.format(':'.join(key_path), dev_os))
+                self._raise_config_exception(
+                    'Key "{}" for {} should be of type <list>'.format(':'.join(key_path), dev_os))
             for item in config[key]:
                 self._verify_config_dict(value[0], item, dev_os, key_path)
                 self._compare_values(value[0], item, dev_os, key_path)
         key_path.remove(key)
 
     def _verify_config_dict(self, valid, config, dev_os, key_path=None):
+        '''
+        Verify if the config dict is valid.
+        '''
         if not key_path:
             key_path = []
         for key, value in valid.items():
