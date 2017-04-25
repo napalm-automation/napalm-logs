@@ -272,7 +272,11 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             kwargs = self._parse(msg_dict)
             if not kwargs:
                 continue
-            oc_obj = self._emit(**kwargs)
+            try:
+                oc_obj = self._emit(**kwargs)
+            except Exception as err:
+                log.exception('Unexpected error when generating the OC object.', exc_info=True)
+                continue
             error = kwargs.get('error')
             model_name = kwargs.get('oc_model')
             host = msg_dict.get('host')
