@@ -3,7 +3,6 @@
 Device worker process
 '''
 from __future__ import absolute_import
-from __future__ import unicode_literals
 
 # Import python stdlib
 import os
@@ -39,7 +38,6 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         self.__up = False
         self.compiled_messages = None
         self._compile_messages()
-        self._setup_ipc()
 
     def _setup_ipc(self):
         '''
@@ -50,9 +48,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         ctx = zmq.Context()
         # subscribe to device IPC
         self.sub = ctx.socket(zmq.SUB)
+        self.sub.bind(DEV_IPC_URL)
         # subscribe to the <name> topic
-        self.sub.subscribe(self._name)
-        self.sub.connect(DEV_IPC_URL)
+        self.sub.setsockopt(zmq.SUBSCRIBE, self._name)
         # publish to the publisher IPC
         self.pub = ctx.socket(zmq.PUB)
         self.pub.connect(PUB_IPC_URL)
@@ -262,15 +260,15 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         '''
         Start the worker process.
         '''
+        self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         self.__up = True
         while self.__up:
-            string = self.sub.recv_string()
-            dev_os, bin_obj = string.split()
+            string = self.sub.recv()
+            bin_obj = string.replace('{0} '.format(self._name), '', 1)
             msg_dict, address = umsgpack.unpackb(bin_obj, use_list=False)
-            # # Will wait till a message is available
             kwargs = self._parse(msg_dict)
             if not kwargs:
                 continue
@@ -296,3 +294,5 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         Stop the worker process.
         '''
         self.__up = False
+        self.sub.close()
+        self.pub.close()

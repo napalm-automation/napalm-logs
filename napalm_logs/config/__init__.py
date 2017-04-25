@@ -65,20 +65,20 @@ DEFAULT_DELIM = '//'
 PROC_DEAD_FLAGS = ('T', 'X', 'Z')
 
 # zmq proxies
-AUTH_IPC_URL = 'ipc://napalm-logs-auth'
-# the auth proxy is not used
-LST_IPC_URL = 'ipc://napalm-logs-lst'
-SRV_IPC_URL = 'ipc://napalm-logs-srv'
+AUTH_IPC_URL = 'ipc:///tmp/napalm-logs-auth'
+# the auth proxy is not used yet, TODO
+LST_IPC_URL = 'ipc:///tmp/napalm-logs-lst'
+SRV_IPC_URL = 'ipc:///tmp/napalm-logs-srv'
 # the publisher IPC is used as proxy
 # the devices send the messages to the proxy
 # and the publisher subscribes to the proxy and
 # publishes them on the desired transport
-DEV_IPC_URL = 'ipc://napalm-logs-dev'
+DEV_IPC_URL = 'ipc:///tmp/napalm-logs-dev'
 # the server publishes to the same IPC,
 # but setting a certain topic
 # the device thread then subscribes to that
 # topic only
-PUB_IPC_URL = 'ipc://napalm-logs-pub'
+PUB_IPC_URL = 'ipc:///tmp/napalm-logs-pub'
 
 # auth
 AUTH_MAX_CONN = 5

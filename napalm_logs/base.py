@@ -3,7 +3,6 @@
 napalm-logs base
 '''
 from __future__ import absolute_import
-from __future__ import unicode_literals
 
 # Import std lib
 import os
@@ -414,29 +413,34 @@ class NapalmLogs:
             log.debug('Generating the signing key')
             self.__signing_key = nacl.signing.SigningKey.generate()
             # start the keepalive thread for the auth sub-process
-            auth_thread = threading.Thread(target=self._respawn_when_dead,
-                                           args=(self._start_auth_proc, auth_skt))
-            auth_thread.start()
+            self._start_auth_proc(auth_skt)
+            # auth_thread = threading.Thread(target=self._respawn_when_dead,
+            #                                args=(self._start_auth_proc, auth_skt))
+            # auth_thread.start()
         # publisher section
-        pub_thread = threading.Thread(target=self._respawn_when_dead,
-                                      args=(self._start_pub_proc,))
-        pub_thread.start()
+        # pub_thread = threading.Thread(target=self._respawn_when_dead,
+        #                               args=(self._start_pub_proc,))
+        # pub_thread.start()
+        self._start_pub_proc()
         # device process start
         log.info('Starting child processes for each device type')
         for device_os, device_config in self.config_dict.items():
-            os_thread = threading.Thread(target=self._respawn_when_dead,
-                                         args=(self._start_dev_proc,
-                                               device_os,
-                                               device_config))
-            os_thread.start()
+            self._start_dev_proc(device_os, device_config)
+            # os_thread = threading.Thread(target=self._respawn_when_dead,
+            #                              args=(self._start_dev_proc,
+            #                                    device_os,
+            #                                    device_config))
+            # os_thread.start()
         # server section
-        srv_thread = threading.Thread(target=self._respawn_when_dead,
-                                      args=(self._start_srv_proc,))
-        srv_thread.start()
+        # srv_thread = threading.Thread(target=self._respawn_when_dead,
+        #                               args=(self._start_srv_proc,))
+        # srv_thread.start()
+        self._start_srv_proc()
         # listener section
-        lst_thread = threading.Thread(target=self._respawn_when_dead,
-                                      args=(self._start_lst_proc, skt))
-        lst_thread.start()
+        # lst_thread = threading.Thread(target=self._respawn_when_dead,
+        #                               args=(self._start_lst_proc, skt))
+        # lst_thread.start()
+        self._start_lst_proc(skt)
 
     def stop_engine(self):
         log.info('Shutting down the engine')

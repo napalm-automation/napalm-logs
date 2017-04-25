@@ -3,7 +3,6 @@
 Listener worker process
 '''
 from __future__ import absolute_import
-from __future__ import unicode_literals
 
 # Import pythond stdlib
 import os
@@ -45,7 +44,6 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
             self.__safe = nacl.secret.SecretBox(private_key)
             self.__signing_key = signing_key
         self._setup_transport()
-        self._setup_ipc()
 
     def _setup_ipc(self):
         '''
@@ -55,8 +53,8 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         ctx = zmq.Context()
         self.sub = ctx.socket(zmq.SUB)
-        self.sub.subscribe(b'')
-        self.sub.connect(PUB_IPC_URL)
+        self.sub.bind(PUB_IPC_URL)
+        self.sub.setsockopt(zmq.SUBSCRIBE, '')
 
     def _setup_transport(self):
         '''
@@ -82,18 +80,18 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         Listen to messages and publish them.
         '''
+        self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         self.transport.start()
         self.__up = True
         while self.__up:
-            bin_obj = self.sub.recv_string() # already packed
-            log.debug('Publishing object (serialised):')
-            log.debug(bin_obj)
+            bin_obj = self.sub.recv()  # already serialized
             if not self.disable_security:
                 bin_obj = self._prepare(bin_obj)
             self.transport.publish(bin_obj)
 
     def stop(self):
         self.__up = False
+        self.sub.close()

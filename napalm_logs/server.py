@@ -3,7 +3,6 @@
 Server worker process
 '''
 from __future__ import absolute_import
-from __future__ import unicode_literals
 
 # Import pythond stdlib
 import os
@@ -32,7 +31,6 @@ class NapalmLogsServerProc(NapalmLogsProc):
         self.__up = False
         self.compiled_prefixes = None
         self._compile_prefixes()
-        self._setup_ipc()
 
     def _setup_ipc(self):
         '''
@@ -43,8 +41,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
         ctx = zmq.Context()
         # subscribe to listener
         self.sub = ctx.socket(zmq.SUB)
-        self.sub.subscribe(b'')
-        self.sub.connect(LST_IPC_URL)
+        self.sub.bind(LST_IPC_URL)
+        self.sub.setsockopt(zmq.SUBSCRIBE, '')
         # publish to device
         self.pub = ctx.socket(zmq.PUB)
         self.pub.connect(DEV_IPC_URL)
@@ -105,13 +103,14 @@ class NapalmLogsServerProc(NapalmLogsProc):
         inspect and identify the operating system,
         then queue the message correspondingly.
         '''
+        self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         self.__up = True
         while self.__up:
             # Take messages from the main queue
-            bin_obj = self.sub.recv_string()
+            bin_obj = self.sub.recv()
             msg, address = umsgpack.unpackb(bin_obj, use_list=False)
             dev_os, msg_dict = self._identify_os(msg)
             if not dev_os or not isinstance(msg_dict, dict):
@@ -130,3 +129,5 @@ class NapalmLogsServerProc(NapalmLogsProc):
 
     def stop(self):
         self.__up = False
+        self.sub.close()
+        self.pub.close()

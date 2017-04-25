@@ -29,7 +29,6 @@ class NapalmLogsListenerProc(NapalmLogsProc):
     def __init__(self, socket):
         self.socket = socket
         self.__up = False
-        self._setup_ipc()
 
     def _setup_ipc(self):
         '''
@@ -43,6 +42,7 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         '''
         Listen to messages and queue them.
         '''
+        self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
@@ -56,3 +56,4 @@ class NapalmLogsListenerProc(NapalmLogsProc):
 
     def stop(self):
         self.__up = False
+        self.pub.close()
