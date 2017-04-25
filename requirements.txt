@@ -3,3 +3,4 @@ pyyaml
 pynacl
 u-msgpack-python
 napalm-yang
+-e git://github.com/napalm-automation/pyangbind.git@napalm_custom#egg=pyangbind
