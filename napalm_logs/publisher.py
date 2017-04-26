@@ -71,7 +71,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         # generating a nonce
         nonce = nacl.utils.random(nacl.secret.SecretBox.NONCE_SIZE)
         # encrypting using the nonce
-        encrypted = self.__safe.encrypt(bin_obj, nonce)
+        encrypted = self.__safe.encrypt(obj, nonce)
         # sign the message
         signed = self.__signing_key.sign(encrypted)
         return signed
