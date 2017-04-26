@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 # Import pythond stdlib
 import ssl
 import socket
+import logging
 
 # Import python stdlib
 import umsgpack
@@ -21,6 +22,8 @@ from nacl.exceptions import BadSignatureError
 import napalm_logs.config as defaults
 from napalm_logs.exceptions import CryptoException
 from napalm_logs.exceptions import BadSignatureException
+
+log = logging.getLogger(__name__)
 
 
 def authenticate(certificate,
