@@ -9,7 +9,7 @@ prefix:
     # Most log lines have a process ID, however some do not
     processId: \[?(\d+)?\]?
     tag: (\w+)
-  line: '{date} {time}  {host} {processName}{processId}: {tag}: '
+  line: '{date} {time} {host} {processName}{processId}: {tag}: '
 
 messages:
   # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
