@@ -17,13 +17,13 @@ import napalm_logs.utils
 import napalm_logs.config
 
 CERTIFICATE_PATH = '/tmp/__napalm_logs.crt'
-SYSLOG_MSG = ('<149>Mar 30 12:45:19  re0.edge01.bjm01 '
+SYSLOG_MSG = ('<149>Mar 30 12:45:19 re0.edge01.bjm01 '
               'rpd[2902]: BGP_PREFIX_THRESH_EXCEEDED: 172.17.17.1 '
               '(External AS 123456): Configured maximum prefix-limit '
               'threshold(160) exceeded for inet-unicast nlri: 181 '
               '(instance master)')
-ROUTERS = 10  # count of devices producing syslog messages
-PACE = 10000  # messages per second
+ROUTERS = 5  # count of devices producing syslog messages
+PACE = 1000  # messages per second
 HEAT_TIME = 10  # 10 seconds to full the buffer
 RUN_TIME = 60
 
@@ -41,7 +41,7 @@ def client():
     sock.setsockopt(zmq.SUBSCRIBE, '')
     heat_stop = time.time() + HEAT_TIME
     stop_time = time.time() + RUN_TIME
-    while time.time()< heat_stop:
+    while time.time() < heat_stop:
         obj = sock.recv()
         decrypted = napalm_logs.utils.decrypt(obj, vk, pk)
     count = 0
@@ -57,15 +57,18 @@ def router():
     Artificially inject dummy syslog messages
     with a very high rate.
     Multiple instances of this have to be started,
-    sending messages to the same
+    sending messages to the same.
     '''
     skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     stop_time = time.time() + RUN_TIME
+    count = 0
     while time.time() < stop_time:
         skt.sendto(SYSLOG_MSG,
                    (napalm_logs.config.ADDRESS,
-                    napalm_logs.config.ADDRESS))
+                    1026))
+        count += 1
         time.sleep(float(1/PACE))
+    print('Sent {0} messages in {1} seconds'.format(count, RUN_TIME))
 
 
 def main():
