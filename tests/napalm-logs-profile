@@ -20,12 +20,12 @@ import napalm_logs.config as defaults
 from napalm_logs.scripts.cli import NLOptionParser
 
 SYSLOG_MSG = ('<149>Mar 30 12:45:19 re0.edge01.bjm01 '
-              'rpd[2902]: BGP_PREFIX_THRESH_EXCEEDED: 172.17.17.1 '
+              'rpd[{id}]: BGP_PREFIX_THRESH_EXCEEDED: 172.17.17.1 '
               '(External AS 123456): Configured maximum prefix-limit '
               'threshold(160) exceeded for inet-unicast nlri: 181 '
               '(instance master)')
 ROUTERS = 5  # count of devices producing syslog messages
-PACE = 20  # messages per second
+PACE = 2000  # messages per second
 HEAT_TIME = 10  # 10 seconds to full the buffer
 RUN_TIME = 60
 
@@ -63,9 +63,9 @@ class ProfilerOptionParser(NLOptionParser):
             help=('Total test time. Default: {0}'.format(RUN_TIME))
         )
         self.add_option(
-            '-s', '--syslog-message',
+            '-s', '--syslog-sample',
             dest='syslog_sample',
-            help=('Syslog message sample. Default: {0}'.format(SYSLOG_MSG))
+            help=('Syslog sample message. Default: {0}'.format(SYSLOG_MSG))
         )
 
     def extra_parse(self, log, screen_handler):
@@ -100,13 +100,17 @@ def client(**config):
     count = 0
     while time.time() < stop_time:
         obj = sock.recv()
+        log.debug('Received:')
+        log.debug(obj)
         decrypted = napalm_logs.utils.decrypt(obj, vk, pk)
+        log.debug('Decrypted:')
+        log.debug(decrypted)
         count += 1
     print('Received {0} messages in {1} seconds'.format(count,
                                                         config['run_time']-config['heat_time']))
 
 
-def router(**config):
+def router(id, **config):
     '''
     Artificially inject dummy syslog messages
     with a very high rate.
@@ -117,7 +121,8 @@ def router(**config):
     stop_time = time.time() + config['run_time']
     count = 0
     while time.time() < stop_time:
-        skt.sendto(config['syslog_sample'],
+        log.debug('Sending sample syslog to {0}:{1}'.format(config['address'], config['port']))
+        skt.sendto(config['syslog_sample'].format(id=str(id*10)+str(count)),
                    (config['address'], config['port']))
         count += 1
         time.sleep(float(1/config['pace']))
@@ -133,11 +138,11 @@ def main():
     log.addHandler(screen_logger)
     pop = ProfilerOptionParser()
     config = pop.extra_parse(log, screen_logger)
-    for _ in range(config['routers']):
-        rproc = Process(target=router, kwargs=config)
-        rproc.start()
     cproc = Process(target=client, kwargs=config)
     cproc.start()
+    for _ in range(config['routers']):
+        rproc = Process(target=router, args=(_,), kwargs=config)
+        rproc.start()
 
 
 if __name__ == '__main__':
