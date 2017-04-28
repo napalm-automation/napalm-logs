@@ -38,6 +38,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         self.__up = False
         self.compiled_messages = None
         self._compile_messages()
+        self.__yang_cache = {}
 
     def _setup_ipc(self):
         '''
@@ -208,20 +209,32 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     return None
         return data
 
+    def _get_oc_model(self, model_name):
+        '''
+        Return the processed YANG model binded to python object.
+        To reduce the overhead, caches the object in memory when
+        generation is successful.
+        '''
+        if model_name in self.__yang_cache:
+            return self.__yang_cache[model_name]
+        oc_obj = napalm_yang.base.Root()
+        try:
+            oc_obj.add_model(getattr(napalm_yang.models, model_name))
+        except AttributeError:
+            error_string = 'Unable to load openconfig module {0},' \
+                           ' please make sure the config is correct'.format(model_name)
+            log.error(error_string, exc_info=True)
+            raise UnknownOpenConfigModel(error_string)
+        self.__yang_cache[model_name] = oc_obj
+        return oc_obj
+
     def _emit(self, **kwargs):
         '''
         Emit an OpenConfig object given a certain combination of
         fields mappeed in the config to the corresponding hierarchy.
         '''
         # Load the appropriate OC model
-        oc_obj = napalm_yang.base.Root()
-        try:
-            oc_obj.add_model(getattr(napalm_yang.models, kwargs['oc_model']))
-        except AttributeError:
-            error_string = 'Unable to load openconfig module {0},' \
-                           ' please make sure the config is correct'.format(kwargs['oc_model'])
-            log.error(error_string, exc_info=True)
-            raise UnknownOpenConfigModel(error_string)
+        oc_obj = self._get_oc_model(kwargs['oc_model'])
         oc_dict = {}
         for mapping, result_key in kwargs['oc_mapping']['variables'].items():
             result = kwargs[result_key]
@@ -269,6 +282,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         while self.__up:
             bin_obj = self.sub.recv()
             msg_dict, address = umsgpack.unpackb(bin_obj, use_list=False)
+            log.debug('Received {0} from {1}'.format(msg_dict, address))
             kwargs = self._parse(msg_dict)
             if not kwargs:
                 continue
@@ -277,6 +291,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             except Exception as err:
                 log.exception('Unexpected error when generating the OC object.', exc_info=True)
                 continue
+            log.debug('Generated OC object')
+            log.debug(oc_obj)
             error = kwargs.get('error')
             model_name = kwargs.get('oc_model')
             host = msg_dict.get('host')
@@ -291,6 +307,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'model_name': model_name,
                 'os': self._name
             }
+            log.debug('Dumping:')
+            log.debug(to_publish)
             self._publish(to_publish)
 
     def stop(self):

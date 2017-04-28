@@ -1,0 +1,144 @@
+#!/usr/bin/env python
+'''
+Profile the napalm-logs processor
+'''
+from __future__ import absolute_import
+
+# Import python stdlib
+from multiprocessing import Process
+
+# Import third party libs
+import zmq
+import sys
+import time
+import socket
+import logging
+
+# Import napalm-logs pkgs
+import napalm_logs.utils
+import napalm_logs.config as defaults
+from napalm_logs.scripts.cli import NLOptionParser
+
+SYSLOG_MSG = ('<149>Mar 30 12:45:19 re0.edge01.bjm01 '
+              'rpd[2902]: BGP_PREFIX_THRESH_EXCEEDED: 172.17.17.1 '
+              '(External AS 123456): Configured maximum prefix-limit '
+              'threshold(160) exceeded for inet-unicast nlri: 181 '
+              '(instance master)')
+ROUTERS = 5  # count of devices producing syslog messages
+PACE = 20  # messages per second
+HEAT_TIME = 10  # 10 seconds to full the buffer
+RUN_TIME = 60
+
+log = logging.getLogger(__name__)
+
+
+class ProfilerOptionParser(NLOptionParser):
+
+    usage = 'napalm-logs-profile [options]'
+    description = 'napalm-logs profiler script'
+
+    def extra_options(self):
+        self.add_option(
+            '-r', '--routers',
+            dest='routers',
+            type=int,
+            help=('Profile router simulators. Default: {0}'.format(ROUTERS))
+        )
+        self.add_option(
+            '--pace',
+            dest='pace',
+            type=int,
+            help=('Artificial syslog message pace. Default: {0}'.format(PACE))
+        )
+        self.add_option(
+            '--heat-time',
+            dest='heat_time',
+            type=int,
+            help=('Heat time. Default: {0}'.format(HEAT_TIME))
+        )
+        self.add_option(
+            '--test-time',
+            dest='test_time',
+            type=int,
+            help=('Total test time. Default: {0}'.format(RUN_TIME))
+        )
+        self.add_option(
+            '-s', '--syslog-message',
+            dest='syslog_sample',
+            help=('Syslog message sample. Default: {0}'.format(SYSLOG_MSG))
+        )
+
+    def extra_parse(self, log, screen_handler):
+        self.extra_options()
+        main_cfg = self.parse(log, screen_handler)
+        main_cfg.update({
+            'routers': self.options.routers or ROUTERS,
+            'pace': self.options.pace or PACE,
+            'heat_time': self.options.heat_time or HEAT_TIME,
+            'run_time': self.options.test_time or RUN_TIME,
+            'syslog_sample': self.options.syslog_sample or SYSLOG_MSG
+        })
+        return main_cfg
+
+
+def client(**config):
+    '''
+    Start the client and listen to messages.
+    '''
+    pk, vk = napalm_logs.utils.authenticate(config['certificate'])
+    context = zmq.Context()
+    sock = context.socket(zmq.SUB)
+    sock.connect('tcp://{addr}:{port}'.format(
+        addr=config['publish_address'],
+        port=config['publish_port']))
+    sock.setsockopt(zmq.SUBSCRIBE, '')
+    heat_stop = time.time() + config['heat_time']
+    stop_time = time.time() + config['run_time']
+    while time.time() < heat_stop:
+        obj = sock.recv()
+        decrypted = napalm_logs.utils.decrypt(obj, vk, pk)
+    count = 0
+    while time.time() < stop_time:
+        obj = sock.recv()
+        decrypted = napalm_logs.utils.decrypt(obj, vk, pk)
+        count += 1
+    print('Received {0} messages in {1} seconds'.format(count,
+                                                        config['run_time']-config['heat_time']))
+
+
+def router(**config):
+    '''
+    Artificially inject dummy syslog messages
+    with a very high rate.
+    Multiple instances of this have to be started,
+    sending messages to the same.
+    '''
+    skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    stop_time = time.time() + config['run_time']
+    count = 0
+    while time.time() < stop_time:
+        skt.sendto(config['syslog_sample'],
+                   (config['address'], config['port']))
+        count += 1
+        time.sleep(float(1/config['pace']))
+    print('Sent {0} messages in {1} seconds'.format(count, config['run_time']))
+
+
+def main():
+    '''
+    Start profiling.
+    '''
+    screen_logger = logging.StreamHandler(sys.stdout)
+    screen_logger.setFormatter(logging.Formatter(defaults.LOG_FORMAT))
+    log.addHandler(screen_logger)
+    pop = ProfilerOptionParser()
+    config = pop.extra_parse(log, screen_logger)
+    for _ in range(config['routers']):
+        rproc = Process(target=router, kwargs=config)
+        rproc.start()
+    cproc = Process(target=client, kwargs=config)
+    cproc.start()
+
+
+if __name__ == '__main__':
+    main()
