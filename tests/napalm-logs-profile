@@ -122,10 +122,12 @@ def router(id, **config):
     count = 0
     while time.time() < stop_time:
         log.debug('Sending sample syslog to {0}:{1}'.format(config['address'], config['port']))
-        skt.sendto(config['syslog_sample'].format(id=str(id*10)+str(count)),
+        # config['syslog_sample'] = '{timestamp} {id}'
+        skt.sendto(config['syslog_sample'].format(id=str(id*10)+str(count),
+                                                  timestamp=time.time()),
                    (config['address'], config['port']))
         count += 1
-        time.sleep(float(1/config['pace']))
+        time.sleep(1.0/config['pace'])
     print('Sent {0} messages in {1} seconds'.format(count, config['run_time']))
 
 
