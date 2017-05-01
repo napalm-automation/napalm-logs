@@ -21,4 +21,4 @@ script:
   - cp examples/server.key /tmp/__napalm_logs.key
   - napalm-logs --log-file cli -l debug --certificate /tmp/__napalm_logs.crt --keyfile /tmp/__napalm_logs.key &
   - cd tests/
-  - python profile.py
+  - python napalm-logs-profile -r 5 --certificate /tmp/__napalm_logs.crt --log-file cli -l debug
