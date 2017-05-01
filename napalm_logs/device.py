@@ -32,9 +32,11 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
     '''
     Device sub-process class.
     '''
-    def __init__(self, name, config):
+    def __init__(self, name, config, pipe, pub_pipe):
         self._name = name
+        self.pipe = pipe
         self._config = config
+        self.pub_pipe = pub_pipe
         self.__up = False
         self.compiled_messages = None
         self._compile_messages()
@@ -48,11 +50,11 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         '''
         ctx = zmq.Context()
         # subscribe to device IPC
-        self.sub = ctx.socket(zmq.SUB)
+        self.sub = ctx.socket(zmq.PULL)
         # subscribe to the corresponding IPC pipe
         ipc_url = DEV_IPC_URL_TPL.format(os=self._name)
-        self.sub.bind(ipc_url)
-        self.sub.setsockopt(zmq.SUBSCRIBE, '')
+        self.sub.connect(ipc_url)
+        # self.sub.setsockopt(zmq.SUBSCRIBE, '')
         # publish to the publisher IPC
         self.pub = ctx.socket(zmq.PUB)
         self.pub.connect(PUB_IPC_URL)
@@ -209,7 +211,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     return None
         return data
 
-    def _get_oc_model(self, model_name):
+    def _get_oc_obj(self, model_name):
         '''
         Return the processed YANG model binded to python object.
         To reduce the overhead, caches the object in memory when
@@ -217,6 +219,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         '''
         if model_name in self.__yang_cache:
             return self.__yang_cache[model_name]
+        log.debug('YANG binding not cached yet, generating')
         oc_obj = napalm_yang.base.Root()
         try:
             oc_obj.add_model(getattr(napalm_yang.models, model_name))
@@ -234,7 +237,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         fields mappeed in the config to the corresponding hierarchy.
         '''
         # Load the appropriate OC model
-        oc_obj = self._get_oc_model(kwargs['oc_model'])
+        log.debug('Getting the YANG model binding')
+        oc_obj = self._get_oc_obj(kwargs['oc_model'])
+        log.debug('Filling the OC model')
         oc_dict = {}
         for mapping, result_key in kwargs['oc_mapping']['variables'].items():
             result = kwargs[result_key]
@@ -274,15 +279,16 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         '''
         Start the worker process.
         '''
-        self._setup_ipc()
+        # self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         self.__up = True
         while self.__up:
-            bin_obj = self.sub.recv()
-            msg_dict, address = umsgpack.unpackb(bin_obj, use_list=False)
-            log.debug('Received {0} from {1}'.format(msg_dict, address))
+            # bin_obj = self.sub.recv()
+            # msg_dict, address = umsgpack.unpackb(bin_obj, use_list=False)
+            msg_dict, address = self.pipe.recv()
+            log.debug('{0}: dequeued {1}, received from {2}'.format(self._name, msg_dict, address))
             kwargs = self._parse(msg_dict)
             if not kwargs:
                 continue
@@ -291,7 +297,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             except Exception as err:
                 log.exception('Unexpected error when generating the OC object.', exc_info=True)
                 continue
-            log.debug('Generated OC object')
+            log.debug('Generated OC object:')
             log.debug(oc_obj)
             error = kwargs.get('error')
             model_name = kwargs.get('oc_model')
@@ -307,14 +313,15 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'model_name': model_name,
                 'os': self._name
             }
-            log.debug('Dumping:')
+            log.debug('Queueing to be published:')
             log.debug(to_publish)
-            self._publish(to_publish)
+            self.pub_pipe.send(to_publish)
+            # self._publish(to_publish)
 
     def stop(self):
         '''
         Stop the worker process.
         '''
         self.__up = False
-        self.sub.close()
-        self.pub.close()
+        # self.sub.close()
+        # self.pub.close()

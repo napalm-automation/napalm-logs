@@ -32,12 +32,14 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                  address,
                  port,
                  transport_type,
+                 pipe,
                  private_key,
                  signing_key,
                  disable_security=False):
         self.__up = False
         self.address = address
         self.port = port
+        self.pipe = pipe
         self.disable_security = disable_security
         self._transport_type = transport_type
         if not disable_security:
@@ -68,10 +70,12 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         Prepare the object to be sent over the untrusted channel.
         '''
+        # serialize the object
+        bin_obj = umsgpack.packb(obj)
         # generating a nonce
         nonce = nacl.utils.random(nacl.secret.SecretBox.NONCE_SIZE)
         # encrypting using the nonce
-        encrypted = self.__safe.encrypt(obj, nonce)
+        encrypted = self.__safe.encrypt(bin_obj, nonce)
         # sign the message
         signed = self.__signing_key.sign(encrypted)
         return signed
@@ -80,18 +84,22 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         Listen to messages and publish them.
         '''
-        self._setup_ipc()
+        # self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         self.transport.start()
         self.__up = True
         while self.__up:
-            bin_obj = self.sub.recv()  # already serialized
+            # bin_obj = self.sub.recv()  # already serialized
+            obj = self.pipe.recv()
+            log.debug('Publishing the OC object (serialised)')
             if not self.disable_security:
-                bin_obj = self._prepare(bin_obj)
+                bin_obj = self._prepare(obj)
+            else:
+                bin_obj = umsgpack.packb(obj)
             self.transport.publish(bin_obj)
 
     def stop(self):
         self.__up = False
-        self.sub.close()
+        # self.sub.close()

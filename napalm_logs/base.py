@@ -307,12 +307,12 @@ class NapalmLogs:
         )
         return proc
 
-    def _start_lst_proc(self, skt):
+    def _start_lst_proc(self, skt, pipe):
         '''
         Start the listener process.
         '''
         log.debug('Starting the listener process')
-        listener = NapalmLogsListenerProc(skt)
+        listener = NapalmLogsListenerProc(skt, pipe)
         proc = Process(target=listener.start)
         proc.start()
         log.debug('Started listener process as {pname} with PID {pid}'.format(
@@ -322,12 +322,14 @@ class NapalmLogs:
         )
         return proc
 
-    def _start_srv_proc(self):
+    def _start_srv_proc(self, pipe, os_pipes):
         '''
         Start the server process.
         '''
         log.debug('Starting the server process')
-        server = NapalmLogsServerProc(self.config_dict)
+        server = NapalmLogsServerProc(self.config_dict,
+                                      pipe,
+                                      os_pipes)
         proc = Process(target=server.start)
         proc.start()
         log.debug('Started server process as {pname} with PID {pid}'.format(
@@ -337,7 +339,7 @@ class NapalmLogs:
         )
         return proc
 
-    def _start_pub_proc(self):
+    def _start_pub_proc(self, pub_pipe):
         '''
         Start the publisher process.
         '''
@@ -345,6 +347,7 @@ class NapalmLogs:
         publisher = NapalmLogsPublisherProc(self.publish_address,
                                             self.publish_port,
                                             self.transport,
+                                            pub_pipe,
                                             self.__priv_key,
                                             self.__signing_key,
                                             disable_security=self.disable_security)
@@ -359,13 +362,18 @@ class NapalmLogs:
 
     def _start_dev_proc(self,
                         device_os,
-                        device_config):
+                        device_config,
+                        device_pipe,
+                        dev_pub_pipe):
         '''
         Start the device worker process.
         '''
         # TODO remove the pipe overhead when migrating to zmq IPC
         log.info('Starting the child process for {dos}'.format(dos=device_os))
-        dos = NapalmLogsDeviceProc(device_os, device_config)
+        dos = NapalmLogsDeviceProc(device_os,
+                                   device_config,
+                                   device_pipe,
+                                   dev_pub_pipe)
         os_proc = Process(target=dos.start)
         os_proc.start()
         log.debug('Started process {pname} for {dos}, having PID {pid}'.format(
@@ -414,33 +422,24 @@ class NapalmLogs:
             self.__signing_key = nacl.signing.SigningKey.generate()
             # start the keepalive thread for the auth sub-process
             self._start_auth_proc(auth_skt)
-            # auth_thread = threading.Thread(target=self._respawn_when_dead,
-            #                                args=(self._start_auth_proc, auth_skt))
-            # auth_thread.start()
-        # publisher section
-        # pub_thread = threading.Thread(target=self._respawn_when_dead,
-        #                               args=(self._start_pub_proc,))
-        # pub_thread.start()
-        self._start_pub_proc()
+        # publisher process start
+        pub_pipe, dev_pub_pipe = Pipe(duplex=False)
+        self._start_pub_proc(pub_pipe)
         # device process start
         log.info('Starting child processes for each device type')
+        os_pipes = {}
         for device_os, device_config in self.config_dict.items():
-            self._start_dev_proc(device_os, device_config)
-            # os_thread = threading.Thread(target=self._respawn_when_dead,
-            #                              args=(self._start_dev_proc,
-            #                                    device_os,
-            #                                    device_config))
-            # os_thread.start()
-        # server section
-        # srv_thread = threading.Thread(target=self._respawn_when_dead,
-        #                               args=(self._start_srv_proc,))
-        # srv_thread.start()
-        self._start_srv_proc()
-        # listener section
-        # lst_thread = threading.Thread(target=self._respawn_when_dead,
-        #                               args=(self._start_lst_proc, skt))
-        # lst_thread.start()
-        self._start_lst_proc(skt)
+            device_pipe, srv_pipe = Pipe(duplex=False)
+            self._start_dev_proc(device_os,
+                                 device_config,
+                                 device_pipe,
+                                 dev_pub_pipe)
+            os_pipes[device_os] = srv_pipe
+        # start server process
+        srv_pipe, lst_pipe = Pipe(duplex=False)
+        self._start_srv_proc(srv_pipe, os_pipes)
+        # start listener process
+        self._start_lst_proc(skt, lst_pipe)
 
     def stop_engine(self):
         log.info('Shutting down the engine')
