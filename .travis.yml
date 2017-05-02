@@ -20,6 +20,6 @@ deploy:
 script:
   - cp examples/server.crt /tmp/__napalm_logs.crt
   - cp examples/server.key /tmp/__napalm_logs.key
-  - napalm-logs --log-file cli -l debug --certificate /tmp/__napalm_logs.crt --keyfile /tmp/__napalm_logs.key &
+  - sudo napalm-logs --log-file cli -l debug --certificate /tmp/__napalm_logs.crt --keyfile /tmp/__napalm_logs.key &
   - cd tests/
   - python napalm-logs-profile -r 5 --pace 200000 --certificate /tmp/__napalm_logs.crt --log-file cli -l debug
