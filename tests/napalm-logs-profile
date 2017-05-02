@@ -25,7 +25,7 @@ SYSLOG_MSG = ('<149>Mar 30 12:45:19 re0.edge01.bjm01 '
               'threshold(160) exceeded for inet-unicast nlri: 181 '
               '(instance master)')
 ROUTERS = 5  # count of devices producing syslog messages
-PACE = 2000  # messages per second
+PACE = 200000  # messages per second
 HEAT_TIME = 10  # 10 seconds to full the buffer
 RUN_TIME = 60
 
@@ -94,10 +94,10 @@ def client(**config):
     sock.setsockopt(zmq.SUBSCRIBE, '')
     heat_stop = time.time() + config['heat_time']
     stop_time = time.time() + config['run_time']
-    while time.time() < heat_stop:
-        obj = sock.recv()
-        decrypted = napalm_logs.utils.decrypt(obj, vk, pk)
     count = 0
+    # while time.time() < heat_stop:
+    #     obj = sock.recv()
+    #     decrypted = napalm_logs.utils.decrypt(obj, vk, pk)
     while time.time() < stop_time:
         obj = sock.recv()
         log.debug('Received:')
