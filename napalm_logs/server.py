@@ -90,7 +90,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
         we are able to identify the operating system and then continue parsing.
         '''
         ret = {}
-        for dev_os, data in self.compiled_prefixes.iteritems():
+        for dev_os, data in self.compiled_prefixes.items():
             match = data.get('prefix', '').search(msg)
             if not match:
                 continue
