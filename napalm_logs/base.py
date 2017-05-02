@@ -397,7 +397,7 @@ class NapalmLogs:
             skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             skt.bind((self.address, self.port))
-        except socket.error, msg:
+        except socket.error as msg:
             error_string = 'Unable to bind to port {} on {}: {}'.format(self.port, self.address, msg)
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
@@ -409,7 +409,7 @@ class NapalmLogs:
             auth_skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             auth_skt.bind((self.auth_address, self.auth_port))
-        except socket.error, msg:
+        except socket.error as msg:
             error_string = 'Unable to bind (auth) to port {} on {}: {}'.format(self.auth_port, self.auth_address, msg)
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
