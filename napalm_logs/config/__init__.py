@@ -21,6 +21,7 @@ LOG_LEVEL = 'warning'
 LOG_FORMAT = '%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'
 LOG_FILE = os.path.join(ROOT_DIR, 'var', 'log', 'napalm', 'logs')
 LOG_FILE_CLI_OPTIONS = ('cli', 'screen')
+KAFKA_TOPIC = "napalm-logs"
 
 LOGGING_LEVEL = {
     'debug': logging.DEBUG,
