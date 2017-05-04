@@ -76,6 +76,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 sorted_position[elem[1]] = i + 1
             # Escape the line, then remove the escape for the curly bracets so they can be used when formatting
             escaped = re.escape(line).replace('\{', '{').replace('\}', '}')
+            # Replace a whitespace with \s+
+            escaped = escaped.replace('\ ', '\s+')
             self.compiled_prefixes[dev_os] = {
                 'prefix': re.compile(escaped.format(**values)),
                 'prefix_positions': sorted_position,
