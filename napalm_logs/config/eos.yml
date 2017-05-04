@@ -1,4 +1,8 @@
 # You should not use special characture in the value keys
+#
+# A single whitespace in `line` will match any number of whitespaces. You should be explicit when
+# Matching white space in `values`
+#
 prefix:
   time_format: "%b %d %H:%M:%S"
   values:
