@@ -175,7 +175,7 @@ class NLOptionParser(OptionParser, object):
             log.info('Unable to read from {0}'.format(filepath))
         return config
 
-    def parse(self, screen_handler):
+    def parse(self, log, screen_handler):
         self.prepare()
         self.parse_args()
         if self.options.version:
@@ -236,7 +236,7 @@ def napalm_logs_engine():
     screen_logger.setFormatter(logging.Formatter(defaults.LOG_FORMAT))
     log.addHandler(screen_logger)
     nlop = NLOptionParser()
-    config = nlop.parse(screen_logger)
+    config = nlop.parse(log, screen_logger)
     nl = napalm_logs.NapalmLogs(**config)
     try:
         nl.start_engine()

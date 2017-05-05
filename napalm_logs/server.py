@@ -6,8 +6,9 @@ from __future__ import absolute_import
 
 # Import pythond stdlib
 import os
-import logging
 import re
+import time
+import logging
 import threading
 
 # Import third party libs
@@ -26,10 +27,12 @@ class NapalmLogsServerProc(NapalmLogsProc):
     '''
     Server sub-process class.
     '''
-    def __init__(self, config):
+    def __init__(self, config, pipe, os_pipes):
         self.config = config
+        self.pipe = pipe
+        self.os_pipes = os_pipes
         self.__up = False
-        self.pubs = {}
+        # self.pubs = {}
         self.compiled_prefixes = None
         self._compile_prefixes()
 
@@ -41,15 +44,14 @@ class NapalmLogsServerProc(NapalmLogsProc):
         '''
         ctx = zmq.Context()
         # subscribe to listener
-        self.sub = ctx.socket(zmq.SUB)
-        self.sub.bind(LST_IPC_URL)
-        self.sub.setsockopt(zmq.SUBSCRIBE, '')
+        self.sub = ctx.socket(zmq.PULL)
+        self.sub.connect(LST_IPC_URL)
         # device publishers
         os_types = self.config.keys()
         for dev_os in os_types:
-            pub = ctx.socket(zmq.PUB)
+            pub = ctx.socket(zmq.PUSH)
             ipc_url = DEV_IPC_URL_TPL.format(os=dev_os)
-            pub.connect(ipc_url)
+            pub.bind(ipc_url)
             self.pubs[dev_os] = pub
 
     def _compile_prefixes(self):
@@ -90,7 +92,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
         we are able to identify the operating system and then continue parsing.
         '''
         ret = {}
-        for dev_os, data in self.compiled_prefixes.iteritems():
+        for dev_os, data in self.compiled_prefixes.items():
             match = data.get('prefix', '').search(msg)
             if not match:
                 continue
@@ -110,25 +112,30 @@ class NapalmLogsServerProc(NapalmLogsProc):
         inspect and identify the operating system,
         then queue the message correspondingly.
         '''
-        self._setup_ipc()
+        # self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         self.__up = True
         while self.__up:
             # Take messages from the main queue
-            bin_obj = self.sub.recv()
-            msg, address = umsgpack.unpackb(bin_obj, use_list=False)
+            # bin_obj = self.sub.recv()
+            # msg, address = umsgpack.unpackb(bin_obj, use_list=False)
+            msg, address = self.pipe.recv()
+            log.debug('[{2}] Dequeued message from {0}: {1}'.format(address, msg, time.time()))
             dev_os, msg_dict = self._identify_os(msg)
+            log.debug('Identified OS: {0}'.format(dev_os))
             if not dev_os or not isinstance(msg_dict, dict):
                 # _identify_os should return a string and a dict
                 # providing the info for the device OS
                 # and the decoded message prefix
                 continue
             # Then send the message in the right queue
-            obj = (msg_dict, address)
-            bin_obj = umsgpack.packb(obj)
-            self.pubs[dev_os].send(bin_obj)
+            # obj = (msg_dict, address)
+            # bin_obj = umsgpack.packb(obj)
+            log.debug('Queueing message to {0}'.format(dev_os))
+            # self.pubs[dev_os].send(bin_obj)
+            self.os_pipes[dev_os].send((msg_dict, address))
 
     def stop(self):
         self.__up = False
