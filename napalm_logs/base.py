@@ -42,6 +42,7 @@ class NapalmLogs:
     def __init__(self,
                  address='0.0.0.0',
                  port=514,
+                 protocol='udp',
                  transport='zmq',
                  publish_address='0.0.0.0',
                  publish_port=49017,
@@ -61,12 +62,14 @@ class NapalmLogs:
 
         :param address: The address to bind the syslog client. Default: 0.0.0.0.
         :param port: Listen port. Default: 514.
+        :param protocol: Listen protocol. Default: udp.
         :param publish_address: The address to bing when publishing the OC
                                  objects. Default: 0.0.0.0.
         :param publish_port: Publish port. Default: 49017.
         '''
         self.address = address
         self.port = port
+        self.protocol = protocol
         self.publish_address = publish_address
         self.publish_port = publish_port
         self.auth_address = auth_address
@@ -312,12 +315,12 @@ class NapalmLogs:
         )
         return proc
 
-    def _start_lst_proc(self, skt, pipe):
+    def _start_lst_proc(self, address, port, protocol, pipe):
         '''
         Start the listener process.
         '''
         log.debug('Starting the listener process')
-        listener = NapalmLogsListenerProc(skt, pipe)
+        listener = NapalmLogsListenerProc(address, port, protocol, pipe)
         proc = Process(target=listener.start)
         proc.start()
         log.debug('Started listener process as {pname} with PID {pid}'.format(
@@ -391,21 +394,9 @@ class NapalmLogs:
 
     def start_engine(self):
         '''
-        Start the child processes (one per device OS),
-        open the socket to start receiving messages.
+        Start the child processes (one per device OS)
         '''
         # main listener socket
-        log.debug('Creating the listener socket')
-        if ':' in self.address:
-            skt = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-        else:
-            skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try:
-            skt.bind((self.address, self.port))
-        except socket.error as msg:
-            error_string = 'Unable to bind to port {} on {}: {}'.format(self.port, self.address, msg)
-            log.error(error_string, exc_info=True)
-            raise BindException(error_string)
         # auth proc section
         log.debug('Creating the auth socket')
         if ':' in self.auth_address:
@@ -444,8 +435,10 @@ class NapalmLogs:
         srv_pipe, lst_pipe = Pipe(duplex=False)
         self._processes.append(self._start_srv_proc(srv_pipe, os_pipes))
         # start listener process
-        self._processes.append(self._start_lst_proc(skt, lst_pipe))
-
+        self._processes.append(self._start_lst_proc(self.address,
+                                                    self.port,
+                                                    self.protocol,
+                                                    lst_pipe))
 
     def stop_engine(self):
         log.info('Shutting down the engine')

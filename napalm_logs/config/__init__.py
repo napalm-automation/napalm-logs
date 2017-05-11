@@ -13,6 +13,7 @@ ROOT_DIR = '/'
 CONFIG_FILE = os.path.join(ROOT_DIR, 'etc', 'napalm', 'logs')
 ADDRESS = '0.0.0.0'
 PORT = 514
+PROTOCOL = 'udp'
 PUBLISH_ADDRESS = '0.0.0.0'
 PUBLISH_PORT = 49017
 AUTH_ADDRESS = '0.0.0.0'
@@ -58,6 +59,7 @@ VALID_CONFIG = {
 
 # listener
 BUFFER_SIZE = 1024
+TIMEOUT = 60
 
 # device
 DEFAULT_DELIM = '//'
