@@ -10,6 +10,7 @@ import re
 import ssl
 import time
 import yaml
+import signal
 import socket
 import logging
 import threading
@@ -87,6 +88,10 @@ class NapalmLogs:
         # Private vars
         self.__priv_key = None
         self.__signing_key = None
+        self._processes = []
+
+    def _exit_gracefully(self, signum, _):
+        self.stop_engine()
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self.stop_engine()
@@ -421,25 +426,31 @@ class NapalmLogs:
             log.debug('Generating the signing key')
             self.__signing_key = nacl.signing.SigningKey.generate()
             # start the keepalive thread for the auth sub-process
-            self._start_auth_proc(auth_skt)
+            self._processes.append(self._start_auth_proc(auth_skt))
         # publisher process start
         pub_pipe, dev_pub_pipe = Pipe(duplex=False)
-        self._start_pub_proc(pub_pipe)
+        self._processes.append(self._start_pub_proc(pub_pipe))
         # device process start
         log.info('Starting child processes for each device type')
         os_pipes = {}
         for device_os, device_config in self.config_dict.items():
             device_pipe, srv_pipe = Pipe(duplex=False)
-            self._start_dev_proc(device_os,
-                                 device_config,
-                                 device_pipe,
-                                 dev_pub_pipe)
+            self._processes.append(self._start_dev_proc(device_os,
+                                   device_config,
+                                   device_pipe,
+                                   dev_pub_pipe))
             os_pipes[device_os] = srv_pipe
         # start server process
         srv_pipe, lst_pipe = Pipe(duplex=False)
-        self._start_srv_proc(srv_pipe, os_pipes)
+        self._processes.append(self._start_srv_proc(srv_pipe, os_pipes))
         # start listener process
-        self._start_lst_proc(skt, lst_pipe)
+        self._processes.append(self._start_lst_proc(skt, lst_pipe))
+
 
     def stop_engine(self):
         log.info('Shutting down the engine')
+        # Set SIGTERM to all child processes, then join them
+        for proc in self._processes:
+            proc.terminate()
+        for proc in self._processes:
+            proc.join()

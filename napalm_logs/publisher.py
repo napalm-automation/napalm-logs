@@ -7,6 +7,7 @@ from __future__ import absolute_import
 # Import pythond stdlib
 import os
 import time
+import signal
 import logging
 import threading
 
@@ -20,6 +21,8 @@ import nacl.secret
 from napalm_logs.config import PUB_IPC_URL
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.transport import get_transport
+# exceptions
+from napalm_logs.exceptions import NapalmLogsExit
 
 log = logging.getLogger(__name__)
 
@@ -46,6 +49,10 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
             self.__safe = nacl.secret.SecretBox(private_key)
             self.__signing_key = signing_key
         self._setup_transport()
+
+    def _exit_gracefully(self, signum, _):
+        log.debug('Caught signal in publisher process')
+        self.stop()
 
     def _setup_ipc(self):
         '''
@@ -88,11 +95,21 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
+        signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.transport.start()
         self.__up = True
         while self.__up:
             # bin_obj = self.sub.recv()  # already serialized
-            obj = self.pipe.recv()
+            try:
+                obj = self.pipe.recv()
+            except IOError as error:
+                if self.__up is False:
+                    return
+                else:
+                    msg = 'Received IOError on publisher pipe: {}'.format(error)
+                    log.error(msg, exc_info=True)
+                    raise NapalmLogsExit(msg)
+
             log.debug('Publishing the OC object (serialised)')
             if not self.disable_security:
                 bin_obj = self._prepare(obj)
@@ -101,5 +118,6 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
             self.transport.publish(bin_obj)
 
     def stop(self):
+        log.info('Stopping publisher process')
         self.__up = False
-        # self.sub.close()
+        self.pipe.close()
