@@ -30,6 +30,8 @@ class ZMQTransport(TransportBase):
     def start(self):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.PUB)
+        if ':' in self.addr:
+            self.socket.ipv6 = True
         try:
             self.socket.bind('tcp://{addr}:{port}'.format(
                 addr=self.addr,
