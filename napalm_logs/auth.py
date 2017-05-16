@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 # Import pythond stdlib
 import os
 import ssl
+import signal
 import socket
 import logging
 import threading
@@ -18,6 +19,8 @@ from napalm_logs.config import MAGIC_ACK
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import AUTH_MAX_CONN
 from napalm_logs.exceptions import SSLMismatchException
+# exceptions
+from napalm_logs.exceptions import NapalmLogsExit
 
 log = logging.getLogger(__name__)
 
@@ -58,6 +61,9 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         self.__sgn = signature_hex
         self.socket = skt
         self.__up = False
+
+    def _exit_gracefully(self, signum, _):
+        self.stop()
 
     def _handshake(self, conn, addr):
         '''
@@ -112,6 +118,7 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
+        signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
         self.socket.listen(AUTH_MAX_CONN)
         while self.__up:
@@ -124,6 +131,13 @@ class NapalmLogsAuthProc(NapalmLogsProc):
             except ssl.SSLError:
                 log.exception('SSL error', exc_info=True)
                 continue
+            except socket.error as error:
+                if self.__up is False:
+                    return
+                else:
+                    msg = 'Received auth socket error: {}'.format(error)
+                    log.error(msg, exc_info=True)
+                    raise NapalmLogsExit(msg)
             log.info('{0} connected'.format(address))
             log.debug('Starting the handshake')
             client_thread = threading.Thread(target=self._handshake,
@@ -131,4 +145,6 @@ class NapalmLogsAuthProc(NapalmLogsProc):
             client_thread.start()
 
     def stop(self):
+        log.info('Stopping auth process')
         self.__up = False
+        self.socket.close()

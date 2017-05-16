@@ -7,6 +7,7 @@ from __future__ import absolute_import
 # Import python stdlib
 import os
 import re
+import signal
 import logging
 import threading
 from datetime import datetime
@@ -24,6 +25,8 @@ from napalm_logs.config import DEFAULT_DELIM
 from napalm_logs.config import REPLACEMENTS
 from napalm_logs.exceptions import OpenConfigPathException
 from napalm_logs.exceptions import UnknownOpenConfigModel
+# exceptions
+from napalm_logs.exceptions import NapalmLogsExit
 
 log = logging.getLogger(__name__)
 
@@ -41,6 +44,10 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         self.compiled_messages = None
         self._compile_messages()
         self.__yang_cache = {}
+
+    def _exit_gracefully(self, signum, _):
+        log.debug('Caught signal in {} device process'.format(self._name))
+        self.stop()
 
     def _setup_ipc(self):
         '''
@@ -285,11 +292,20 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
+        signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
         while self.__up:
             # bin_obj = self.sub.recv()
             # msg_dict, address = umsgpack.unpackb(bin_obj, use_list=False)
-            msg_dict, address = self.pipe.recv()
+            try:
+                msg_dict, address = self.pipe.recv()
+            except IOError as error:
+                if self.__up is False:
+                    return
+                else:
+                    msg = 'Received IOError on {} device pipe: {}'.format(self._name, error)
+                    log.error(msg, exc_info=True)
+                    raise NapalmLogsExit(msg)
             log.debug('{0}: dequeued {1}, received from {2}'.format(self._name, msg_dict, address))
             kwargs = self._parse(msg_dict)
             if not kwargs:
@@ -324,6 +340,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         '''
         Stop the worker process.
         '''
+        log.info('Stopping {} device process'.format(self._name))
         self.__up = False
-        # self.sub.close()
-        # self.pub.close()
+        self.pipe.close()
+        self.pub_pipe.close()

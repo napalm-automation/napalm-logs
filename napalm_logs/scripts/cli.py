@@ -6,6 +6,8 @@ Kick off the napalm-logs engine.
 # Import python stdlib
 import os
 import sys
+import time
+import signal
 import logging
 import optparse
 
@@ -226,6 +228,15 @@ class NLOptionParser(OptionParser, object):
         return cfg
 
 
+def _exit_gracefully(signum, _):
+    ''' 
+    Called when a signal is caught and marks exiting variable True
+    '''
+    global _up
+    _up = False
+
+_up = True
+
 def napalm_logs_engine():
     if '' in sys.path:
         sys.path.remove('')
@@ -237,13 +248,16 @@ def napalm_logs_engine():
     log.addHandler(screen_logger)
     nlop = NLOptionParser()
     config = nlop.parse(log, screen_logger)
+    # Ignore SIGINT whilst starting child processes so they inherit the ignore
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
     nl = napalm_logs.NapalmLogs(**config)
-    try:
-        nl.start_engine()
-    except KeyboardInterrupt:
-        log.warning('Exiting on Ctrl-c')
-        nl.stop_engine()
-
+    nl.start_engine()
+    # Set SIGINT to _exit_gracefully so we can close everything down gracefully
+    signal.signal(signal.SIGINT, _exit_gracefully)
+    # Keep this function running until we receive instruction to terminate
+    while _up is True:
+        time.sleep(1)
+    nl.stop_engine()
 
 if __name__ == '__main__':
     napalm_logs_engine()

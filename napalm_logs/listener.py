@@ -8,6 +8,8 @@ from __future__ import unicode_literals
 # Import pythond stdlib
 import os
 import time
+import signal
+import socket
 import logging
 import threading
 
@@ -19,6 +21,8 @@ import umsgpack
 from napalm_logs.config import LST_IPC_URL
 from napalm_logs.config import BUFFER_SIZE
 from napalm_logs.proc import NapalmLogsProc
+# exceptions
+from napalm_logs.exceptions import NapalmLogsExit
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +35,10 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         self.socket = socket
         self.pipe = pipe
         self.__up = False
+
+    def _exit_gracefully(self, signum, _):
+        log.debug('Caught signal in listener process')
+        self.stop()
 
     def _setup_ipc(self):
         '''
@@ -48,9 +56,18 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
+	signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
         while self.__up:
-            msg, addr = self.socket.recvfrom(BUFFER_SIZE)
+            try:
+                msg, addr = self.socket.recvfrom(BUFFER_SIZE)
+            except socket.error as error:
+                if self.__up is False:
+                    return
+                else:
+                    msg = 'Received listener socket error: {}'.format(error)
+                    log.error(msg, exc_info=True)
+                    raise NapalmLogsExit(msg)
             # Addr contains (IP, port), we only care about the IP
             # obj = (msg, addr[0])
             # bin_obj = umsgpack.packb(obj)
@@ -59,5 +76,7 @@ class NapalmLogsListenerProc(NapalmLogsProc):
             self.pipe.send((msg, addr[0]))
 
     def stop(self):
+        log.info('Stopping listener process')
         self.__up = False
-        # self.pub.close()
+        self.socket.close()
+        self.pipe.close()

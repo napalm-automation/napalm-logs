@@ -8,6 +8,7 @@ from __future__ import absolute_import
 import os
 import re
 import time
+import signal
 import logging
 import threading
 
@@ -19,6 +20,8 @@ import umsgpack
 from napalm_logs.config import LST_IPC_URL
 from napalm_logs.config import DEV_IPC_URL_TPL
 from napalm_logs.proc import NapalmLogsProc
+# exceptions
+from napalm_logs.exceptions import NapalmLogsExit
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +38,10 @@ class NapalmLogsServerProc(NapalmLogsProc):
         # self.pubs = {}
         self.compiled_prefixes = None
         self._compile_prefixes()
+
+    def _exit_gracefully(self, signum, _):
+        log.debug('Caught signal in server process')
+        self.stop()
 
     def _setup_ipc(self):
         '''
@@ -116,12 +123,21 @@ class NapalmLogsServerProc(NapalmLogsProc):
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
+        signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
         while self.__up:
             # Take messages from the main queue
             # bin_obj = self.sub.recv()
             # msg, address = umsgpack.unpackb(bin_obj, use_list=False)
-            msg, address = self.pipe.recv()
+            try:
+                msg, address = self.pipe.recv()
+            except IOError as error:
+                if self.__up is False:
+                    return
+                else:
+                    msg = 'Received IOError from server pipe: {}'.format(error)
+                    log.error(msg, exc_info=True)
+                    raise NapalmLogsExit(msg)
             log.debug('[{2}] Dequeued message from {0}: {1}'.format(address, msg, time.time()))
             dev_os, msg_dict = self._identify_os(msg)
             log.debug('Identified OS: {0}'.format(dev_os))
@@ -138,6 +154,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
             self.os_pipes[dev_os].send((msg_dict, address))
 
     def stop(self):
+        log.info('Stopping server process')
         self.__up = False
-        self.sub.close()
-        self.pub.close()
+        self.pipe.close()
+        for os_pipe in self.os_pipes.values():
+            os_pipe.close()
