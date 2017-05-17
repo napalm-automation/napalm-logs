@@ -110,10 +110,29 @@ def client(**config):
                                                         config['run_time']-config['heat_time']))
 
 
-def router(id, **config):
+def router_tcp(id, **config):
     '''
     Artificially inject dummy syslog messages
-    with a very high rate.
+    with a very high rate over tcp.
+    Multiple instances of this have to be started,
+    sending messages to the same.
+    '''
+    skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    stop_time = time.time() + config['run_time']
+    count = 0
+    skt.connect((config['address'], config['port']))
+    while time.time() < stop_time:
+        log.debug('Sending sample syslog to {0}:{1} via tcp'.format(config['address'], config['port']))
+        skt.send(config['syslog_sample'].format(id=str(id*10)+str(count),timestamp=time.time()))
+        count += 1
+        time.sleep(1.0/config['pace'])
+    skt.close()
+    print('Sent {0} messages in {1} seconds'.format(count, config['run_time']))
+
+def router_udp(id, **config):
+    '''
+    Artificially inject dummy syslog messages
+    with a very high rate over udp.
     Multiple instances of this have to be started,
     sending messages to the same.
     '''
@@ -121,7 +140,7 @@ def router(id, **config):
     stop_time = time.time() + config['run_time']
     count = 0
     while time.time() < stop_time:
-        log.debug('Sending sample syslog to {0}:{1}'.format(config['address'], config['port']))
+        log.debug('Sending sample syslog to {0}:{1} via udp'.format(config['address'], config['port']))
         # config['syslog_sample'] = '{timestamp} {id}'
         skt.sendto(config['syslog_sample'].format(id=str(id*10)+str(count),
                                                   timestamp=time.time()),
@@ -129,7 +148,6 @@ def router(id, **config):
         count += 1
         time.sleep(1.0/config['pace'])
     print('Sent {0} messages in {1} seconds'.format(count, config['run_time']))
-
 
 def main():
     '''
@@ -143,7 +161,10 @@ def main():
     cproc = Process(target=client, kwargs=config)
     cproc.start()
     for _ in range(config['routers']):
-        rproc = Process(target=router, args=(_,), kwargs=config)
+        if config['protocol'] == 'tcp':
+            rproc = Process(target=router_tcp, args=(_,), kwargs=config)
+        else:
+            rproc = Process(target=router_udp, args=(_,), kwargs=config)
         rproc.start()
 
 
