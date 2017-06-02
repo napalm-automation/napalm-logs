@@ -28,6 +28,6 @@ messages:
     model: openconfig_bgp
     mapping:
       variables:
-        limit: bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet//ipv4_unicast//prefix_limit//state//max_prefixes
-        current: bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet//state//prefixes//received
+        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet//ipv4_unicast//prefix_limit//state//max_prefixes: limit
+        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet//state//prefixes//received: current
       static: {}
