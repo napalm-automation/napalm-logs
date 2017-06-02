@@ -6,13 +6,18 @@
 prefix:
   values:
     messageId: (\d+)
-    host: ([^ ]+)
-    date: (\w+ \d\d)
+    # On IOS-XR syslog messages do not contain the hostname by default, they
+    # only provide the node-id which, e.g RP/0/RSP0/CPU0. To include the
+    # hostname you can add a hostname prefix, however as this is not always
+    # present the host field can be empty.
+    host: ([^ ]+ )?
+    nodeId: ([^ ]+)
+    date: (\w+ +\d+)
     time: (\d\d:\d\d:\d\d\.\d\d\d \w\w\w)
     processName: (\w+)
     processId: (\d+)
     tag: ([\w-]+)
-  line: '{messageId}: {host}:{date} {time}: {processName}[{processId}]: %{tag}'
+  line: '{messageId}: {host}{nodeId}:{date} {time}: {processName}[{processId}]: %{tag}'
 
 messages:
   # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
