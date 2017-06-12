@@ -23,6 +23,13 @@ class BindException(NapalmLogsException):
     pass
 
 
+class ListenerException(NapalmLogsException):
+    '''
+    Exception raised when encountering an exception in a listener process
+    '''
+    pass
+
+
 class ConfigurationException(NapalmLogsException):
     '''
     Exception thrown when the user configuration is not correct.

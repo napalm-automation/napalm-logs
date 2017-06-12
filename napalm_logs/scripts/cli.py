@@ -106,10 +106,10 @@ class NLOptionParser(OptionParser, object):
             help=('Listener bind port. Default: {0}'.format(defaults.PORT))
         )
         self.add_option(
-            '--protocol',
-            dest='protocol',
-            choices=['tcp', 'udp'],
-            help=('Listener bind protocol. Default: {0}'.format(defaults.PROTOCOL))
+            '--listener',
+            dest='listener',
+            choices=['kafka', 'tcp', 'udp'],
+            help=('Listener type. Default: {0}'.format(defaults.LISTENER))
         )
         self.add_option(
             '-t', '--transport',
@@ -214,7 +214,7 @@ class NLOptionParser(OptionParser, object):
         cfg = {
             'address': self.options.address or file_cfg.get('address') or defaults.ADDRESS,
             'port': self.options.port or file_cfg.get('port') or defaults.PORT,
-            'protocol': self.options.protocol or file_cfg.get('protocol') or defaults.PROTOCOL,
+            'listener': self.options.listener or file_cfg.get('listener') or defaults.LISTENER,
             'transport': self.options.transport or file_cfg.get('transport'),
             'publish_address': self.options.publish_address or file_cfg.get('publish_address')\
                                or defaults.PUBLISH_ADDRESS,
