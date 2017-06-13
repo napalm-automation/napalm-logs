@@ -19,7 +19,7 @@ except ImportError as err:
 # Import napalm-logs pkgs
 from napalm_logs.exceptions import NapalmLogsException
 from napalm_logs.transport.base import TransportBase
-from napalm_logs.config import KAFKA_TOPIC
+from napalm_logs.config import KAFKA_PUBLISHER_TOPIC
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class KafkaTransport(TransportBase):
     '''
     def __init__(self, addr, port):
         self.bootstrap_servers = '{addr}:{port}'.format(addr=addr, port=port)
-        self.topic = KAFKA_TOPIC
+        self.topic = KAFKA_PUBLISHER_TOPIC
 
     def start(self):
         try:

@@ -25,11 +25,11 @@ import nacl.encoding
 
 # Import napalm-logs pkgs
 import napalm_logs.config as CONFIG
+from napalm_logs.listener import get_listener
 # processes
 from napalm_logs.auth import NapalmLogsAuthProc
 from napalm_logs.device import NapalmLogsDeviceProc
 from napalm_logs.server import NapalmLogsServerProc
-from napalm_logs.listener import NapalmLogsListenerProc
 from napalm_logs.publisher import NapalmLogsPublisherProc
 # exceptions
 from napalm_logs.exceptions import BindException
@@ -42,7 +42,7 @@ class NapalmLogs:
     def __init__(self,
                  address='0.0.0.0',
                  port=514,
-                 protocol='udp',
+                 listener='udp',
                  transport='zmq',
                  publish_address='0.0.0.0',
                  publish_port=49017,
@@ -62,14 +62,14 @@ class NapalmLogs:
 
         :param address: The address to bind the syslog client. Default: 0.0.0.0.
         :param port: Listen port. Default: 514.
-        :param protocol: Listen protocol. Default: udp.
+        :param listener: Listen type. Default: udp.
         :param publish_address: The address to bing when publishing the OC
                                  objects. Default: 0.0.0.0.
         :param publish_port: Publish port. Default: 49017.
         '''
         self.address = address
         self.port = port
-        self.protocol = protocol
+        self.listener = listener
         self.publish_address = publish_address
         self.publish_port = publish_port
         self.auth_address = auth_address
@@ -315,12 +315,14 @@ class NapalmLogs:
         )
         return proc
 
-    def _start_lst_proc(self, address, port, protocol, pipe):
+    def _start_lst_proc(self, address, port, listener, pipe):
         '''
         Start the listener process.
         '''
         log.debug('Starting the listener process')
-        listener = NapalmLogsListenerProc(address, port, protocol, pipe)
+        # Get the correct listener class
+        listener_class = get_listener(self.listener)
+        listener = listener_class(address, port, pipe)
         proc = Process(target=listener.start)
         proc.start()
         log.debug('Started listener process as {pname} with PID {pid}'.format(
@@ -437,7 +439,7 @@ class NapalmLogs:
         # start listener process
         self._processes.append(self._start_lst_proc(self.address,
                                                     self.port,
-                                                    self.protocol,
+                                                    self.listener,
                                                     lst_pipe))
 
     def stop_engine(self):

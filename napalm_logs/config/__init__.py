@@ -13,7 +13,7 @@ ROOT_DIR = '/'
 CONFIG_FILE = os.path.join(ROOT_DIR, 'etc', 'napalm', 'logs')
 ADDRESS = '0.0.0.0'
 PORT = 514
-PROTOCOL = 'udp'
+LISTENER = 'udp'
 PUBLISH_ADDRESS = '0.0.0.0'
 PUBLISH_PORT = 49017
 AUTH_ADDRESS = '0.0.0.0'
@@ -22,7 +22,8 @@ LOG_LEVEL = 'warning'
 LOG_FORMAT = '%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'
 LOG_FILE = os.path.join(ROOT_DIR, 'var', 'log', 'napalm', 'logs')
 LOG_FILE_CLI_OPTIONS = ('cli', 'screen')
-KAFKA_TOPIC = "napalm-logs"
+KAFKA_LISTENER_TOPIC = "syslog.net"
+KAFKA_PUBLISHER_TOPIC = "napalm-logs"
 
 LOGGING_LEVEL = {
     'debug': logging.DEBUG,
