@@ -82,6 +82,9 @@ DEV_IPC_URL_TPL = 'ipc:///tmp/napalm-logs-dev-{os}'
 PUB_IPC_URL = 'ipc:///tmp/napalm-logs-pub'
 
 # auth
+AUTH_KEEP_ALIVE = 'KEEPALIVE'
+AUTH_KEEP_ALIVE_ACK = 'KEEPALIVEACK'
+AUTH_KEEP_ALIVE_INTERVAL = 10
 AUTH_MAX_CONN = 5
 AUTH_TIMEOUT = 5
 MAGIC_ACK = 'ACK'
