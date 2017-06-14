@@ -257,10 +257,12 @@ def napalm_logs_engine():
     config = nlop.parse(log, screen_logger)
     # Ignore SIGINT whilst starting child processes so they inherit the ignore
     signal.signal(signal.SIGINT, signal.SIG_IGN)
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
     nl = napalm_logs.NapalmLogs(**config)
     nl.start_engine()
     # Set SIGINT to _exit_gracefully so we can close everything down gracefully
     signal.signal(signal.SIGINT, _exit_gracefully)
+    signal.signal(signal.SIGTERM, _exit_gracefully)
     # Keep this function running until we receive instruction to terminate
     while _up is True:
         time.sleep(1)
