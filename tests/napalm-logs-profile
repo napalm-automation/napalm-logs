@@ -161,7 +161,7 @@ def main():
     cproc = Process(target=client, kwargs=config)
     cproc.start()
     for _ in range(config['routers']):
-        if config['protocol'] == 'tcp':
+        if config['listener'] == 'tcp':
             rproc = Process(target=router_tcp, args=(_,), kwargs=config)
         else:
             rproc = Process(target=router_udp, args=(_,), kwargs=config)

@@ -226,8 +226,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         To reduce the overhead, caches the object in memory when
         generation is successful.
         '''
-        if model_name in self.__yang_cache:
-            return self.__yang_cache[model_name]
+        # FIXME Disabled cache due to issue #85
+        #if model_name in self.__yang_cache:
+        #    return self.__yang_cache[model_name]
         log.debug('YANG binding not cached yet, generating')
         oc_obj = napalm_yang.base.Root()
         try:
