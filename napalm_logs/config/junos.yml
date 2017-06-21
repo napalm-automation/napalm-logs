@@ -38,6 +38,25 @@ messages:
         bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//ipv4_{type}//prefix_limit//state//max_prefixes: limit
       static: {}
     replace: {}
+  - error: BGP_PREFIX_THRESH_EXCEEDED
+    tag: BGP_PREFIX_THRESH_EXCEEDED
+    values:
+      peer: ([\w\d:]+)
+      asn: (\d+)
+      limit: (\d+)
+      current: (\d+)
+      table: (\w+)
+      type: (\w+)
+    replace: {}
+    line: '{peer} (External AS {asn}): Configured maximum prefix-limit threshold({limit}) exceeded for {table}-{type} nlri: {current} (instance master)'
+    model: openconfig_bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//peer_as: asn
+        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//state//prefixes//received: current
+        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//ipv6_{type}//prefix_limit//state//max_prefixes: limit
+      static: {}
+    replace: {}
   - error: BGP_MD5_INCORRECT
     tag: tcp_auth_ok
     values:
