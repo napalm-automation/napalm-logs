@@ -18,6 +18,8 @@ from napalm_logs.config import MAGIC_REQ
 from napalm_logs.config import MAGIC_ACK
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import AUTH_MAX_CONN
+from napalm_logs.config import AUTH_KEEP_ALIVE
+from napalm_logs.config import AUTH_KEEP_ALIVE_ACK
 from napalm_logs.exceptions import SSLMismatchException
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
@@ -90,11 +92,24 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         if msg != MAGIC_ACK:
             return
         log.info('{0} is now authenticated'.format(addr))
-        log.debug('Shutting down the connection with {0}'.format(addr))
-        conn.shutdown(socket.SHUT_RDWR)
-        log.debug('Closing the connection with {0}'.format(addr))
-        conn.close()
-        # https://msdn.microsoft.com/en-us/library/ms738547(VS.85).aspx
+        self.keep_alive(conn)
+
+    def keep_alive(self, conn):
+        '''
+        Maintains auth sessions
+        '''
+        while self.__up:
+            msg = conn.recv(len(AUTH_KEEP_ALIVE))
+            if msg != AUTH_KEEP_ALIVE:
+                log.error('Received something other than {}'.format(AUTH_KEEP_ALIVE))
+                conn.close()
+                return
+            try:
+                conn.send(AUTH_KEEP_ALIVE_ACK)
+            except IOError as err:
+                log.error('Unable to send auth keep alive: {}'.format(err))
+                conn.close()
+                return
 
     def verify_cert(self):
         '''
