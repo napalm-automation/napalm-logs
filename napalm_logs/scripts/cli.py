@@ -173,14 +173,43 @@ class NLOptionParser(OptionParser, object):
             help=('Logging format. Default: {0}'.format(defaults.LOG_FORMAT))
         )
 
-    @staticmethod
-    def read_config_file(filepath):
+    def convert_env_dict(self, d):
+        for k, v in d.items():
+            if isinstance(v, basestring):
+                if not v.startswith('${') or not v.endswith('}'):
+                    continue
+                if not os.environ.get(v[2:-1]):
+                    log.error('No env variable found for {}, please check your config file'.format(v[2:-1]))
+                    sys.exit(1)
+                d[k] = os.environ[v[2:-1]]
+            if isinstance(v, dict):
+                self.convert_env_dict(v)
+            if isinstance(v, list):
+                self.convert_env_list(v)
+
+    def convert_env_list(self, l):
+        for n, v in enumerate(l):
+            if isinstance(v, basestring):
+                if not v.startswith('${') or not v.endswith('}'):
+                    continue
+                if not os.environ.get(v[2:-1]):
+                    log.error('No env variable found for {}, please check your config file'.format(v[2:-1]))
+                    sys.exit(1)
+                l[n] = os.environ[v[2:-1]]
+            if isinstance(v, dict):
+                self.convert_env_dict(v)
+            if isinstance(v, list):
+                self.convert_env_list(v)
+
+    def read_config_file(self, filepath):
         config = {}
         try:
             with open(filepath, 'r') as fstream:
                 config = yaml.load(fstream)
         except (IOError, yaml.YAMLError):
             log.info('Unable to read from {0}'.format(filepath))
+        # Convert any env variables
+        self.convert_env_dict(config)
         return config
 
     def parse(self, log, screen_handler):
@@ -211,6 +240,15 @@ class NLOptionParser(OptionParser, object):
         if not cert and self.options.disable_security is False:
             log.error('certfile must be specified for server-side operations')
             raise ValueError('Please specify a valid SSL certificate.')
+        # For each module we need to merge the defaults with the
+        # config file, but prefer the config file
+        listener_opts = defaults.LISTENER_OPTS
+        listener_opts.update(file_cfg.get('listener_opts', {}))
+        logger_opts = defaults.LOGGER_OPTS
+        logger_opts.update(file_cfg.get('logger_opts', {}))
+        publisher_opts = defaults.PUBLISHER_OPTS
+        publisher_opts.update(file_cfg.get('publisher_opts', {}))
+
         cfg = {
             'address': self.options.address or file_cfg.get('address') or defaults.ADDRESS,
             'port': self.options.port or file_cfg.get('port') or defaults.PORT,
@@ -230,13 +268,16 @@ class NLOptionParser(OptionParser, object):
             'config_path': self.options.config_path or file_cfg.get('config_path'),
             'extension_config_path': self.options.extension_config_path or file_cfg.get('extension_config_path'),
             'log_level': log_lvl,
-            'log_format': log_fmt
+            'log_format': log_fmt,
+            'listener_opts': listener_opts,
+            'logger_opts': logger_opts,
+            'publisher_opts': publisher_opts
         }
         return cfg
 
 
 def _exit_gracefully(signum, _):
-    ''' 
+    '''
     Called when a signal is caught and marks exiting variable True
     '''
     global _up

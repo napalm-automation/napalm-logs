@@ -20,7 +20,6 @@ except ImportError as err:
 
 # Import napalm-logs pkgs
 from napalm_logs.listener.base import ListenerBase
-from napalm_logs.config import KAFKA_LISTENER_TOPIC
 from napalm_logs.exceptions import ListenerException
 
 log = logging.getLogger(__name__)
@@ -30,12 +29,18 @@ class KafkaListener(ListenerBase):
     '''
     Kafka listener class.
     '''
-    def __init__(self, address, port, pipe):
-        self.address = address
-        self.port = port
+    def __init__(self, address, port, pipe, **kwargs):
         self.pipe = pipe
-        self.topic = KAFKA_LISTENER_TOPIC
         self.__up = False
+        if kwargs.get('address'):
+            address = kwargs['address']
+        if kwargs.get('port'):
+            address = kwargs['port']
+        if kwargs.get('bootstrap_servers'):
+            self.bootstrap_servers = kwargs['bootstrap_servers']
+        else:
+            self.bootstrap_servers = '{}:{}'.format(address, port)
+        self.kafka_topic = kwargs['kafka_topic']
 
     def _exit_gracefully(self, signum, _):
         log.debug('Caught signal in listener process')
@@ -43,18 +48,18 @@ class KafkaListener(ListenerBase):
 
     def start(self):
         '''
-        Start listening for messages  
+        Start listening for messages
         '''
         # Start suicide polling thread
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
         try:
-            self.consumer = kafka.KafkaConsumer(bootstrap_servers='{}:{}'.format(self.address, self.port),
+            self.consumer = kafka.KafkaConsumer(bootstrap_servers=self.bootstrap_servers,
                                                 group_id='napalm-logs')
         except kafka.errors.NoBrokersAvailable as err:
             log.error(err, exc_info=True)
             raise ListenerException(err)
-        self.consumer.subscribe(topics=[self.topic])
+        self.consumer.subscribe(topics=[self.kafka_topic])
         while self.__up:
             try:
                 msg = next(self.consumer)

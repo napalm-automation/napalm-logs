@@ -19,7 +19,6 @@ except ImportError as err:
 # Import napalm-logs pkgs
 from napalm_logs.exceptions import NapalmLogsException
 from napalm_logs.transport.base import TransportBase
-from napalm_logs.config import KAFKA_PUBLISHER_TOPIC
 
 log = logging.getLogger(__name__)
 
@@ -28,9 +27,16 @@ class KafkaTransport(TransportBase):
     '''
     Kafka transport class.
     '''
-    def __init__(self, addr, port):
-        self.bootstrap_servers = '{addr}:{port}'.format(addr=addr, port=port)
-        self.topic = KAFKA_PUBLISHER_TOPIC
+    def __init__(self, address, port, **kwargs):
+        if kwargs.get('address'):
+            address = kwargs['address']
+        if kwargs.get('port'):
+            address = kwargs['port']
+        if kwargs.get('bootstrap_servers'):
+            self.bootstrap_servers = kwargs['bootstrap_servers']
+        else:
+            self.bootstrap_servers = '{}:{}'.format(address, port)
+        self.kafka_topic = kwargs['kafka_topic']
 
     def start(self):
         try:
@@ -40,7 +46,7 @@ class KafkaTransport(TransportBase):
             raise NapalmLogsException(err)
 
     def publish(self, obj):
-        self.producer.send(self.topic, obj)
+        self.producer.send(self.kafka_topic, obj)
 
     def stop(self):
         if hasattr(self, 'producer'):

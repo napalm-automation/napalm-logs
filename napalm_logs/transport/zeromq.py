@@ -23,18 +23,24 @@ class ZMQTransport(TransportBase):
     '''
     ZMQ transport class.
     '''
-    def __init__(self, addr, port):
-        self.addr = addr
-        self.port = port
+    def __init__(self, address, port, **kwargs):
+        if kwargs.get('address'):
+            self.address = kwargs['address']
+        else:
+            self.address = address
+        if kwargs.get('port'):
+            self.port = kwargs['port']
+        else:
+            self.port = port
 
     def start(self):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.PUB)
-        if ':' in self.addr:
+        if ':' in self.address:
             self.socket.ipv6 = True
         try:
             self.socket.bind('tcp://{addr}:{port}'.format(
-                addr=self.addr,
+                addr=self.address,
                 port=self.port)
             )
         except zmq.error.ZMQError as err:

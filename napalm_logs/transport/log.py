@@ -19,14 +19,20 @@ class LogTransport(TransportBase):
     '''
     Log transport class.
     '''
-    def __init__(self, addr, port):
-        self.addr = addr
-        self.port = port
+    def __init__(self, address, port, **kwargs):
+        if kwargs.get('address'):
+            self.address = kwargs['address']
+        else:
+            self.address = address
+        if kwargs.get('port'):
+            self.port = kwargs['port']
+        else:
+            self.port = port
 
     def start(self):
         self.logger = logging.getLogger('napalm-logs')
         self.logger.setLevel(logging.INFO)
-        handler = logging.handlers.SocketHandler(self.addr, self.port)
+        handler = logging.handlers.SocketHandler(self.address, self.port)
         formatter = logging.Formatter('%(asctime)s: %(message)s')
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)

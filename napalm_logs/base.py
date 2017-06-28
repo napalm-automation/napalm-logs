@@ -56,7 +56,10 @@ class NapalmLogs:
                  extension_config_path=None,
                  extension_config_dict=None,
                  log_level='warning',
-                 log_format='%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'):
+                 log_format='%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s',
+                 listener_opts={},
+                 logger_opts={},
+                 publisher_opts={}):
         '''
         Init the napalm-logs engine.
 
@@ -84,6 +87,9 @@ class NapalmLogs:
         self.extension_config_dict = extension_config_dict
         self.log_level = log_level
         self.log_format = log_format
+        self.listener_opts = listener_opts
+        self.logger_opts = logger_opts
+        self.publisher_opts = publisher_opts
         # Setup the environment
         self._setup_log()
         self._build_config()
@@ -315,14 +321,14 @@ class NapalmLogs:
         )
         return proc
 
-    def _start_lst_proc(self, address, port, listener, pipe):
+    def _start_lst_proc(self, pipe):
         '''
         Start the listener process.
         '''
         log.debug('Starting the listener process')
         # Get the correct listener class
         listener_class = get_listener(self.listener)
-        listener = listener_class(address, port, pipe)
+        listener = listener_class(self.address, self.port, pipe, **self.listener_opts)
         proc = Process(target=listener.start)
         proc.start()
         log.debug('Started listener process as {pname} with PID {pid}'.format(
@@ -337,9 +343,7 @@ class NapalmLogs:
         Start the server process.
         '''
         log.debug('Starting the server process')
-        server = NapalmLogsServerProc(self.config_dict,
-                                      pipe,
-                                      os_pipes)
+        server = NapalmLogsServerProc(self.config_dict, pipe, os_pipes, self.logger_opts)
         proc = Process(target=server.start)
         proc.start()
         log.debug('Started server process as {pname} with PID {pid}'.format(
@@ -360,6 +364,7 @@ class NapalmLogs:
                                             pub_pipe,
                                             self.__priv_key,
                                             self.__signing_key,
+                                            self.publisher_opts,
                                             disable_security=self.disable_security)
         proc = Process(target=publisher.start)
         proc.start()
@@ -437,10 +442,7 @@ class NapalmLogs:
         srv_pipe, lst_pipe = Pipe(duplex=False)
         self._processes.append(self._start_srv_proc(srv_pipe, os_pipes))
         # start listener process
-        self._processes.append(self._start_lst_proc(self.address,
-                                                    self.port,
-                                                    self.listener,
-                                                    lst_pipe))
+        self._processes.append(self._start_lst_proc(lst_pipe))
 
     def stop_engine(self):
         log.info('Shutting down the engine')
