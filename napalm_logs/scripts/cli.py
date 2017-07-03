@@ -92,7 +92,7 @@ class NLOptionParser(OptionParser, object):
         self.add_option(
             '--config-path',
             dest='config_path',
-            help=('Extension device config path.')
+            help=('Device config path.')
         )
         self.add_option(
             '--extension-config-path',
