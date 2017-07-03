@@ -67,6 +67,8 @@ Will produce the following object:
 
 The library is flexible to listen to the syslog messages via UDP or TCP, but also from brokers such as Apache Kafka. Similarly, the output objects can be published via various channels such as ZeroMQ, Kafka remote server logging. It is also pluggable enough to extend these capabilities and listen or publish to other services, depending on the needs.
 
+The messages are published over a secured channel, encrypted and signed. Although the security can be disabled, this is highly discouraged.
+
 Install
 -------
 napalm-logs is available on PyPi and can easily be installed using the following command:
