@@ -6,64 +6,66 @@ Python library to parse syslog messages from network devices and produce JSON se
 
 For example, the following syslog message from a Juniper device:
 
-```text
-Mar 30 12:45:19 re0.edge01.bjm01 rpd[15852]: BGP_PREFIX_THRESH_EXCEEDED 1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)
-```
+.. code-block:: text
+
+	Mar 30 12:45:19 re0.edge01.bjm01 rpd[15852]: BGP_PREFIX_THRESH_EXCEEDED 1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)
+
 
 Will produce the following object:
 
-```json
-{
-  "ip": "172.17.17.1",
-  "host": "edge01.bjm01",
-  "message_details": {
-    "processId": "15852",
-    "error": "BGP_PREFIX_THRESH_EXCEEDED",
-    "pri": "149",
-    "processName": "rpd",
+.. code-block:: json
+
+  {
+    "ip": "172.17.17.1",
     "host": "edge01.bjm01",
-    "time": "12:45:19",
-    "date": "Mar 30",
-    "message": "1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)"
-  },
-  "open_config": {
-    "bgp": {
-      "neighbors": {
-        "neighbor": {
-          "1.2.3.4": {
-            "neighbor-address": "1.2.3.4",
-            "state": {
-              "peer-as": 15169
-            },
-            "afi-safis": {
-              "afi-safi": {
-                "inet": {
-                  "state": {
-                    "prefixes": {
-                      "received": 181
-                    }
-                  },
-                  "ipv4-unicast": {
-                    "prefix-limit": {
-                      "state": {
-                        "max-prefixes": 160
+    "message_details": {
+      "processId": "15852",
+      "error": "BGP_PREFIX_THRESH_EXCEEDED",
+      "pri": "149",
+      "processName": "rpd",
+      "host": "edge01.bjm01",
+      "time": "12:45:19",
+      "date": "Mar 30",
+      "message": "1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)"
+    },
+    "open_config": {
+      "bgp": {
+        "neighbors": {
+          "neighbor": {
+            "1.2.3.4": {
+              "neighbor-address": "1.2.3.4",
+              "state": {
+                "peer-as": 15169
+              },
+              "afi-safis": {
+                "afi-safi": {
+                  "inet": {
+                    "state": {
+                      "prefixes": {
+                        "received": 181
                       }
-                    }
-                  },
-                  "afi-safi-name": "inet"
+                    },
+                    "ipv4-unicast": {
+                      "prefix-limit": {
+                        "state": {
+                          "max-prefixes": 160
+                        }
+                      }
+                    },
+                    "afi-safi-name": "inet"
+                  }
                 }
               }
             }
           }
         }
       }
-    }
-  },
-  "timestamp": "1490877919"
-}
-```
+    },
+    "timestamp": "1490877919"
+  }
 
-The library is flexible to listen to syslog messages via UDP or TCP, but also from brokers such as Apache Kafka. Similarly, the output objects can be published via various channels such as ZeroMQ, Kafka remote server logging. It is also pluggable enough to extend these capabilities and listen or publish to other services, depending on the needs.
+
+The library is flexible to listen to the syslog messages via UDP or TCP, but also from brokers such as Apache Kafka. Similarly, the output objects can be published via various channels such as ZeroMQ, Kafka remote server logging. It is also pluggable enough to extend these capabilities and listen or publish to other services, depending on the needs.
 
 Install
 -------
