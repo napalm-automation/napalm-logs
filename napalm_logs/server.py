@@ -7,6 +7,7 @@ from __future__ import absolute_import
 # Import pythond stdlib
 import os
 import re
+import json
 import time
 import signal
 import logging
@@ -20,6 +21,7 @@ import umsgpack
 from napalm_logs.config import LST_IPC_URL
 from napalm_logs.config import DEV_IPC_URL_TPL
 from napalm_logs.proc import NapalmLogsProc
+from napalm_logs.transport import get_transport
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
 
@@ -30,10 +32,11 @@ class NapalmLogsServerProc(NapalmLogsProc):
     '''
     Server sub-process class.
     '''
-    def __init__(self, config, pipe, os_pipes):
+    def __init__(self, config, pipe, os_pipes, logger):
         self.config = config
         self.pipe = pipe
         self.os_pipes = os_pipes
+        self.logger = logger
         self.__up = False
         # self.pubs = {}
         self.compiled_prefixes = None
@@ -113,6 +116,20 @@ class NapalmLogsServerProc(NapalmLogsProc):
         log.debug('No OS matched for: {}'.format(msg))
         return '', ret
 
+    def _setup_log_syslog_transport(self):
+        transport_class = get_transport(self.logger['syslog'])
+        # The tranport classes expect address and port to be passed as args,
+        # but as the options for logger are configured via the config file
+        # these will be found in **kwargs. So we will send None for both
+        self._log_syslog_transport = transport_class(None, None, **self.logger)
+        self._log_syslog_transport.start()
+
+    def _send_log_syslog(self, dev_os, msg_dict):
+        log_dict = {}
+        log_dict.update(msg_dict)
+        log_dict['os'] = dev_os
+        self._log_syslog_transport.publish(json.dumps(log_dict))
+
     def start(self):
         '''
         Take the messages from the queue,
@@ -124,6 +141,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
+        # If were are to log all processed syslogs we need to initiate the class
+        if self.logger.get('syslog'):
+            self._setup_log_syslog_transport()
         self.__up = True
         while self.__up:
             # Take messages from the main queue
@@ -141,6 +161,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
             log.debug('[{2}] Dequeued message from {0}: {1}'.format(address, msg, time.time()))
             dev_os, msg_dict = self._identify_os(msg)
             log.debug('Identified OS: {0}'.format(dev_os))
+            if self.logger.get('syslog'):
+                self._send_log_syslog(dev_os, msg_dict)
             if not dev_os or not isinstance(msg_dict, dict):
                 # _identify_os should return a string and a dict
                 # providing the info for the device OS
@@ -159,3 +181,5 @@ class NapalmLogsServerProc(NapalmLogsProc):
         self.pipe.close()
         for os_pipe in self.os_pipes.values():
             os_pipe.close()
+        if self.logger.get('syslog'):
+            self._log_syslog_transport.stop()

@@ -27,9 +27,15 @@ class UDPListener(ListenerBase):
     '''
     UDP syslog listener class
     '''
-    def __init__(self, address, port, pipe):
-        self.address = address
-        self.port = port
+    def __init__(self, address, port, pipe, **kwargs):
+        if kwargs.get('address'):
+            self.address = kwargs['address']
+        else:
+            self.address = address
+        if kwargs.get('port'):
+            self.port = kwargs['port']
+        else:
+            self.port = port
         self.pipe = pipe
         self.__up = False
 
@@ -55,7 +61,7 @@ class UDPListener(ListenerBase):
         self.__up = True
         self.skt = self._open_socket(socket.SOCK_DGRAM)
         try:
-            self.skt.bind((self.address, self.port))
+            self.skt.bind((self.address, int(self.port)))
         except socket.error as msg:
             error_string = 'Unable to bind to port {} on {}: {}'.format(self.port, self.address, msg)
             log.error(error_string, exc_info=True)

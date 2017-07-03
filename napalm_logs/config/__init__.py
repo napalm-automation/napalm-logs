@@ -22,8 +22,15 @@ LOG_LEVEL = 'warning'
 LOG_FORMAT = '%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'
 LOG_FILE = os.path.join(ROOT_DIR, 'var', 'log', 'napalm', 'logs')
 LOG_FILE_CLI_OPTIONS = ('cli', 'screen')
-KAFKA_LISTENER_TOPIC = "syslog.net"
-KAFKA_PUBLISHER_TOPIC = "napalm-logs"
+LISTENER_OPTS = {
+    'kafka_topic': 'syslog.net',
+    }
+LOGGER_OPTS = {
+    'kafka_topic': 'syslog.net.processed'
+    }
+PUBLISHER_OPTS = {
+    'kafka_topic': 'napalm-logs'
+    }
 
 LOGGING_LEVEL = {
     'debug': logging.DEBUG,
