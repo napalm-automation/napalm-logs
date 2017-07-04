@@ -65,9 +65,11 @@ Will produce the following object:
   }
 
 
-The library is flexible to listen to the syslog messages via UDP or TCP, but also from brokers such as Apache Kafka. Similarly, the output objects can be published via various channels such as ZeroMQ, Kafka remote server logging. It is also pluggable enough to extend these capabilities and listen or publish to other services, depending on the needs.
+The library is flexible to listen to the syslog messages via UDP or TCP, but also from brokers such as Apache Kafka. Similarly, the output objects can be published via various channels such as ZeroMQ, Kafka, or remote server logging. It is also pluggable enough to extend these capabilities and listen or publish to other services, depending on the needs.
 
 The messages are published over a secured channel, encrypted and signed. Although the security can be disabled, this is highly discouraged.
+
+Thie library is provides with a program which acts as a daemon, running in background and listening to syslog messages continuously.
 
 Install
 -------
@@ -87,9 +89,9 @@ If you do want them to be encrypted you will require a certificate and key, whic
 
 .. code-block:: bash
 
-    openssl req -nodes -x509 -newkey rsa:4096 -keyout napalm-logs.key -out napalm-logs.crt -days 365
+    openssl req -nodes -x509 -newkey rsa:4096 -keyout /var/cache/napalm-logs.key -out /var/cache/napalm-logs.crt -days 365
 
-This will provide a self-signed certificate ``napalm-logs.crt`` and key ``napalm-logs.key``
+This will provide a self-signed certificate ``napalm-logs.crt`` and key ``napalm-logs.key`` under the ``/var/cache`` directory.
 
 If you do not require the messages to be encrypted you can ignore the above step and just use the command line argument ``--disable-security`` when starting napalm-logs.
 
@@ -103,7 +105,7 @@ To start napalm-logs using the crt and key generated above you should run the fo
 
 .. code-block:: bash
 
-    napalm-logs --certificate napalm-logs.crt --keyfile napalm-logs.key
+    napalm-logs --certificate /var/cache/napalm-logs.crt --keyfile /var/cache/napalm-logs.key
 
 This will start napalm-logs listening for incoming syslog messages on ``0.0.0.0`` port ``514``. It will also start to listen for incoming client requests on ``0.0.0.0`` port ``49017``, and incoming authentication requests on ``0.0.0.0`` port ``49018``. For more information on authentication please see the authentication section.
 
@@ -141,7 +143,31 @@ There are more configuration options, please see relevant sections for more deta
 Starting a Client
 +++++++++++++++++
 
-Here is the basic code you would need for a client:
+The client structure depends on how you start the napalm-logs daemon. If the security is disabled (via the CLI option ``--disable-security`` or through the configuration file, where the ``disable_security`` field is set as ``false``), the client script is as simple as:
+
+.. code-block:: python
+
+    #!/usr/bin/env python
+
+    import zmq
+    import napalm_logs.utils
+
+    server_address = '127.0.0.1'
+    server_port = 49017
+
+    context = zmq.Context()
+    socket = context.socket(zmq.SUB)
+    socket.connect('tcp://{address}:{port}'.format(address=server_address,
+                                                   port=server_port))
+    socket.setsockopt(zmq.SUBSCRIBE, '')
+
+    while True:
+        raw_object = socket.recv()
+        print(napalm_logs.utils.unserialize(raw_object))
+
+Which subscribes to the ZeroMQ bus and deserializes messages using the ``napalm_logs.utils.unserialise`` helper. The ``server_address`` and the ``server_port`` of the client represent the ``--publish-address`` and the ``--publish-port`` of the napalm-logs daemon.
+
+When the program is started with security enabled (**recommended**), the clients can use the ``napalm_logs.utils.ClientAuth`` class, which executes the handshake to retrieve the encryption key and hex of the verification key. This class requires the certificate (the same certificate specified when starting the napalm-logs daemon), as well as the authentication address and port (corresponding to the ``--auth-address`` and ``--auth-port`` CLI arguments or ``auth_address`` and ``auth_port`` configuration fields sent to the napalm-logs daemon):
 
 .. code-block:: python
 
@@ -155,7 +181,7 @@ Here is the basic code you would need for a client:
 	auth_address = '127.0.0.1'
 	auth_port = 49018
 
-	certificate = 'napalm-logs.crt' # This is the server crt generated earlier
+	certificate = '/var/cache/napalm-logs.crt' # This is the server crt generated earlier
 
 	context = zmq.Context()
 	socket = context.socket(zmq.SUB)
@@ -170,7 +196,7 @@ Here is the basic code you would need for a client:
 	while True:
 	    raw_object = socket.recv()
 	    decrypted = auth.decrypt(raw_object)
-	    print decrypted
+	    print(decrypted)
 
 
 .. toctree::
