@@ -1,6 +1,6 @@
-=======
-Options
-=======
+=====================
+Configuration Options
+=====================
 
 Here we will list all options and what they do.
 

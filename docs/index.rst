@@ -204,4 +204,8 @@ When the program is started with security enabled (**recommended**), the clients
 
    installation/index
    options/index
+   authentication/index
+   listener/index
+   publisher/index
+   logger/index
    developers/index
