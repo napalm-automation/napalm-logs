@@ -121,7 +121,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
         # The tranport classes expect address and port to be passed as args,
         # but as the options for logger are configured via the config file
         # these will be found in **kwargs. So we will send None for both
-        self._log_syslog_transport = transport_class(None, None, **self.logger)
+        address = self.logger.pop('address', None)
+        port = self.logger.pop('port', None)
+        self._log_syslog_transport = transport_class(address, port, **self.logger)
         self._log_syslog_transport.start()
 
     def _send_log_syslog(self, dev_os, msg_dict):
@@ -162,7 +164,10 @@ class NapalmLogsServerProc(NapalmLogsProc):
             dev_os, msg_dict = self._identify_os(msg)
             log.debug('Identified OS: {0}'.format(dev_os))
             if self.logger.get('syslog'):
-                self._send_log_syslog(dev_os, msg_dict)
+                if dev_os:
+                    self._send_log_syslog(dev_os, msg_dict)
+                else:
+                    self._send_log_syslog('unknown', {'message': msg})
             if not dev_os or not isinstance(msg_dict, dict):
                 # _identify_os should return a string and a dict
                 # providing the info for the device OS
