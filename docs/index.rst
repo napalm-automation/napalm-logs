@@ -65,11 +65,11 @@ Will produce the following object:
   }
 
 
-The library is flexible to listen to the syslog messages via UDP or TCP, but also from brokers such as Apache Kafka. Similarly, the output objects can be published via various channels such as ZeroMQ, Kafka, or remote server logging. It is also pluggable enough to extend these capabilities and listen or publish to other services, depending on the needs.
+Thie library is provided with a command line program which acts as a daemon, running in background and listening to syslog messages continuously, then publishing them over secured channels, where multiple clients can subscribe.
+
+It is flexible to listen to the syslog messages via UDP or TCP, but also from brokers such as Apache Kafka. Similarly, the output objects can be published via various channels such as ZeroMQ, Kafka, or remote server logging. It is also pluggable enough to extend these capabilities and listen or publish to other services, depending on the needs.
 
 The messages are published over a secured channel, encrypted and signed. Although the security can be disabled, this is highly discouraged.
-
-Thie library is provides with a program which acts as a daemon, running in background and listening to syslog messages continuously.
 
 Install
 -------
@@ -138,7 +138,36 @@ You can chose which listener to use, and which publisher to use by using the fol
 	  -t TRANSPORT, --transport=TRANSPORT
 							Publish transport. Default: zmq
 
-There are more configuration options, please see relevant sections for more details.
+There are more configuration options, please see :ref:`configuration-options` for more details.
+
+Configuration file example
+++++++++++++++++++++++++++
+
+The napalm-logs server can be started without any CLI aguments, as long as they are correctly specified under the configuration file. The default path of the configuration file is under ``/etc/napalm/logs``. To select a different filepath, we can use the ``-c`` option:
+
+.. code-block:: bash
+
+	napalm-logs -c /home/admin/napalm/logs
+
+The configuration file is formatted as YAML, which makes it more human readable. In general, any configuration option available on the CLI can be specified in the configuration file, with the mention that hyphen is replaced by underscore, e.g.: the CLI option ``auth-address`` becomes ``auth_address`` in the napalm-logs configuration file.
+
+.. code-block:: yaml
+
+	address: 172.17.17.1
+	port: 5514
+	publish_address: 172.17.17.2
+	publish_port: 49017
+	transport: zmq
+	listener: kafka
+	listener_opts:
+	  bootstrap_servers:
+	    - 10.10.10.1
+	    - 10.10.10.2
+	    - 10.10.10.3
+
+The configuration above listenes to the syslog messages from the Kafka bootstrap servers ``10.10.10.1``, ``10.10.10.2`` and ``10.10.10.3`` then publishes the structured objects encrypted and serialized via ZeroMQ, serving them at the address ``172.17.17.2``, port ``49017``.
+
+Check the complete list of configuration options under :ref:`configuration-options`.
 
 Starting a Client
 +++++++++++++++++
