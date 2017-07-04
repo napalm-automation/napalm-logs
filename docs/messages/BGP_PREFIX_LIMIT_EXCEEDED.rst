@@ -8,7 +8,7 @@ Maps to the ``openconfig_bgp`` YANG model.
 
 Example:
 
-.. code-block:
+.. code-block:: json
 
     {
       "message_details": {

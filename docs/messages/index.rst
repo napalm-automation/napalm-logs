@@ -12,7 +12,7 @@ For example, the following syslog message:
 
 ``napalm-logs`` identifies that it was produced by a Junos device and assigns the error tag ``BGP_PREFIX_LIMIT_EXCEEDED`` and then will try to map the information into the OpenConfig model ``openconfig_bgp``:
 
-.. code-block:
+.. code-block:: json
 
     {
       "message_details": {
