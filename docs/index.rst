@@ -69,6 +69,8 @@ The library is flexible to listen to the syslog messages via UDP or TCP, but als
 
 The messages are published over a secured channel, encrypted and signed. Although the security can be disabled, this is highly discouraged.
 
+Thie library is provides with a program which acts as a daemon, running in background and listening to syslog messages continuously.
+
 Install
 -------
 napalm-logs is available on PyPi and can easily be installed using the following command:
@@ -141,7 +143,7 @@ There are more configuration options, please see relevant sections for more deta
 Starting a Client
 +++++++++++++++++
 
-The client structure depends on how you start the napalm-logs daemon. If the security is disabled (via the CLI option ``--disable-security`` or through the configuration file as ``disable_security: false``), the client script is as simple as:
+The client structure depends on how you start the napalm-logs daemon. If the security is disabled (via the CLI option ``--disable-security`` or through the configuration file, where the ``disable_security`` field is set as ``false``), the client script is as simple as:
 
 .. code-block:: python
 
@@ -162,8 +164,8 @@ The client structure depends on how you start the napalm-logs daemon. If the sec
     while True:
         raw_object = socket.recv()
         print(napalm_logs.utils.unserialize(raw_object))
-	
-Which subscribes to the ZeroMQ bus and deserializes messages using the ``napalm_logs.utils.unserialise`` helper.
+
+Which subscribes to the ZeroMQ bus and deserializes messages using the ``napalm_logs.utils.unserialise`` helper. The ``server_address`` and the ``server_port`` of the client represent the ``--publish-address`` and the ``--publish-port`` of the napalm-logs daemon.
 
 When the program is started with security enabled (**recommended**), the clients can use the ``napalm_logs.utils.ClientAuth`` class, which executes the handshake to retrieve the encryption key and hex of the verification key. This class requires the certificate (the same certificate specified when starting the napalm-logs daemon), as well as the authentication address and port (corresponding to the ``--auth-address`` and ``--auth-port`` CLI arguments or ``auth_address`` and ``auth_port`` configuration fields sent to the napalm-logs daemon):
 
@@ -194,7 +196,7 @@ When the program is started with security enabled (**recommended**), the clients
 	while True:
 	    raw_object = socket.recv()
 	    decrypted = auth.decrypt(raw_object)
-	    print decrypted
+	    print(decrypted)
 
 
 .. toctree::
