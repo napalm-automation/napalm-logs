@@ -6,6 +6,10 @@ This error tag corresponds to syslog messages notifying that the prefix limit fo
 
 Maps to the ``openconfig_bgp`` YANG model.
 
+Implemented for:
+
+- junos
+
 Example:
 
 .. code-block:: json
