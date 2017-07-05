@@ -13,11 +13,12 @@ prefix:
     host: ([^ ]+ )?
     nodeId: ([^ ]+)
     date: (\w+ +\d+)
-    time: (\d\d:\d\d:\d\d\.\d\d\d \w\w\w)
+    time: (\d\d:\d\d:\d\d\.\d\d\d)
+    timeZone: \s?(\w\w\w)?
     processName: (\w+)
     processId: (\d+)
     tag: ([\w-]+)
-  line: '{messageId}: {host}{nodeId}:{date} {time}: {processName}[{processId}]: %{tag}'
+  line: '{messageId}: {host}{nodeId}:{date} {time}{timeZone}: {processName}[{processId}]: %{tag}'
 
 messages:
   # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
