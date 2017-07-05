@@ -103,8 +103,9 @@ messages:
     tag: tcp_auth_ok
     values:
       peer: (\d+\.\d+\.\d+\.\d+)
+      port: (\d+)
     replace: {}
-    line: 'Packet from {peer}:179 missing MD5 digest'
+    line: 'Packet from {peer}:{port} wrong MD5 digest'
     model: openconfig_bgp
     mapping:
       variables: {}

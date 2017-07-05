@@ -72,5 +72,6 @@ Under this section, we present the possible error tags, together with their corr
 .. toctree::
    :maxdepth: 1
 
+   BGP_MD5_INCORRECT
    BGP_PREFIX_THRESH_EXCEEDED
    BGP_PREFIX_LIMIT_EXCEEDED
