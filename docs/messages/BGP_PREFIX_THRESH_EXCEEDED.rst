@@ -1,16 +1,18 @@
-===================
-Structured Messages
-===================
+==========================
+BGP_PREFIX_THRESH_EXCEEDED
+==========================
 
-Each message has a certain identification tag which is unique and cross-platform.
+This error tag corresponds to syslog messages notifying that the prefix limit threshhold for a BGP neighbor has been exceeded and the neighbor has been torn down.
 
-For example, the following syslog message:
+Maps to the ``openconfig_bgp`` YANG model.
 
-.. code-block:: text
+Implemented for:
 
-	<28>Jul  4 13:40:55 vmx2 rpd[2942]: BGP_PREFIX_LIMIT_EXCEEDED: 10.0.0.31 (Internal AS 65001): Configured maximum prefix-limit(1) exceeded for inet-unicast nlri: 7 (instance master)
+- junos
+- iosxr
+- eos
 
-``napalm-logs`` identifies that it was produced by a Junos device and assigns the error tag ``BGP_PREFIX_LIMIT_EXCEEDED`` and then will try to map the information into the OpenConfig model ``openconfig_bgp``:
+Example:
 
 .. code-block:: json
 
@@ -21,7 +23,7 @@ For example, the following syslog message:
         "pri": "28",
         "processName": "rpd",
         "host": "vmx2",
-        "tag": "BGP_PREFIX_LIMIT_EXCEEDED",
+        "tag": "BGP_PREFIX_THRESH_EXCEEDED",
         "time": "13:35:25",
         "date": "Jul  4",
         "message": "10.0.0.31 (Internal AS 65001): Configured maximum prefix-limit(1) exceeded for inet-unicast nlri: 7 (instance master)"
@@ -60,17 +62,9 @@ For example, the following syslog message:
         }
       },
       "ip": "130.211.119.212",
-      "error": "BGP_PREFIX_LIMIT_EXCEEDED",
+      "error": "BGP_PREFIX_THRESH_EXCEEDED",
       "host": "vmx2",
       "timestamp": "1499175325",
       "os": "junos",
       "model_name": "openconfig_bgp"
     }
-
-Under this section, we present the possible error tags, together with their corresponding YANG model and examples.
-
-.. toctree::
-   :maxdepth: 1
-
-   BGP_PREFIX_THRESH_EXCEEDED
-   BGP_PREFIX_LIMIT_EXCEEDED
