@@ -13,7 +13,7 @@ prefix:
     processName: /?(\w+)
     # Most log lines have a process ID, however some do not
     processId: \[?(\d+)?\]?
-    tag: (\w+)
+    tag: ([\w\s]+)
   line: '{date} {time} {hostPrefix}{host} {processName}{processId}: {tag}: '
 
 messages:
