@@ -28,8 +28,9 @@ messages:
       current: (\d+)
       table: (\w+)
       type: (\w+)
+      peeringType: (\w+)
     replace: {}
-    line: '{peer} (External AS {asn}): Configured maximum prefix-limit threshold({limit}) exceeded for {table}-{type} nlri: {current} (instance master)'
+    line: '{peer} ({peeringType} AS {asn}): Configured maximum prefix-limit threshold({limit}) exceeded for {table}-{type} nlri: {current} (instance master)'
     model: openconfig_bgp
     mapping:
       variables:
@@ -47,8 +48,9 @@ messages:
       current: (\d+)
       table: (\w+)
       type: (\w+)
+      peeringType: (\w+)
     replace: {}
-    line: '{peer} (External AS {asn}): Configured maximum prefix-limit threshold({limit}) exceeded for {table}-{type} nlri: {current} (instance master)'
+    line: '{peer} ({peeringType} AS {asn}): Configured maximum prefix-limit threshold({limit}) exceeded for {table}-{type} nlri: {current} (instance master)'
     model: openconfig_bgp
     mapping:
       variables:
