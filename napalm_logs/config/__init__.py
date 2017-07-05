@@ -103,3 +103,5 @@ REPLACEMENTS = {
     'uppercase': lambda var: var.upper(),
     'lowercase': lambda var: var.lower()
 }
+
+OPEN_CONFIG_NO_MODEL = 'NO_MODEL'

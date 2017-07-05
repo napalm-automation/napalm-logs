@@ -23,6 +23,7 @@ from napalm_logs.config import PUB_IPC_URL
 from napalm_logs.config import DEV_IPC_URL_TPL
 from napalm_logs.config import DEFAULT_DELIM
 from napalm_logs.config import REPLACEMENTS
+from napalm_logs.config import OPEN_CONFIG_NO_MODEL
 from napalm_logs.exceptions import OpenConfigPathException
 from napalm_logs.exceptions import UnknownOpenConfigModel
 # exceptions
@@ -246,16 +247,21 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         Emit an OpenConfig object given a certain combination of
         fields mappeed in the config to the corresponding hierarchy.
         '''
-        # Load the appropriate OC model
-        log.debug('Getting the YANG model binding')
-        oc_obj = self._get_oc_obj(kwargs['oc_model'])
-        log.debug('Filling the OC model')
         oc_dict = {}
         for mapping, result_key in kwargs['oc_mapping']['variables'].items():
             result = kwargs[result_key]
             oc_dict = self._setval(mapping.format(**kwargs), result, oc_dict)
         for mapping, result in kwargs['oc_mapping']['static'].items():
             oc_dict = self._setval(mapping.format(**kwargs), result, oc_dict)
+
+        # Check if OC model is set to NO_MODEL
+        if kwargs['oc_model'] == OPEN_CONFIG_NO_MODEL:
+            return oc_dict
+
+        # Load the appropriate OC model
+        log.debug('Getting the YANG model binding')
+        oc_obj = self._get_oc_obj(kwargs['oc_model'])
+        log.debug('Filling the OC model')
         try:
             oc_obj.load_dict(oc_dict)
         except AttributeError:

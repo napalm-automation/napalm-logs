@@ -38,7 +38,6 @@ messages:
         bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//state//prefixes//received: current
         bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//ipv4_{type}//prefix_limit//state//max_prefixes: limit
       static: {}
-    replace: {}
   - error: BGP_PREFIX_THRESH_EXCEEDED
     tag: BGP_PREFIX_THRESH_EXCEEDED
     values:
@@ -58,7 +57,6 @@ messages:
         bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//state//prefixes//received: current
         bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//ipv6_{type}//prefix_limit//state//max_prefixes: limit
       static: {}
-    replace: {}
   - error: BGP_PREFIX_LIMIT_EXCEEDED
     tag: BGP_PREFIX_LIMIT_EXCEEDED
     values:
@@ -78,7 +76,6 @@ messages:
         bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//state//prefixes//received: current
         bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//ipv4_{type}//prefix_limit//state//max_prefixes: limit
       static: {}
-    replace: {}
   - error: BGP_PREFIX_LIMIT_EXCEEDED
     tag: BGP_PREFIX_LIMIT_EXCEEDED
     values:
@@ -98,7 +95,17 @@ messages:
         bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//state//prefixes//received: current
         bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//ipv6_{type}//prefix_limit//state//max_prefixes: limit
       static: {}
+  - error: USER_ENTER_CONFIG_MODE
+    tag: UI_DBASE_LOGIN_EVENT
+    values:
+      user: (\w+)
     replace: {}
+    line: User '{user}' entering configuration mode
+    model: NO_MODEL
+    mapping:
+      variables: {}
+      static:
+        users//user//{user}//action//enter_config_mode: True
   - error: BGP_MD5_INCORRECT
     tag: tcp_auth_ok
     values:
