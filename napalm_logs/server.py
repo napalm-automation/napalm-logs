@@ -160,6 +160,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     msg = 'Received IOError from server pipe: {}'.format(error)
                     log.error(msg, exc_info=True)
                     raise NapalmLogsExit(msg)
+            msg = msg.encode('utf8')
             log.debug('[{2}] Dequeued message from {0}: {1}'.format(address, msg, time.time()))
             dev_os, msg_dict = self._identify_os(msg)
             log.debug('Identified OS: {0}'.format(dev_os))
