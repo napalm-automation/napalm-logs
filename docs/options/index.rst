@@ -138,6 +138,31 @@ Config File Only Options
 
 The options to be used inside of the pluggable modules are not provided via the command line, they need to be provided in the config file.
 
+``device_whitelist``
+++++++++++++++++++++
+
+List of platforms to be supported. By default this is an empty list, thus everything will be accepted. This is useful to control the number of sub-processes started.
+
+Example:
+
+.. code-block:: yaml
+
+  device_whitelist:
+    - junos
+    - iosxr
+
+``device_blacklist``
+++++++++++++++++++++
+
+List of platforms to be ignored. By default this list is empty, thus nothing will be ignored. This is also useful to control the number of sub-processes started.
+
+Example:
+
+.. code-block:: yaml
+
+  device_blacklist:
+    - eos
+
 Each of the following should be a ``dictionary`` containing the ``keys`` provided below each one.
 
 ``listener_opts``
