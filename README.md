@@ -1,15 +1,18 @@
 # napalm-logs
 
 napalm-logs is a Python library that listens to syslog messages from network
-devices and returns strucuted data in an [OpenConfig](http://www.openconfig.net/)
-format.
+devices and returns strucuted data following the [OpenConfig](http://www.openconfig.net/)
+or [IETF](https://github.com/YangModels/yang/tree/master/standard/ietf) YANG models.
 
 
 <img src="logo.png" data-canonical-src="logo.png" width="300" />
 
-The outgoing objects are published via ZeroMQ or other usual transport
+The outgoing objects are published via ZeroMQ, Kafka, or other usual transport
 options. It is easy enough to switch between transports and pluggable to add
-others such as Kafka, ZeroMQ etc.
+others such as Google Datastore, RabbitMQ, etc.
+
+Similarly, the syslog messages can be received via UDP, TCP, or different
+services, such as  Kafka, etc.
 
 New platforms can be easily added, just referencing the path to the
 YAML configuration file.
@@ -17,9 +20,10 @@ YAML configuration file.
 Requirements
 ------------
 
-- [napalm-yang](https://github.com/napalm-automation/napalm-yang)
 - PyYAML
-- pyzmq
+- PyZMQ
+- PyNaCl
+- u-msgpack-python
 
 Installation
 ------------
