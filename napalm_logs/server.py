@@ -103,6 +103,10 @@ class NapalmLogsServerProc(NapalmLogsProc):
         '''
         ret = {}
         for dev_os, data in self.compiled_prefixes.items():
+            # TODO Should we prevent attepmting to determine the OS for the blacklisted?
+            # [mircea] I think its good from a logging perspective to know at least that
+            #   that the server found the matching and it tells that it won't be processed
+            #   further. Later, we could potentially add an option to control this.
             match = data.get('prefix', '').search(msg)
             if not match:
                 continue
@@ -179,9 +183,13 @@ class NapalmLogsServerProc(NapalmLogsProc):
             # Then send the message in the right queue
             # obj = (msg_dict, address)
             # bin_obj = umsgpack.packb(obj)
-            log.debug('Queueing message to {0}'.format(dev_os))
-            # self.pubs[dev_os].send(bin_obj)
-            self.os_pipes[dev_os].send((msg_dict, address))
+            if dev_os in self.os_pipes:
+                log.debug('Queueing message to {0}'.format(dev_os))
+                # self.pubs[dev_os].send(bin_obj)
+                self.os_pipes[dev_os].send((msg_dict, address))
+            else:
+                log.info('Unable to queue the message to {0}. Is the sub-process started?'.format(dev_os))
+
 
     def stop(self):
         log.info('Stopping server process')

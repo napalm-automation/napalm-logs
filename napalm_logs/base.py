@@ -59,7 +59,9 @@ class NapalmLogs:
                  log_format='%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s',
                  listener_opts={},
                  logger_opts={},
-                 publisher_opts={}):
+                 publisher_opts={},
+                 device_blacklist=[],
+                 device_whitelist=[]):
         '''
         Init the napalm-logs engine.
 
@@ -90,6 +92,8 @@ class NapalmLogs:
         self.listener_opts = listener_opts
         self.logger_opts = logger_opts
         self.publisher_opts = publisher_opts
+        self.device_whitelist = device_whitelist
+        self.device_blacklist = device_blacklist
         # Setup the environment
         self._setup_log()
         self._build_config()
@@ -432,6 +436,16 @@ class NapalmLogs:
         log.info('Starting child processes for each device type')
         os_pipes = {}
         for device_os, device_config in self.config_dict.items():
+            if (self.device_whitelist and\
+                hasattr(self.device_whitelist, '__iter__') and\
+                device_os not in self.device_whitelist) or\
+               (self.device_blacklist and\
+                hasattr(self.device_blacklist, '__iter__') and\
+                device_os in self.device_blacklist):
+                # Ignore devices that are not in the whitelist (if defined),
+                #   or those operating systems that are on the blacklist.
+                # This way we can prevent starting unwanted sub-processes.
+                continue
             device_pipe, srv_pipe = Pipe(duplex=False)
             self._processes.append(self._start_dev_proc(device_os,
                                    device_config,
