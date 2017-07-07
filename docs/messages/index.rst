@@ -75,3 +75,4 @@ Under this section, we present the possible error tags, together with their corr
    BGP_MD5_INCORRECT
    BGP_PREFIX_THRESH_EXCEEDED
    BGP_PREFIX_LIMIT_EXCEEDED
+   BGP_PEER_NOT_CONFIGURED

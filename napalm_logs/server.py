@@ -111,6 +111,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
             ret = {}
             for key in values.keys():
                 ret[key] = match.group(positions.get(key))
+            # Remove whitespace from the start or end of the message
+            ret['message'] = ret['message'].strip()
             # TODO Should we stop searching and just return, or should we return all matches OS?
             return dev_os, ret
         log.debug('No OS matched for: {}'.format(msg))
