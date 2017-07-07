@@ -442,7 +442,7 @@ class NapalmLogs:
                (self.device_blacklist and\
                 hasattr(self.device_blacklist, '__iter__') and\
                 device_os in self.device_blacklist):
-                # Ignore devices that are not in the whitelist if defined,
+                # Ignore devices that are not in the whitelist (if defined),
                 #   or those operating systems that are on the blacklist.
                 # This way we can prevent starting unwanted sub-processes.
                 continue

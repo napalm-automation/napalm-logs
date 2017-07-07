@@ -179,9 +179,13 @@ class NapalmLogsServerProc(NapalmLogsProc):
             # Then send the message in the right queue
             # obj = (msg_dict, address)
             # bin_obj = umsgpack.packb(obj)
-            log.debug('Queueing message to {0}'.format(dev_os))
-            # self.pubs[dev_os].send(bin_obj)
-            self.os_pipes[dev_os].send((msg_dict, address))
+            if dev_os in self.os_pipes:
+                log.debug('Queueing message to {0}'.format(dev_os))
+                # self.pubs[dev_os].send(bin_obj)
+                self.os_pipes[dev_os].send((msg_dict, address))
+            else:
+                log.info('Unable to queue the message to {0}. Is the sub-process started?'.format(dev_os))
+
 
     def stop(self):
         log.info('Stopping server process')
