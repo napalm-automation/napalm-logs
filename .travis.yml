@@ -6,15 +6,13 @@ python:
 before_install:
   - pip install -r requirements-dev.txt
 install:
-  - python setup.py install
+  - pip install .
 deploy:
   provider: pypi
   user: mirucha
   password:
-    secure: ZqQ3zMD7JVa3K2/TjFTKk4xZc+23W4m5otsPY0DJ8LoXkdTU+t2xo/bsd8h0YD9zW2qmkzf7ODN5OitzwFIHe2q5/NSlHwpIf342H/U103nnRCp/A5T2YufnsSsQYf1BiZzzhpsKEmsTiGEJ6bf0uKxE8Z+bbChT5aqFEizJ/iqvi1pPLrO7QTWXQX+d0VmPM81GhtI06X/BFmsYJLgpQ7daum+O9rhwQCZ45VggXZnTUCA39QUfpni9mix+IbjtZkLbW3KvWdReubLDEb98hXWB71/KF8Wo1cDI3V5e8/Dm03edSQ2HS5FFlBMaeEt+FWjgaXjfF3ctnwEsyZCDVF4XebY6m3khqpSe+7xwXpSEt78a4oRuC5t2JQ30ps/uYk0ETGSOucPQp8DeyADiSLMByFfMC+kUxGpbvtX1TeBXvCFNNV4XWW4PNKJ5axfaU8Kup2AHZS+qkj05ItbL96chpdT2R+9eC70xoqqRb9CnYhdsiRwzpNQskObKxlqCTbYNgPlRKKYEh1eilYJKnlK+58FXbQX3k9MdQk5k/iq9E3LjUAYQeGGCI43xnHcNzt22gOqXHpE3Cviz5bUcI11qwmkr3B+FaDFS3Me86BAPK5Mc2oANWLYy3xXvtvWYDIkJWO5+4C/zCgzqj4BGShkI/ckpbmsqQU6M+l2o9N4=
-  on:
+    secure: "uSMbPGF+iSjhNALEse35mNFDP34kwHwDTA8QZefSaDMlHy/SphPbcmwp4BQpY/cgrP83kYDHssNsjexNVU4lqZZ4PbNU3LB/O+UHL4Vd/RgehC9MceRDmzTUXQ1V5nwRo+KO2K4u9mp6xv1HRtx+3auF7PIBYk5T/C3jb/kztjnbVIFVtcX9YB01xXftm3qmDi1JEmXqgiFuhMD7AGZjVU9y166EHT6TlHvWeOQUwN8wTtwd0NqRoeTTGEXUK0o1HI3fVxXH5bGaVHk+xHuA6tUr8PLJHPV1rS39lwolfpfKWPX9OMmo43r7E8gZ37jUMWHRnPj/iBoJq344s9gtmyN8QEEfC9QCbE7X4vafccisLVI+F2c6leXTn1WrVLfJNp7opDhf2d6Q8n0uHP8/xL6bW+p1XZNT0qF0U57xRMaxpPqFM8sZvck8zKT4IFYS3mdUiSCZGXC3lakcuaO+ASquMHH9DY/2FSU9X0+t3tBrSQB53AUCSOblR3QIpOkinpJoPAPc9hmg+23rz4HxLAC4zkoOmZdpoZfRrP1V9TdYWMfnvSzrv/YoskzaQP0sZuAzkj7b/FelyCJ9BuYWLCF3jqQfSjeKlyx3C2Gf66GPWOspxWCR6MB6KN630k22YzDJqqZM1zxetxUjq/Lyvs0BQqeWbH9aHRJFd4l7iBs="
     tags: true
-    branch: master
 script:
   - cp examples/server.crt /tmp/__napalm_logs.crt
   - cp examples/server.key /tmp/__napalm_logs.key
