@@ -85,13 +85,17 @@ def client(**config):
     '''
     Start the client and listen to messages.
     '''
-    pk, vk = napalm_logs.utils.authenticate(config['certificate'])
     context = zmq.Context()
     sock = context.socket(zmq.SUB)
     sock.connect('tcp://{addr}:{port}'.format(
         addr=config['publish_address'],
         port=config['publish_port']))
     sock.setsockopt(zmq.SUBSCRIBE, '')
+
+    auth = napalm_logs.utils.ClientAuth(config['certificate'],
+                                        address=config['auth_address'],
+                                        port=config['auth_port'])
+
     heat_stop = time.time() + config['heat_time']
     stop_time = time.time() + config['run_time']
     count = 0
@@ -102,7 +106,7 @@ def client(**config):
         obj = sock.recv()
         log.debug('Received:')
         log.debug(obj)
-        decrypted = napalm_logs.utils.decrypt(obj, vk, pk)
+        decrypted = auth.decrypt(obj)
         log.debug('Decrypted:')
         log.debug(decrypted)
         count += 1

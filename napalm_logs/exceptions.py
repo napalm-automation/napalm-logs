@@ -37,13 +37,6 @@ class ConfigurationException(NapalmLogsException):
     pass
 
 
-class UnknownOpenConfigModel(NapalmLogsException):
-    '''
-    Unable to log a model via napalm-yang
-    '''
-    pass
-
-
 class OpenConfigPathException(NapalmLogsException):
     '''
     Unable to set the open config path specified.
