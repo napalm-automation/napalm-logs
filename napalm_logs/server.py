@@ -103,6 +103,10 @@ class NapalmLogsServerProc(NapalmLogsProc):
         '''
         ret = {}
         for dev_os, data in self.compiled_prefixes.items():
+            # TODO Should we prevent attepmting to determine the OS for the blacklisted?
+            # [mircea] I think its good from a logging perspective to know at least that
+            #   that the server found the matching and it tells that it won't be processed
+            #   further. Later, we could potentially add an option to control this.
             match = data.get('prefix', '').search(msg)
             if not match:
                 continue
