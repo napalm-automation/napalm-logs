@@ -248,6 +248,8 @@ class NLOptionParser(OptionParser, object):
         logger_opts.update(file_cfg.get('logger_opts', {}))
         publisher_opts = defaults.PUBLISHER_OPTS
         publisher_opts.update(file_cfg.get('publisher_opts', {}))
+        device_whitelist = file_cfg.get('device_whitelist', [])
+        device_blacklist = file_cfg.get('device_blacklist', [])
 
         cfg = {
             'address': self.options.address or file_cfg.get('address') or defaults.ADDRESS,
@@ -271,7 +273,9 @@ class NLOptionParser(OptionParser, object):
             'log_format': log_fmt,
             'listener_opts': listener_opts,
             'logger_opts': logger_opts,
-            'publisher_opts': publisher_opts
+            'publisher_opts': publisher_opts,
+            'device_whitelist': device_whitelist,
+            'device_blacklist': device_blacklist
         }
         return cfg
 
