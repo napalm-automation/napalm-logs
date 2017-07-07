@@ -17,7 +17,6 @@ YAML configuration file.
 Requirements
 ------------
 
-- [napalm-yang](https://github.com/napalm-automation/napalm-yang)
 - PyYAML
 - pyzmq
 

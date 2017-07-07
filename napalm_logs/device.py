@@ -15,7 +15,6 @@ from datetime import datetime
 # Import thrid party libs
 import zmq
 import umsgpack
-import napalm_yang
 
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
@@ -25,7 +24,6 @@ from napalm_logs.config import DEFAULT_DELIM
 from napalm_logs.config import REPLACEMENTS
 from napalm_logs.config import OPEN_CONFIG_NO_MODEL
 from napalm_logs.exceptions import OpenConfigPathException
-from napalm_logs.exceptions import UnknownOpenConfigModel
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
 
@@ -44,7 +42,6 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         self.__up = False
         self.compiled_messages = None
         self._compile_messages()
-        self.__yang_cache = {}
 
     def _exit_gracefully(self, signum, _):
         log.debug('Caught signal in {} device process'.format(self._name))
@@ -221,27 +218,6 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     return None
         return data
 
-    def _get_oc_obj(self, model_name):
-        '''
-        Return the processed YANG model binded to python object.
-        To reduce the overhead, caches the object in memory when
-        generation is successful.
-        '''
-        # FIXME Disabled cache due to issue #85
-        #if model_name in self.__yang_cache:
-        #    return self.__yang_cache[model_name]
-        log.debug('YANG binding not cached yet, generating')
-        oc_obj = napalm_yang.base.Root()
-        try:
-            oc_obj.add_model(getattr(napalm_yang.models, model_name))
-        except AttributeError:
-            error_string = 'Unable to load openconfig module {0},' \
-                           ' please make sure the config is correct'.format(model_name)
-            log.error(error_string, exc_info=True)
-            raise UnknownOpenConfigModel(error_string)
-        self.__yang_cache[model_name] = oc_obj
-        return oc_obj
-
     def _emit(self, **kwargs):
         '''
         Emit an OpenConfig object given a certain combination of
@@ -254,22 +230,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         for mapping, result in kwargs['oc_mapping']['static'].items():
             oc_dict = self._setval(mapping.format(**kwargs), result, oc_dict)
 
-        # Check if OC model is set to NO_MODEL
-        if kwargs['oc_model'] == OPEN_CONFIG_NO_MODEL:
-            return oc_dict
-
-        # Load the appropriate OC model
-        log.debug('Getting the YANG model binding')
-        oc_obj = self._get_oc_obj(kwargs['oc_model'])
-        log.debug('Filling the OC model')
-        try:
-            oc_obj.load_dict(oc_dict)
-        except AttributeError:
-            error_string = 'Error whilst mapping to open config, ' \
-                           'please check that the mappings are correct for {0}'.format(self._name)
-            log.error(error_string, exc_info=True)
-            raise OpenConfigPathException(error_string)
-        return oc_obj.to_dict(filter=True)
+        return oc_dict
 
     def _publish(self, obj):
         '''
