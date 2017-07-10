@@ -77,7 +77,7 @@ class UDPListener(ListenerBase):
                     msg = 'Received listener socket error: {}'.format(error)
                     log.error(msg, exc_info=True)
                     raise NapalmLogsExit(msg)
-            log.debug('[{2}] Received {0} from {1}. Adding in the queue'.format(msg, addr, time.time()))
+            log.debug('[%s] Received %s from %s. Adding in the queue', msg, addr, time.time())
             self.pipe.send((msg, addr[0]))
 
     def stop(self):

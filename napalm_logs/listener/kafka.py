@@ -73,7 +73,7 @@ class KafkaListener(ListenerBase):
             log_source = msg.key
             decoded = json.loads(msg.value)
             log_message = decoded.get('message')
-            log.debug('[{2}] Received {0} from {1}. Adding in the queue'.format(log_message, log_source, time.time()))
+            log.debug('[%s] Received %s from %s. Adding in the queue', log_message, log_source, time.time())
             self.pipe.send((log_message, log_source))
 
     def stop(self):

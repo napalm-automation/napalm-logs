@@ -73,9 +73,9 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         '''
         # waiting for the magic request message
         msg = conn.recv(len(MAGIC_REQ))
-        log.debug('Received message {0} from {1}'.format(msg, addr))
+        log.debug('Received message %s from %s', msg, addr)
         if msg != MAGIC_REQ:
-            log.warning('{0} is not a valid REQ message from {1}'.format(msg, addr))
+            log.warning('%s is not a valid REQ message from %s', msg, addr)
             return
         log.debug('Sending the private key')
         conn.send(self.__key)
@@ -91,7 +91,7 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         msg = conn.recv(len(MAGIC_ACK))
         if msg != MAGIC_ACK:
             return
-        log.info('{0} is now authenticated'.format(addr))
+        log.info('%s is now authenticated', addr)
         self.keep_alive(conn)
 
     def keep_alive(self, conn):
@@ -101,13 +101,13 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         while self.__up:
             msg = conn.recv(len(AUTH_KEEP_ALIVE))
             if msg != AUTH_KEEP_ALIVE:
-                log.error('Received something other than {}'.format(AUTH_KEEP_ALIVE))
+                log.error('Received something other than %s', AUTH_KEEP_ALIVE)
                 conn.close()
                 return
             try:
                 conn.send(AUTH_KEEP_ALIVE_ACK)
             except IOError as err:
-                log.error('Unable to send auth keep alive: {}'.format(err))
+                log.error('Unable to send auth keep alive: %s', err)
                 conn.close()
                 return
 
@@ -153,7 +153,7 @@ class NapalmLogsAuthProc(NapalmLogsProc):
                     msg = 'Received auth socket error: {}'.format(error)
                     log.error(msg, exc_info=True)
                     raise NapalmLogsExit(msg)
-            log.info('{0} connected'.format(address))
+            log.info('%s connected', address)
             log.debug('Starting the handshake')
             client_thread = threading.Thread(target=self._handshake,
                                              args=(wrapped_auth_skt, address))

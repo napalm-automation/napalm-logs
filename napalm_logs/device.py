@@ -47,7 +47,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         self._compile_messages()
 
     def _exit_gracefully(self, signum, _):
-        log.debug('Caught signal in {} device process'.format(self._name))
+        log.debug('Caught signal in %s device process', self._name)
         self.stop()
 
     def _setup_ipc(self):
@@ -137,19 +137,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 ret[key] = result
             return ret
         if error_present is True:
-            log.info(
-                'Configured regex did not match for os: {} tag {}'.format(
-                    self._name,
-                    msg_dict.get('tag', '')
-                )
-            )
+            log.info('Configured regex did not match for os: %s tag %s', self._name, msg_dict.get('tag', ''))
         else:
-            log.info(
-                'Syslog message not configured for os: {} tag {}'.format(
-                    self._name,
-                    msg_dict.get('tag', '')
-                )
-            )
+            log.info('Syslog message not configured for os: %s tag %s', self._name, msg_dict.get('tag', ''))
 
     @staticmethod
     def _setval(key, val, dict_=None):
@@ -277,7 +267,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     msg = 'Received IOError on {} device pipe: {}'.format(self._name, error)
                     log.error(msg, exc_info=True)
                     raise NapalmLogsExit(msg)
-            log.debug('{0}: dequeued {1}, received from {2}'.format(self._name, msg_dict, address))
+            log.debug('%s: dequeued %s, received from %s', self._name, msg_dict, address)
             if self._name == UNKNOWN_DEVICE_NAME:
                 # If running in the sub-process publishing messages for unknown OSs.
                 # This will always send what receives, as-is.
@@ -344,7 +334,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         '''
         Stop the worker process.
         '''
-        log.info('Stopping {} device process'.format(self._name))
+        log.info('Stopping %s device process', self._name)
         self.__up = False
         self.pipe.close()
         self.pub_pipe.close()

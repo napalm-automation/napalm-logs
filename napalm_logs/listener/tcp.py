@@ -56,20 +56,20 @@ class TCPListener(ListenerBase):
         return skt
 
     def _tcp_connection(self, conn, addr):
-        log.debug('Established connection with {}'.format(addr))
+        log.debug('Established connection with %s', addr)
         conn.settimeout(TIMEOUT)
         while True:
             try:
                 msg = conn.recv(BUFFER_SIZE)
             except socket.timeout:
-                log.debug('Connection {} timed out'.format(addr))
+                log.debug('Connection %s timed out', addr)
                 return
             if not msg:
-                log.info('Received empty message from {}'.format(addr))
+                log.info('Received empty message from %s', addr)
                 return
-            log.debug('[{2}] Received {0} from {1}. Adding in the queue'.format(msg, addr, time.time()))
+            log.debug('[%s] Received %s from %s. Adding in the queue', msg, addr, time.time())
             self.pipe.send((msg, addr))
-        log.debug('Closing connection with {}'.format(addr))
+        log.debug('Closing connection with %s', addr)
         conn.close()
 
     def start(self):
