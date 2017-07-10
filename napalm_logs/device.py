@@ -285,7 +285,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 to_publish = {
                     'ip': address,
                     'host': 'unknown',
-                    'timestamp': time.time(),
+                    'timestamp': int(time.time()),
                     'message_details': msg_dict,
                     'os': UNKNOWN_DEVICE_NAME,
                     'error': 'UNKNOWN',
