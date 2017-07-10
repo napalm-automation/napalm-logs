@@ -446,12 +446,23 @@ Example:
   listener_opts:
     kafka_topic: napalm-logs-in
 
+.. _logger:
+
+``logger``
+++++++++++
+
+The logger subsystem uses the modules from the publisher pluggable subsystem to send partially parsed syslog messages.
+
+.. code-block:: yaml
+
+  logger: kafka
+
 .. _logger-opts:
 
 ``logger_opts``
 +++++++++++++++
 
-The logger subsystem uses the modules from the publisher pluggable subsystem to sent partially parsed syslog messages, that either couldn't detect the network operating system, either there isn't a profile mapping available.
+Configuration options for the logger module used to send partially parsed syslog messages.
 
 .. _logger-opts-bootstrap-servers:
 

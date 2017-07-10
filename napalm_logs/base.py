@@ -58,6 +58,7 @@ class NapalmLogs:
                  log_level='warning',
                  log_format='%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s',
                  listener_opts={},
+                 logger=None,
                  logger_opts={},
                  publisher_opts={},
                  device_blacklist=[],
@@ -90,6 +91,7 @@ class NapalmLogs:
         self.log_level = log_level
         self.log_format = log_format
         self.listener_opts = listener_opts
+        self.logger = logger
         self.logger_opts = logger_opts
         self.publisher_opts = publisher_opts
         self.device_whitelist = device_whitelist
@@ -329,6 +331,7 @@ class NapalmLogs:
         server = NapalmLogsServerProc(self.config_dict,
                                       pipe,
                                       os_pipes,
+                                      self.logger,
                                       self.logger_opts,
                                       self.publisher_opts)
         proc = Process(target=server.start)

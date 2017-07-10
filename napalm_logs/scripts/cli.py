@@ -272,6 +272,7 @@ class NLOptionParser(OptionParser, object):
             'log_level': log_lvl,
             'log_format': log_fmt,
             'listener_opts': listener_opts,
+            'logger': file_cfg.get('logger'),
             'logger_opts': logger_opts,
             'publisher_opts': publisher_opts,
             'device_whitelist': device_whitelist,
