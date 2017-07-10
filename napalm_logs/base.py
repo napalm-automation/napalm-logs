@@ -442,7 +442,7 @@ class NapalmLogs:
         os_pipes = {}
         if self.publisher_opts.get('send_unknown'):
             # Explicitly requested to send messages from unidentified devices.
-            log.info('Starting an additional process to publish messages from unitendified OSs.')
+            log.info('Starting an additional process to publish messages from identified operating systems.')
             self.config_dict[CONFIG.UNKNOWN_DEVICE_NAME] = {}
         for device_os, device_config in self.config_dict.items():
             if (self.device_whitelist and
