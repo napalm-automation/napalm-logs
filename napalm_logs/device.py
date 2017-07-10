@@ -236,14 +236,14 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         # TODO can we work out the time format from the regex? Probably but this is a task for another day
         time_format = self._config['prefix'].get('time_format', '')
         if not time or not date or not time_format:
-            return datetime.now().strftime('%s')
+            return int(datetime.now().strftime('%s'))
         # Most syslog do not include the year, so we will add the current year if we are not supplied with one
         if '%y' in date or '%Y' in date:
             timestamp = datetime.strptime('{} {}'.format(date, time), time_format)
         else:
             year = datetime.now().year
             timestamp = datetime.strptime('{} {} {}'.format(year, date, time), '%Y {}'.format(time_format))
-        return timestamp.strftime('%s')
+        return int(timestamp.strftime('%s'))
 
     def start(self):
         '''
