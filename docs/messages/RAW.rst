@@ -38,7 +38,7 @@ Example:
     },
     "ip": "172.17.17.1",
     "host": "vmx1",
-    "timestamp": "1499682723",
+    "timestamp": 1499682723,
     "os": "junos",
     "model_name": "raw",
     "error": "RAW"

@@ -44,7 +44,7 @@ Example:
 	  "ip": "127.0.0.1",
 	  "error": "BGP_PEER_NOT_CONFIGURED",
 	  "host": "vmx01",
-	  "timestamp": "1499230364",
+	  "timestamp": 1499230364,
 	  "os": "junos",
 	  "model_name": "openconfig_bgp"
 	}

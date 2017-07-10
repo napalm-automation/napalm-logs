@@ -62,7 +62,7 @@ Example:
       "ip": "130.211.119.212",
       "error": "BGP_PREFIX_LIMIT_EXCEEDED",
       "host": "vmx2",
-      "timestamp": "1499175325",
+      "timestamp": 1499175325,
       "os": "junos",
       "model_name": "openconfig_bgp"
     }

@@ -43,7 +43,7 @@ Example:
       "ip": "192.168.140.252",
       "error": "BGP_MD5_INCORRECT",
       "host": "vmx01",
-      "timestamp": "1496991066",
+      "timestamp": 1496991066,
       "os": "junos",
       "model_name": "openconfig_bgp"
     }
