@@ -25,7 +25,6 @@ from napalm_logs.config import DEFAULT_DELIM
 from napalm_logs.config import REPLACEMENTS
 from napalm_logs.config import UNKNOWN_DEVICE_NAME
 from napalm_logs.config import OPEN_CONFIG_NO_MODEL
-from napalm_logs.config import RAW_MESSAGE_MODEL_NAME
 from napalm_logs.exceptions import OpenConfigPathException
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
@@ -289,7 +288,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     'timestamp': time.time(),
                     'message_details': msg_dict,
                     'os': UNKNOWN_DEVICE_NAME,
-                    'model_name': RAW_MESSAGE_MODEL_NAME
+                    'error': 'UNKNOWN',
+                    'model_name': 'unknown'
                 }
                 log.debug('Queueing to be published:')
                 log.debug(to_publish)
@@ -309,7 +309,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                         'timestamp': timestamp,
                         'message_details': msg_dict,
                         'os': self._name,
-                        'model_name': RAW_MESSAGE_MODEL_NAME
+                        'error': 'RAW',
+                        'model_name': 'raw'
                     }
                     log.debug('Queueing to be published:')
                     log.debug(to_publish)
