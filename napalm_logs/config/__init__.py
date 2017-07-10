@@ -22,15 +22,20 @@ LOG_LEVEL = 'warning'
 LOG_FORMAT = '%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'
 LOG_FILE = os.path.join(ROOT_DIR, 'var', 'log', 'napalm', 'logs')
 LOG_FILE_CLI_OPTIONS = ('cli', 'screen')
+UNKNOWN_DEVICE_NAME = 'unknown'
 LISTENER_OPTS = {
-    'kafka_topic': 'syslog.net',
-    }
+    'kafka_topic': 'syslog.net'
+}
 LOGGER_OPTS = {
-    'kafka_topic': 'syslog.net.processed'
-    }
+    'kafka_topic': 'syslog.net.processed',
+    'send_raw': False,  # initially called `syslog`
+    'send_unknown': False
+}
 PUBLISHER_OPTS = {
-    'kafka_topic': 'napalm-logs'
-    }
+    'kafka_topic': 'napalm-logs',
+    'send_raw': False,
+    'send_unknown': False
+}
 
 LOGGING_LEVEL = {
     'debug': logging.DEBUG,
@@ -105,3 +110,4 @@ REPLACEMENTS = {
 }
 
 OPEN_CONFIG_NO_MODEL = 'NO_MODEL'
+RAW_MESSAGE_MODEL_NAME = 'RAW'
