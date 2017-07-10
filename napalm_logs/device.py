@@ -7,6 +7,7 @@ from __future__ import absolute_import
 # Import python stdlib
 import os
 import re
+import time
 import signal
 import logging
 import threading
@@ -22,6 +23,7 @@ from napalm_logs.config import PUB_IPC_URL
 from napalm_logs.config import DEV_IPC_URL_TPL
 from napalm_logs.config import DEFAULT_DELIM
 from napalm_logs.config import REPLACEMENTS
+from napalm_logs.config import UNKNOWN_DEVICE_NAME
 from napalm_logs.config import OPEN_CONFIG_NO_MODEL
 from napalm_logs.exceptions import OpenConfigPathException
 # exceptions
@@ -34,11 +36,12 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
     '''
     Device sub-process class.
     '''
-    def __init__(self, name, config, pipe, pub_pipe):
+    def __init__(self, name, config, pipe, pub_pipe, publisher_opts):
         self._name = name
         self.pipe = pipe
         self._config = config
         self.pub_pipe = pub_pipe
+        self.publisher_opts = publisher_opts
         self.__up = False
         self.compiled_messages = None
         self._compile_messages()
@@ -275,8 +278,43 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     log.error(msg, exc_info=True)
                     raise NapalmLogsExit(msg)
             log.debug('{0}: dequeued {1}, received from {2}'.format(self._name, msg_dict, address))
+            if self._name == UNKNOWN_DEVICE_NAME:
+                # If running in the sub-process publishing messages for unknown OSs.
+                # This will always send what receives, as-is.
+                log.debug('Publishing the message as-is, no further processing possible.')
+                to_publish = {
+                    'ip': address,
+                    'host': 'unknown',
+                    'timestamp': int(time.time()),
+                    'message_details': msg_dict,
+                    'os': UNKNOWN_DEVICE_NAME,
+                    'error': 'UNKNOWN',
+                    'model_name': 'unknown'
+                }
+                log.debug('Queueing to be published:')
+                log.debug(to_publish)
+                self.pub_pipe.send(to_publish)
+                continue
+            # From here on, we're running in a regular OS sub-process.
+            host = msg_dict.get('host')
+            timestamp = self._format_time(msg_dict.get('time', ''), msg_dict.get('date', ''))
             kwargs = self._parse(msg_dict)
             if not kwargs:
+                # Unable to identify what model to generate for the message in cause.
+                if self.publisher_opts.get('send_raw'):
+                    # But publish the message when the user requested to push raw messages.
+                    to_publish = {
+                        'ip': address,
+                        'host': host,
+                        'timestamp': timestamp,
+                        'message_details': msg_dict,
+                        'os': self._name,
+                        'error': 'RAW',
+                        'model_name': 'raw'
+                    }
+                    log.debug('Queueing to be published:')
+                    log.debug(to_publish)
+                    self.pub_pipe.send(to_publish)
                 continue
             try:
                 oc_obj = self._emit(**kwargs)
@@ -287,8 +325,6 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             log.debug(oc_obj)
             error = kwargs.get('error')
             model_name = kwargs.get('oc_model')
-            host = msg_dict.get('host')
-            timestamp = self._format_time(msg_dict.get('time', ''), msg_dict.get('date', ''))
             to_publish = {
                 'error': error,
                 'host': host,

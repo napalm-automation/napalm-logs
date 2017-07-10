@@ -1,3 +1,5 @@
+.. _device-profiles:
+
 ===============
 Device Profiles
 ===============
@@ -28,7 +30,7 @@ Here is the config for ``junos``:
 		date: (\w+\s+\d+)
 		time: (\d\d:\d\d:\d\d)
 		hostPrefix: (re\d.)?
-		host: ([^ ]+) 
+		host: ([^ ]+)
 		processName: /?(\w+)
 		processId: \[?(\d+)?\]?
 		tag: (\w+)

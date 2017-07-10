@@ -170,12 +170,12 @@ class NapalmLogs:
                 ':'.join(key_path),
                 config.get('error'),
                 dev_os
-                )
+            )
         else:
             error = 'The "values" do not match variables in "line" for {} in {}'.format(
                 ':'.join(key_path),
                 dev_os
-                )
+            )
         self._raise_config_exception(error)
 
     def _verify_config_key(self, key, value, valid, config, dev_os, key_path):
@@ -347,7 +347,11 @@ class NapalmLogs:
         Start the server process.
         '''
         log.debug('Starting the server process')
-        server = NapalmLogsServerProc(self.config_dict, pipe, os_pipes, self.logger_opts)
+        server = NapalmLogsServerProc(self.config_dict,
+                                      pipe,
+                                      os_pipes,
+                                      self.logger_opts,
+                                      self.publisher_opts)
         proc = Process(target=server.start)
         proc.start()
         log.debug('Started server process as {pname} with PID {pid}'.format(
@@ -392,7 +396,8 @@ class NapalmLogs:
         dos = NapalmLogsDeviceProc(device_os,
                                    device_config,
                                    device_pipe,
-                                   dev_pub_pipe)
+                                   dev_pub_pipe,
+                                   self.publisher_opts)
         os_proc = Process(target=dos.start)
         os_proc.start()
         log.debug('Started process {pname} for {dos}, having PID {pid}'.format(
@@ -435,12 +440,16 @@ class NapalmLogs:
         # device process start
         log.info('Starting child processes for each device type')
         os_pipes = {}
+        if self.publisher_opts.get('send_unknown'):
+            # Explicitly requested to send messages from unidentified devices.
+            log.info('Starting an additional process to publish messages from identified operating systems.')
+            self.config_dict[CONFIG.UNKNOWN_DEVICE_NAME] = {}
         for device_os, device_config in self.config_dict.items():
-            if (self.device_whitelist and\
-                hasattr(self.device_whitelist, '__iter__') and\
+            if (self.device_whitelist and
+                hasattr(self.device_whitelist, '__iter__') and
                 device_os not in self.device_whitelist) or\
-               (self.device_blacklist and\
-                hasattr(self.device_blacklist, '__iter__') and\
+               (self.device_blacklist and
+                hasattr(self.device_blacklist, '__iter__') and
                 device_os in self.device_blacklist):
                 # Ignore devices that are not in the whitelist (if defined),
                 #   or those operating systems that are on the blacklist.

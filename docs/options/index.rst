@@ -11,6 +11,8 @@ Command Line
 
 All of the command line arguments can also be added to a config file.
 
+.. _address:
+
 ``address``
 -----------
 
@@ -31,6 +33,8 @@ Configuration file example:
 
   address: 172.17.17.1
 
+.. _auth-address:
+
 ``auth-address``
 ----------------
 
@@ -49,6 +53,8 @@ Configuration file example:
 .. code-block:: yaml
 
   auth_address: 172.17.17.2
+
+.. _auth-port:
 
 ``auth-port``
 -------------
@@ -69,6 +75,8 @@ Configuration file example:
 
   auth_port: 2022
 
+.. _certificate:
+
 ``certificate``
 ---------------
 
@@ -86,6 +94,8 @@ Configuration file example:
 
   certificate: /var/cache/server.crt
 
+.. _config-file:
+
 ``config-file``
 ---------------
 
@@ -99,6 +109,8 @@ CLI usage example:
 
   napalm-logs -c /srv/napalm-logs
   napalm-logs --config-file /srv/napalm-logs
+
+.. _config-path:
 
 ``config-path``
 ---------------
@@ -116,6 +128,8 @@ Configuration file example:
 .. code-block:: yaml
 
   config_path: /home/admin/napalm-logs/
+
+.. _disable-security:
 
 ``disable-security``
 --------------------
@@ -136,6 +150,8 @@ Configuration file example:
 
   disable_security: true
 
+.. _extension-config-path:
+
 ``extension-config-path``
 -------------------------
 
@@ -153,6 +169,8 @@ Configuration file example:
 
   extension_config_path: /home/admin/napalm-logs/
 
+.. _keyfile:
+
 ``keyfile``
 -----------
 
@@ -169,6 +187,8 @@ Configuration file example:
 .. code-block:: yaml
 
   keyfile: /var/cache/server.key
+
+.. _listener:
 
 ``listener``
 ------------
@@ -188,6 +208,8 @@ Configuration file example:
 .. code-block:: yaml
 
   listener: kafka
+
+.. _log-file:
 
 ``log-file``
 ------------
@@ -210,6 +232,8 @@ Configuration file example:
 
   log_file: /var/log/napalm-logs
 
+.. _log-format:
+
 ``log-format``
 --------------
 
@@ -231,6 +255,8 @@ Configuration file example:
 
   log_format: '%(asctime)s,%(msecs)03.0f [%(levelname)] %(message)s'
 
+.. _log-level:
+
 ``log-level``
 -------------
 
@@ -250,6 +276,8 @@ Configuration file example:
 .. code-block:: yaml
 
   log_level: info
+
+.. _port:
 
 ``port``
 --------
@@ -273,6 +301,8 @@ Configuration file example:
 
   port: 1024
 
+.. _publish-address:
+
 ``publish-address``
 -------------------
 
@@ -292,6 +322,8 @@ Configuration file example:
 
   publish_address: 172.17.17.3
 
+.. _publish-port:
+
 ``publish-port``
 ----------------
 
@@ -310,6 +342,8 @@ Configuration file example:
 .. code-block:: yaml
 
   publish_port: 2048
+
+.. _transport:
 
 ``transport``
 -------------
@@ -336,6 +370,8 @@ Config File Only Options
 
 The options to be used inside of the pluggable modules are not provided via the command line, they need to be provided in the config file.
 
+.. _device-whitelist:
+
 ``device_whitelist``
 ++++++++++++++++++++
 
@@ -348,6 +384,8 @@ Example:
   device_whitelist:
     - junos
     - iosxr
+
+.. _device-blacklist:
 
 ``device_blacklist``
 ++++++++++++++++++++
@@ -363,10 +401,14 @@ Example:
 
 Each of the following should be a ``dictionary`` containing the ``keys`` provided below each one.
 
+.. _listener-opts:
+
 ``listener_opts``
 +++++++++++++++++
 
 Configuration options for the listener module used to receive the syslog messages.
+
+.. _listener-opts-bootstrap-servers:
 
 ``bootstrap_servers``
 ---------------------
@@ -385,6 +427,8 @@ Example:
       - kk1.brokers.example.org:1234
       - 192.168.0.1
       - 192.168.0.2:5678
+
+.. _listener-opts-kafka-topic:
 
 ``kafka_topic``
 ---------------
@@ -402,10 +446,14 @@ Example:
   listener_opts:
     kafka_topic: napalm-logs-in
 
+.. _logger-opts:
+
 ``logger_opts``
 +++++++++++++++
 
 The logger subsystem uses the modules from the publisher pluggable subsystem to sent partially parsed syslog messages, that either couldn't detect the network operating system, either there isn't a profile mapping available.
+
+.. _logger-opts-bootstrap-servers:
 
 ``bootstrap_servers``
 ---------------------
@@ -424,6 +472,8 @@ Example:
       - kk1.brokers.example.org:1234
       - 192.168.0.1
       - 192.168.0.2:5678
+
+.. _logger-opts-kafka-topic:
 
 ``kafka_topic``
 ---------------
@@ -441,8 +491,10 @@ Example:
   listener_opts:
     kafka_topic: napalm-logs-processed
 
-``syslog``
-----------
+.. _logger-opts-send-raw:
+
+``send_raw``
+------------
 
 If this option is set, all processed syslog messages, even ones that have not matched a configured error, will be output via the specified transport.
 This can be used to forward to log server for storage.
@@ -452,12 +504,31 @@ Example:
 .. code-block:: yaml
 
   listener_opts:
-    syslog: true
+    send_raw: true
+
+.. _logger-opts-send-unknown:
+
+``send_unknown``
+----------------
+
+If this option is set, all processed syslog messages, even ones that have not matched a certain operating system, will be output via the specified transport.
+This can be used to forward to log server for storage.
+
+Example:
+
+.. code-block:: yaml
+
+  listener_opts:
+    send_unknown: true
+
+.. _publisher-opts:
 
 ``publisher_opts``
 +++++++++++++++++
 
 Options for the transport module used to publish the structured objects.
+
+.. _publisher-opts-bootstrap-servers:
 
 ``bootstrap_servers``
 ---------------------
@@ -477,6 +548,8 @@ Example:
       - 192.168.0.1
       - 192.168.0.2:5678
 
+.. _publisher-opts-kafka-topic:
+
 ``kafka_topic``
 ---------------
 
@@ -492,3 +565,33 @@ Example:
 
   publisher_opts:
     kafka_topic: napalm-logs-out
+
+.. _publisher-opts-send-raw:
+
+``send_raw``
+------------
+
+If this option is set, all processed syslog messages, even ones that have not matched a configured error, will be published over the specified transport.
+This can be used to forward to log server for storage.
+
+Example:
+
+.. code-block:: yaml
+
+  listener_opts:
+    send_raw: true
+
+.. _publisher-opts-send-unknown:
+
+``send_unknown``
+----------------
+
+If this option is set, all processed syslog messages, even ones that have not matched a certain operating system, will be published over the specified transport.
+This can be used to forward to log server for storage.
+
+Example:
+
+.. code-block:: yaml
+
+  listener_opts:
+    send_unknown: true
