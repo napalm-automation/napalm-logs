@@ -146,7 +146,7 @@ class NapalmLogs:
                 with open(filepath, 'r') as fstream:
                     config[filename] = yaml.load(fstream)
             except yaml.YAMLError as yamlexc:
-                log.error('Invalid YAML file: {}'.format(filepath), exc_info=True)
+                log.error('Invalid YAML file: %s', filepath, exc_info=True)
                 raise IOError(yamlexc)
         if not config:
             msg = 'Unable to find proper configuration files under {path}'.format(path=path)
@@ -222,7 +222,7 @@ class NapalmLogs:
         # Check for device conifg, if there isn't anything then just log, do not raise an exception
         for dev_os, dev_config in self.config_dict.items():
             if not dev_config:
-                log.warning('No config found for {}'.format(dev_os))
+                log.warning('No config found for %s', dev_os)
                 continue
             # Compare the valid opts with the conifg
             self._verify_config_dict(CONFIG.VALID_CONFIG, dev_config, dev_os)
@@ -240,12 +240,12 @@ class NapalmLogs:
                     os.path.dirname(os.path.realpath(__file__)),
                     'config'
                 )
-            log.info('Reading the configuration from {path}'.format(path=self.config_path))
+            log.info('Reading the configuration from %s', self.config_path)
             self.config_dict = self._load_config(self.config_path)
         if not self.extension_config_dict and self.extension_config_path:
             # When extension config is not sent as dict
             # But `extension_config_path` is specified
-            log.info('Reading extension configuration from {path}'.format(path=self.extension_config_path))
+            log.info('Reading extension configuration from %s', self.extension_config_path)
             self.extension_config_dict = self._load_config(self.extension_config_path)
         elif not self.extension_config_dict:
             self.extension_config_dict = {}
@@ -264,11 +264,7 @@ class NapalmLogs:
         '''
         proc = start_fun(*args, **kwargs)
         pid = proc.pid
-        log.debug('Starting keepalive for {pname} ({pid})'.format(
-                pname=proc._name,
-                pid=pid
-            )
-        )
+        log.debug('Starting keepalive for %s (%s)', proc._name, pid)
         while True:
             time.sleep(5)
             proc_file = os.path.join('/proc', str(pid), 'stat')
@@ -276,30 +272,21 @@ class NapalmLogs:
                 proc_flag = open(proc_file).readline().split()[2]
             except IOError:
                 log.warning('The following error may not be critical:')
-                log.warning('Unable to read {0}'.format(proc_file), exc_info=True)
+                log.warning('Unable to read %s', proc_file, exc_info=True)
                 proc_flag = 'X'
             if proc_flag in CONFIG.PROC_DEAD_FLAGS:
-                log.warning('Process {pname} with {pid} is dead, restarting'.format(
-                        pname=proc._name,
-                        pid=pid
-                    )
-                )
+                log.warning('Process %s with %s is dead, restarting', proc._name, pid)
                 log.debug('Killing the previous process')
                 try:
                     os.kill(pid, 9)
                 except OSError as err:
-                    log.error('Unable to kill {0}'.format(pid))
+                    log.error('Unable to kill %s', pid)
                     if err.strerror == 'No such process':
                         log.warning('The following error may not be critical:')
-                        log.warning('Unable to kill PID {0}'.format(pid), exc_info=True)
+                        log.warning('Unable to kill PID %s', pid, exc_info=True)
                 # Restarting proc
                 proc = start_fun(*args, **kwargs)
-                log.warning('{pname} {prev_pid} restarted as PID {pid}'.format(
-                        pname=proc._name,
-                        prev_pid=pid,
-                        pid=proc.pid
-                    )
-                )
+                log.warning('%s %s restarted as PID %s', proc._name, pid, proc.pid)
                 pid = proc.pid
 
     def _start_auth_proc(self, auth_skt):
@@ -318,11 +305,7 @@ class NapalmLogs:
         auth.verify_cert()
         proc = Process(target=auth.start)
         proc.start()
-        log.debug('Started auth process as {pname} with PID {pid}'.format(
-                pname=proc._name,
-                pid=proc.pid
-            )
-        )
+        log.debug('Started auth process as %s with PID %s', proc._name, proc.pid)
         return proc
 
     def _start_lst_proc(self, pipe):
@@ -335,11 +318,7 @@ class NapalmLogs:
         listener = listener_class(self.address, self.port, pipe, **self.listener_opts)
         proc = Process(target=listener.start)
         proc.start()
-        log.debug('Started listener process as {pname} with PID {pid}'.format(
-                pname=proc._name,
-                pid=proc.pid
-            )
-        )
+        log.debug('Started listener process as %s with PID %s', proc._name, proc.pid)
         return proc
 
     def _start_srv_proc(self, pipe, os_pipes):
@@ -354,11 +333,7 @@ class NapalmLogs:
                                       self.publisher_opts)
         proc = Process(target=server.start)
         proc.start()
-        log.debug('Started server process as {pname} with PID {pid}'.format(
-                pname=proc._name,
-                pid=proc.pid
-            )
-        )
+        log.debug('Started server process as %s with PID %s', proc._name, proc.pid)
         return proc
 
     def _start_pub_proc(self, pub_pipe):
@@ -376,11 +351,7 @@ class NapalmLogs:
                                             disable_security=self.disable_security)
         proc = Process(target=publisher.start)
         proc.start()
-        log.debug('Started publisher process as {pname} with PID {pid}'.format(
-                pname=proc._name,
-                pid=proc.pid
-            )
-        )
+        log.debug('Started publisher process as %s with PID %s', proc._name, proc.pid)
         return proc
 
     def _start_dev_proc(self,
@@ -392,7 +363,7 @@ class NapalmLogs:
         Start the device worker process.
         '''
         # TODO remove the pipe overhead when migrating to zmq IPC
-        log.info('Starting the child process for {dos}'.format(dos=device_os))
+        log.info('Starting the child process for %s', device_os)
         dos = NapalmLogsDeviceProc(device_os,
                                    device_config,
                                    device_pipe,
@@ -400,12 +371,7 @@ class NapalmLogs:
                                    self.publisher_opts)
         os_proc = Process(target=dos.start)
         os_proc.start()
-        log.debug('Started process {pname} for {dos}, having PID {pid}'.format(
-                pname=os_proc._name,
-                dos=device_os,
-                pid=os_proc.pid
-            )
-        )
+        log.debug('Started process %s for %s, having PID %s', os_proc._name, device_os, os_proc.pid)
         return os_proc
 
     def start_engine(self):

@@ -179,7 +179,7 @@ class NLOptionParser(OptionParser, object):
                 if not v.startswith('${') or not v.endswith('}'):
                     continue
                 if not os.environ.get(v[2:-1]):
-                    log.error('No env variable found for {}, please check your config file'.format(v[2:-1]))
+                    log.error('No env variable found for %s, please check your config file', v[2:-1])
                     sys.exit(1)
                 d[k] = os.environ[v[2:-1]]
             if isinstance(v, dict):
@@ -193,7 +193,7 @@ class NLOptionParser(OptionParser, object):
                 if not v.startswith('${') or not v.endswith('}'):
                     continue
                 if not os.environ.get(v[2:-1]):
-                    log.error('No env variable found for {}, please check your config file'.format(v[2:-1]))
+                    log.error('No env variable found for %s, please check your config file', v[2:-1])
                     sys.exit(1)
                 l[n] = os.environ[v[2:-1]]
             if isinstance(v, dict):
@@ -207,7 +207,7 @@ class NLOptionParser(OptionParser, object):
             with open(filepath, 'r') as fstream:
                 config = yaml.load(fstream)
         except (IOError, yaml.YAMLError):
-            log.info('Unable to read from {0}'.format(filepath))
+            log.info('Unable to read from %s', filepath)
         # Convert any env variables
         self.convert_env_dict(config)
         return config
@@ -226,11 +226,11 @@ class NLOptionParser(OptionParser, object):
         if log_file.lower() not in defaults.LOG_FILE_CLI_OPTIONS:
             log_file_dir = os.path.dirname(log_file)
             if not os.path.isdir(log_file_dir):
-                log.warning('{0} does not exist, trying to create'.format(log_file_dir))
+                log.warning('%s does not exist, trying to create', log_file_dir)
                 try:
                     os.mkdir(log_file_dir)
                 except OSError:
-                    log.error('Unable to create {0}'.format(log_file_dir), exc_info=True)
+                    log.error('Unable to create %s', log_file_dir, exc_info=True)
                     sys.exit(0)
             log.removeHandler(screen_handler)  # remove printing to the screen
             logging.basicConfig(filename=log_file,

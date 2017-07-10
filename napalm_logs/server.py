@@ -121,7 +121,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
             ret['message'] = ret['message'].strip()
             # TODO Should we stop searching and just return, or should we return all matches OS?
             return dev_os, ret
-        log.debug('No OS matched for: {}'.format(msg))
+        log.debug('No OS matched for: %s', msg)
         return '', ret
 
     def _setup_log_syslog_transport(self):
@@ -169,9 +169,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     log.error(msg, exc_info=True)
                     raise NapalmLogsExit(msg)
             msg = msg.encode('utf8')
-            log.debug('[{2}] Dequeued message from {0}: {1}'.format(address, msg, time.time()))
+            log.debug('[%s] Dequeued message from %s: %s', address, msg, time.time())
             dev_os, msg_dict = self._identify_os(msg)
-            log.debug('Identified OS: {0}'.format(dev_os))
+            log.debug('Identified OS: %s', dev_os)
             if self.logger_opts.get('send_raw'):
                 if dev_os:
                     self._send_log_syslog(dev_os, msg_dict)
@@ -182,12 +182,12 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 # Then send the message in the right queue
                 # obj = (msg_dict, address)
                 # bin_obj = umsgpack.packb(obj)
-                log.debug('Queueing message to {0}'.format(dev_os))
+                log.debug('Queueing message to %s', dev_os)
                 # self.pubs[dev_os].send(bin_obj)
                 self.os_pipes[dev_os].send((msg_dict, address))
             elif dev_os and dev_os not in self.os_pipes:
                 # Identified the OS, but the corresponding process does not seem to be started.
-                log.info('Unable to queue the message to {0}. Is the sub-process started?'.format(dev_os))
+                log.info('Unable to queue the message to %s. Is the sub-process started?', dev_os)
             elif not dev_os and self.publisher_opts.get('send_unknown'):
                 # OS not identified, but the user requested to publish the message as-is
                 self.os_pipes[UNKNOWN_DEVICE_NAME].send(({'message': msg}, address))
