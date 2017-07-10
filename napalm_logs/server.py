@@ -37,7 +37,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
         self.config = config
         self.pipe = pipe
         self.os_pipes = os_pipes
-        self.logger_opts = logger
+        self.logger_opts = logger_opts
         self.publisher_opts = publisher_opts
         self.__up = False
         # self.pubs = {}
