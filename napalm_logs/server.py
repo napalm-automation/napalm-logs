@@ -33,10 +33,11 @@ class NapalmLogsServerProc(NapalmLogsProc):
     '''
     Server sub-process class.
     '''
-    def __init__(self, config, pipe, os_pipes, logger_opts, publisher_opts):
+    def __init__(self, config, pipe, os_pipes, logger, logger_opts, publisher_opts):
         self.config = config
         self.pipe = pipe
         self.os_pipes = os_pipes
+        self.logger = logger
         self.logger_opts = logger_opts
         self.publisher_opts = publisher_opts
         self.__up = False
@@ -125,7 +126,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
         return '', ret
 
     def _setup_log_syslog_transport(self):
-        transport_class = get_transport(self.logger_opts['send_raw'])
+        transport_class = get_transport(self.logger)
         # The tranport classes expect address and port to be passed as args,
         # but as the options for logger are configured via the config file
         # these will be found in **kwargs. So we will send None for both
@@ -152,7 +153,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         # If were are to log all processed syslogs we need to initiate the class
-        if self.logger_opts.get('send_raw'):
+        if self.logger:
             self._setup_log_syslog_transport()
         self.__up = True
         while self.__up:
@@ -172,10 +173,10 @@ class NapalmLogsServerProc(NapalmLogsProc):
             log.debug('[%s] Dequeued message from %s: %s', address, msg, time.time())
             dev_os, msg_dict = self._identify_os(msg)
             log.debug('Identified OS: %s', dev_os)
-            if self.logger_opts.get('send_raw'):
-                if dev_os:
+            if self.logger:
+                if self.logger_opts.get('send_raw') and dev_os:
                     self._send_log_syslog(dev_os, msg_dict)
-                elif self.logger_opts.get('send_unknown'):
+                elif self.logger_opts.get('send_unknown') and not dev_os:
                     self._send_log_syslog(UNKNOWN_DEVICE_NAME, {'message': msg})
             if dev_os and dev_os in self.os_pipes:
                 # Identified the OS and the corresponding process is started.
@@ -199,5 +200,5 @@ class NapalmLogsServerProc(NapalmLogsProc):
         self.pipe.close()
         for os_pipe in self.os_pipes.values():
             os_pipe.close()
-        if self.logger_opts.get('send_raw'):
+        if self.logger:
             self._log_syslog_transport.stop()
