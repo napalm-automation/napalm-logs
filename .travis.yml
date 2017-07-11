@@ -16,5 +16,4 @@ deploy:
 script:
   - cp examples/server.crt /tmp/__napalm_logs.crt
   - cp examples/server.key /tmp/__napalm_logs.key
-#  - cd napalm_logs/scripts/
-#  - sudo python cli.py --log-file cli -l debug --certificate /tmp/__napalm_logs.crt --keyfile /tmp/__napalm_logs.key
+  - sudo python napalm_logs/scripts/cli.py --log-file cli -l debug --certificate /tmp/__napalm_logs.crt --keyfile /tmp/__napalm_logs.key && python tests/napalm-logs-profile
