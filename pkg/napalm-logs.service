@@ -6,7 +6,7 @@ After=network.target
 LimitNOFILE=2048
 Type=notify
 NotifyAccess=all
-ExecStart=/usr/bin/napalm-logs
+ExecStart=/usr/local/bin/napalm-logs
 
 [Install]
 WantedBy=multi-user.target
