@@ -158,7 +158,6 @@ class NLOptionParser(OptionParser, object):
         )
         self.add_option(
             '-l', '--log-level',
-            default='warning',
             dest='log_level',
             help=('Logging level. Default: {0}'.format(defaults.LOG_LEVEL))
         )
