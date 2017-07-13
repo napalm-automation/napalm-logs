@@ -237,7 +237,8 @@ class NLOptionParser(OptionParser, object):
                                 level=defaults.LOGGING_LEVEL.get(log_lvl.lower(), 'warning'),
                                 format=log_fmt)  # log to filecm
         cert = self.options.certificate or file_cfg.get('certificate')
-        if not cert and self.options.disable_security is False:
+        disable_security = self.options.disable_security or file_cfg.get('disable_security', False)
+        if not cert and disable_security is False:
             log.error('certfile must be specified for server-side operations')
             raise ValueError('Please specify a valid SSL certificate.')
         # For each module we need to merge the defaults with the
