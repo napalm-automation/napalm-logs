@@ -267,7 +267,7 @@ class NLOptionParser(OptionParser, object):
                             or defaults.AUTH_PORT,
             'certificate': cert,
             'keyfile': self.options.keyfile or file_cfg.get('keyfile'),
-            'disable_security': self.options.disable_security or file_cfg.get('disable_security'),
+            'disable_security': disable_security,
             'config_path': self.options.config_path or file_cfg.get('config_path'),
             'extension_config_path': self.options.extension_config_path or file_cfg.get('extension_config_path'),
             'log_level': log_lvl,
