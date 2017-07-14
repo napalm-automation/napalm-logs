@@ -307,12 +307,12 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     self.pub_pipe.send(to_publish)
                 continue
             try:
-                oc_obj = self._emit(**kwargs)
+                yang_obj = self._emit(**kwargs)
             except Exception as err:
                 log.exception('Unexpected error when generating the OC object.', exc_info=True)
                 continue
             log.debug('Generated OC object:')
-            log.debug(oc_obj)
+            log.debug(yang_obj)
             error = kwargs.get('error')
             model_name = kwargs.get('oc_model')
             to_publish = {
@@ -320,9 +320,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'host': host,
                 'ip': address,
                 'timestamp': timestamp,
-                'open_config': oc_obj,
+                'yang_message': yang_obj,
                 'message_details': msg_dict,
-                'model_name': model_name,
+                'yang_model': model_name,
                 'os': self._name
             }
             log.debug('Queueing to be published:')
