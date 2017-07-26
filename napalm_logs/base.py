@@ -128,6 +128,7 @@ class NapalmLogs:
         and return the object.
         '''
         config = {}
+        log.debug('Reading configuration from %s', path)
         if not os.path.isdir(path):
             msg = (
                 'Unable to read from {path}: '
@@ -135,25 +136,48 @@ class NapalmLogs:
             ).format(path=path)
             log.error(msg)
             raise IOError(msg)
-        files = os.listdir(path)
-        # Read all files under the config dir
-        for file in files:
-            # And allow only .yml and .yaml extensions
-            if not file.endswith('.yml') and not file.endswith('.yaml'):
-                continue
-            filename, _ = file.split('.')
-            # The filename is also the network OS name
-            filepath = os.path.join(path, file)
-            try:
-                with open(filepath, 'r') as fstream:
-                    config[filename] = yaml.load(fstream)
-            except yaml.YAMLError as yamlexc:
-                log.error('Invalid YAML file: %s', filepath, exc_info=True)
-                raise IOError(yamlexc)
+        # The directory tree should look like the following:
+        # .
+        # ├── eos
+        # │   └── init.yml
+        # ├── __init__.py
+        # ├── iosxr
+        # │   └── init.yml
+        # ├── junos
+        # │   └── init.yml
+        # └── nxos
+        #     └── init.yml
+        os_subdirs = [path[0] for path in os.walk(path)][1:]
+        if not os_subdirs:
+            log.error('%s does not contain any OS subdirectories', path)
+        for os_dir in os_subdirs:
+            log.debug('Checking under %s', os_dir)
+            # TODO skip directories based on the whitelist / blacklist logic
+            os_name = os.path.split(os_dir)[1]  # the network OS name
+            if os_name not in config:
+                config[os_name] = {}
+            files = os.listdir(os_dir)
+            # Read all files under the OS dir
+            for file_ in files:
+                log.debug('Looking at %s', file_)
+                file_name, file_extension = os.path.splitext(file_)
+                file_extension = file_extension.replace('.', '')
+                if file_extension in CONFIG.OS_CONFIG_EXTENSIONS:
+                    filepath = os.path.join(os_dir, file_)
+                    try:
+                        with open(filepath, 'r') as fstream:
+                            config[os_name].update(yaml.load(fstream))
+                    except yaml.YAMLError as yamlexc:
+                        log.error('Invalid YAML file: %s', filepath, exc_info=True)
+                        raise IOError(yamlexc)
+                else:
+                    log.info('Ignoring %s (extension not allowed)', filepath)
         if not config:
-            msg = 'Unable to find proper configuration files under {path}'.format(path=path)
+            msg = 'Could not find proper configuration files under {path}'.format(path=path)
             log.error(msg)
             raise IOError(msg)
+        log.debug('Complete config:')
+        log.debug(config)
         return config
 
     @staticmethod

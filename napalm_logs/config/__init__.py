@@ -22,6 +22,15 @@ LOG_LEVEL = 'warning'
 LOG_FORMAT = '%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'
 LOG_FILE = os.path.join(ROOT_DIR, 'var', 'log', 'napalm', 'logs')
 LOG_FILE_CLI_OPTIONS = ('cli', 'screen')
+OS_INIT_FILENAMES = (
+    'init',
+    'index'
+)
+OS_CONFIG_EXTENSIONS = (
+    'yml',
+    'yaml'
+    # 'py'
+)
 UNKNOWN_DEVICE_NAME = 'unknown'
 LISTENER_OPTS = {
     'kafka_topic': 'syslog.net'
