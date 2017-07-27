@@ -232,9 +232,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         bin_obj = umsgpack.packb(obj)
         self.pub.send(bin_obj)
 
-    def _format_time(self, time, date):
+    def _format_time(self, time, date, prefix_id):
         # TODO can we work out the time format from the regex? Probably but this is a task for another day
-        time_format = self._config['prefix'].get('time_format', '')
+        time_format = self._config['prefixes'][0].get('time_format', '')
         if not time or not date or not time_format:
             return int(datetime.now().strftime('%s'))
         # Most syslog do not include the year, so we will add the current year if we are not supplied with one
@@ -287,7 +287,10 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 continue
             # From here on, we're running in a regular OS sub-process.
             host = msg_dict.get('host')
-            timestamp = self._format_time(msg_dict.get('time', ''), msg_dict.get('date', ''))
+            prefix_id = msg_dict.pop('__prefix_id__')
+            timestamp = self._format_time(msg_dict.get('time', ''),
+                                          msg_dict.get('date', ''),
+                                          prefix_id)
             kwargs = self._parse(msg_dict)
             if not kwargs:
                 # Unable to identify what model to generate for the message in cause.

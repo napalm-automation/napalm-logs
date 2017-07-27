@@ -193,11 +193,11 @@ class NapalmLogs:
                             # if extract is defined and is callable
                             if 'prefixes' not in config[os_name]:
                                 config[os_name]['prefixes'] = []
-                            config[os_name]['prefixes'] = {
-                                'values': {'tag': {}},
-                                'line': {},
+                            config[os_name]['prefixes'].append({
+                                'values': {'tag': ''},
+                                'line': '',
                                 '__python_fun__': getattr(mod, CONFIG.INIT_RUN_FUN)
-                            }
+                            })
                             log.info('Adding the prefix function defined under %s to %s',
                                      filepath, os_name)
                         elif file_name != '__init__':
@@ -258,7 +258,9 @@ class NapalmLogs:
         raise ConfigurationException(error_string)
 
     def _compare_values(self, value, config, dev_os, key_path):
-        if 'line' not in value.keys() or 'values' not in value.keys():
+        if 'line' not in value or\
+           'values' not in value or\
+           '__python_fun__' not in value:  # Check looks good when using a Python-defined profile.
             return
         from_line = re.findall('\{(\w+)\}', config['line'])
         if set(from_line) == set(config['values']):

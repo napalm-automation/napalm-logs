@@ -75,29 +75,35 @@ class NapalmLogsServerProc(NapalmLogsProc):
         for dev_os, os_config in self.config.items():
             if not os_config:
                 continue
-            values = os_config.get('prefix', {}).get('values', {})
-            line = os_config.get('prefix', {}).get('line', '')
-            # Add 'pri' and 'message' to the line, and values
-            line = '{{pri}}{}{{message}}'.format(line)
-            # PRI https://tools.ietf.org/html/rfc5424#section-6.2.1
-            values['pri'] = '\<(\d+)\>'
-            values['message'] = '(.*)'
-            # We will now figure out which position each value is in so we can use it with the match statement
-            position = {}
-            for key in values.keys():
-                position[line.find('{' + key + '}')] = key
-            sorted_position = {}
-            for i, elem in enumerate(sorted(position.items())):
-                sorted_position[elem[1]] = i + 1
-            # Escape the line, then remove the escape for the curly bracets so they can be used when formatting
-            escaped = re.escape(line).replace('\{', '{').replace('\}', '}')
-            # Replace a whitespace with \s+
-            escaped = escaped.replace('\ ', '\s+')
-            self.compiled_prefixes[dev_os] = {
-                'prefix': re.compile(escaped.format(**values)),
-                'prefix_positions': sorted_position,
-                'values': values
-            }
+            self.compiled_prefixes[dev_os] = []
+            for prefix in os_config.get('prefixes', []):
+                values = prefix.get('values', {})
+                line = prefix.get('line', '')
+                if prefix.get('__python_fun__'):
+                    self.compiled_prefixes[dev_os].append({
+                        '__python_fun__' : prefix['__python_fun__']
+                    })
+                # Add 'pri' and 'message' to the line, and values
+                line = '{{pri}}{}{{message}}'.format(line)
+                # PRI https://tools.ietf.org/html/rfc5424#section-6.2.1
+                values['pri'] = '\<(\d+)\>'
+                values['message'] = '(.*)'
+                # We will now figure out which position each value is in so we can use it with the match statement
+                position = {}
+                for key in values.keys():
+                    position[line.find('{' + key + '}')] = key
+                sorted_position = {}
+                for i, elem in enumerate(sorted(position.items())):
+                    sorted_position[elem[1]] = i + 1
+                # Escape the line, then remove the escape for the curly bracets so they can be used when formatting
+                escaped = re.escape(line).replace('\{', '{').replace('\}', '}')
+                # Replace a whitespace with \s+
+                escaped = escaped.replace('\ ', '\s+')
+                self.compiled_prefixes[dev_os].append({
+                    'prefix': re.compile(escaped.format(**values)),
+                    'prefix_positions': sorted_position,
+                    'values': values
+                })
 
     def _identify_os(self, msg):
         '''
@@ -110,18 +116,32 @@ class NapalmLogsServerProc(NapalmLogsProc):
             # [mircea] I think its good from a logging perspective to know at least that
             #   that the server found the matching and it tells that it won't be processed
             #   further. Later, we could potentially add an option to control this.
-            match = data.get('prefix', '').search(msg)
-            if not match:
-                continue
-            positions = data.get('prefix_positions', {})
-            values = data.get('values')
-            ret = {}
-            for key in values.keys():
-                ret[key] = match.group(positions.get(key))
-            # Remove whitespace from the start or end of the message
-            ret['message'] = ret['message'].strip()
-            # TODO Should we stop searching and just return, or should we return all matches OS?
-            return dev_os, ret
+            prefix_id = -1
+            for prefix in data:
+                prefix_id += 1
+                if '__python_fun__' in prefix:
+                    log.debug('Trying to match using the custom python profiler')
+                    match = prefix['__python_fun__'](msg)
+                else:
+                    log.debug('Matching using YAML-defined profiler')
+                    match = prefix.get('prefix', '').search(msg)
+                if not match:
+                    continue
+                if '__python_fun__' in prefix:
+                    log.debug('%s matched using the custom python profiler', msg)
+                    ret = match  # the output as-is from the custom function
+                else:
+                    positions = prefix.get('prefix_positions', {})
+                    values = prefix.get('values')
+                    ret = {}
+                    for key in values.keys():
+                        ret[key] = match.group(positions.get(key))
+                # Remove whitespace from the start or end of the message
+                ret['__prefix_id__'] = prefix_id
+                ret['message'] = ret['message'].strip()
+                # TODO Should we stop searching and just return, or should we return all matches OS?
+                return dev_os, ret
+            log.debug('No prefix matched under %s', dev_os)
         log.debug('No OS matched for: %s', msg)
         return '', ret
 
