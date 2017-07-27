@@ -314,3 +314,19 @@ consider being:
 - A dunder called ``__yang_model__`` that specifies the YANG model.
 - A variable names ``__tag__`` that specifies the tag name, that is used to match when comparing the value of the ``tag`` field extracted from the message prefix and determine what parser should process the syslog message. However, this variable is optional -- when not defined, it will use the filename as tag.
 - A variable called ``__error__`` that defines the name of the global error. Each structured message published by napalm-logs has a certain error tag, that is unique and cross-platform. This variable is also optional -- when not defined, the error ID will be the file name.
+
+Useful function
+^^^^^^^^^^^^^^^
+
+At times, the developer may find very useful several function, in order to
+acomplish recurrent tasks:
+
+- ``napalm_logs.utils.extract``: Extracts the fields from a unstructured text, given a field-regex mapping. Please check the previous paragraph for an usage example.
+- ``napalm_logs.utils.setval``: Set a value under the dictionary hierarchy identified under the key. The key 'foo//bar//baz' will configure the value under the dictionary hierarchy {'foo': {'bar': {'baz': {}}}}. Example:
+
+.. code-block:: python
+
+    >>> napalm_logs.utils.setval('foo//bar//baz', 'value')
+    {'foo': {'bar': {'baz': 'value'}}}
+
+- ``napalm_logs.utils.traverse``: Traverse a dict or list using a slash delimiter target string. The target 'foo//bar//0' will return data['foo']['bar'][0] if this value exists, otherwise will return empty dict. Return ``None`` when not found. This can be used to verify if a certain key exists under dictionary hierarchy.
