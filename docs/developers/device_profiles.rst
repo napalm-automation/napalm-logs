@@ -19,8 +19,8 @@ Directory tree structure example:
 
 .. code-block:: text
 
-		napalm_logs/config/
-		├── __init__.py
+    napalm_logs/config/
+    ├── __init__.py
     ├── eos
     │   └── init.yml
     ├── iosxr
@@ -38,7 +38,7 @@ Custom directory tree example:
 
 .. code-block:: text
 
-		/pat/to/custom/config/
+    /pat/to/custom/config/
     ├── eos
     │   └── bgp_3_notification.py
     ├── junos
@@ -91,17 +91,17 @@ Here is the config for ``junos``:
 
 .. code-block:: yaml
 
-	prefixes:
-	  - time_format: "%b %d %H:%M:%S"
-		  values:
-			date: (\w+\s+\d+)
-			time: (\d\d:\d\d:\d\d)
-			hostPrefix: (re\d.)?
-			host: ([^ ]+)
-			processName: /?(\w+)
-			processId: \[?(\d+)?\]?
-			tag: (\w+)
-		  line: '{date} {time} {hostPrefix}{host} {processName}{processId}: {tag}: '
+  prefixes:
+    - time_format: "%b %d %H:%M:%S"
+      values:
+      date: (\w+\s+\d+)
+      time: (\d\d:\d\d:\d\d)
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      processName: /?(\w+)
+      processId: \[?(\d+)?\]?
+      tag: (\w+)
+      line: '{date} {time} {hostPrefix}{host} {processName}{processId}: {tag}: '
 
 What does each option mean?
 
@@ -135,26 +135,26 @@ Here is an example message:
 
 .. code-block:: yaml
 
-	messages:
-	  - error: INTERFACE_DOWN
-		tag: SNMP_TRAP_LINK_DOWN
-		values:
-		  snmpID: (\d+)
-		  adminStatusString: (\w+)
-		  adminStatusValue: (\d)
-		  operStatusString: (\w+)
-		  operStatusValue: (\d)
-		  interface: ([\w\-\/]+)
-		replace:
-		  adminStatusString: uppercase
-		  operStatusString: uppercase
-		line: 'ifIndex {snmpID}, ifAdminStatus {adminStatusString}({adminStatusValue}), ifOperStatus {operStatusString}({operStatusValue}), ifName {interface}'
-		model: openconfig_interfaces
-		mapping:
-		  variables:
-			interfaces//interface//{interface}//state//admin_status: adminStatusString
-			interfaces//interface//{interface}//state//oper_status: operStatusString
-		  static: {}
+  messages:
+    - error: INTERFACE_DOWN
+    tag: SNMP_TRAP_LINK_DOWN
+    values:
+      snmpID: (\d+)
+      adminStatusString: (\w+)
+      adminStatusValue: (\d)
+      operStatusString: (\w+)
+      operStatusValue: (\d)
+      interface: ([\w\-\/]+)
+    replace:
+      adminStatusString: uppercase
+      operStatusString: uppercase
+    line: 'ifIndex {snmpID}, ifAdminStatus {adminStatusString}({adminStatusValue}), ifOperStatus {operStatusString}({operStatusValue}), ifName {interface}'
+    model: openconfig_interfaces
+    mapping:
+      variables:
+      interfaces//interface//{interface}//state//admin_status: adminStatusString
+      interfaces//interface//{interface}//state//oper_status: operStatusString
+      static: {}
 
 
 What does each option mean?
@@ -228,8 +228,8 @@ directory as the YAML descriptors, and they will be loaded dynamically.
 
 .. note::
 
-		The user is allowed to use any combination of YAML and pure Python parsers
-		to match the messages and defined the prefixes.
+    The user is allowed to use any combination of YAML and pure Python parsers
+    to match the messages and defined the prefixes.
 
 Similarly to the YAML profilers, the Python profiles have two logical sections:
 ``prefixes`` that provide the operating system identification and ``messages``
@@ -261,27 +261,27 @@ The following example is a Python prefix parser for NX-OS:
 
 .. code-block:: python
 
-		import re
-		from collections import OrderedDict
+    import re
+    from collections import OrderedDict
 
-		import napalm_logs.utils
+    import napalm_logs.utils
 
-		_RGX_PARTS = [
-		    ('pri', r'(\d+)'),
-		    ('host', r'([^ ]+)'),
-		    ('date', r'(\d+ \w+ +\d+)'),
-		    ('time', r'(\d\d:\d\d:\d\d)'),
-		    ('timeZone', r'(\w\w\w)'),
-		    ('tag', r'([\w\d-]+)'),
-		    ('message', r'(.*)')
-		]
-		_RGX_PARTS = OrderedDict(_RGX_PARTS)
+    _RGX_PARTS = [
+        ('pri', r'(\d+)'),
+        ('host', r'([^ ]+)'),
+        ('date', r'(\d+ \w+ +\d+)'),
+        ('time', r'(\d\d:\d\d:\d\d)'),
+        ('timeZone', r'(\w\w\w)'),
+        ('tag', r'([\w\d-]+)'),
+        ('message', r'(.*)')
+    ]
+    _RGX_PARTS = OrderedDict(_RGX_PARTS)
 
-		_RGX = '\<{0[pri]}\>{0[host]}: {0[date]} {0[time]} {0[timeZone]}: %{0[tag]}: {0[message]}'.format(_RGX_PARTS)
+    _RGX = '\<{0[pri]}\>{0[host]}: {0[date]} {0[time]} {0[timeZone]}: %{0[tag]}: {0[message]}'.format(_RGX_PARTS)
 
 
-		def extract(msg):
-		    return napalm_logs.utils.extract(_RGX, msg, _RGX_PARTS)
+    def extract(msg):
+        return napalm_logs.utils.extract(_RGX, msg, _RGX_PARTS)
 
 The example above matches messages from NX-OS looking like: ``<190>sw01.bjm01: 2017 Jul 26 14:42:46 UTC: %SOME-TAG: this is a very useful syslog message``,
 and extracts the following details:
@@ -299,15 +299,15 @@ dictionary such as:
 
 .. code-block:: python
 
-		{
-			'pri': '190',
-			'host': 'sw01.bjm01',
-			'tag': 'SOME-TAG',
-			'time': '14:42:46',
-			'date': '2017 Jul 26',
-			'timeZone': 'UTC',
-			'message': 'this is a very useful syslog message'
-		}
+    {
+      'pri': '190',
+      'host': 'sw01.bjm01',
+      'tag': 'SOME-TAG',
+      'time': '14:42:46',
+      'date': '2017 Jul 26',
+      'timeZone': 'UTC',
+      'message': 'this is a very useful syslog message'
+    }
 
 Except ``tag``, ``host`` and ``message``, all the other fields can be optional,
 and **they are platform-specific** (or even message-type-specific, in some very
