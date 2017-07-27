@@ -7,6 +7,7 @@ from __future__ import absolute_import
 # Import std lib
 import os
 import re
+import imp
 import ssl
 import time
 import yaml
@@ -151,7 +152,7 @@ class NapalmLogs:
         if not os_subdirs:
             log.error('%s does not contain any OS subdirectories', path)
         for os_dir in os_subdirs:
-            log.debug('Checking under %s', os_dir)
+            log.debug('Looking under %s', os_dir)
             # TODO skip directories based on the whitelist / blacklist logic
             os_name = os.path.split(os_dir)[1]  # the network OS name
             if os_name not in config:
@@ -159,17 +160,78 @@ class NapalmLogs:
             files = os.listdir(os_dir)
             # Read all files under the OS dir
             for file_ in files:
-                log.debug('Looking at %s', file_)
+                log.debug('Inspecting %s', file_)
                 file_name, file_extension = os.path.splitext(file_)
                 file_extension = file_extension.replace('.', '')
-                if file_extension in CONFIG.OS_CONFIG_EXTENSIONS:
-                    filepath = os.path.join(os_dir, file_)
+                filepath = os.path.join(os_dir, file_)
+                if file_extension in ('yml', 'yaml'):
+                    # TODO: if python -> load and execute run
                     try:
+                        log.debug('Loading %s as YAML', file_)
                         with open(filepath, 'r') as fstream:
-                            config[os_name].update(yaml.load(fstream))
+                            config[os_name].update(yaml.load(fstream))  # TODO switch to deep update with list merge
                     except yaml.YAMLError as yamlexc:
                         log.error('Invalid YAML file: %s', filepath, exc_info=True)
-                        raise IOError(yamlexc)
+                        if file_name in CONFIG.OS_INIT_FILENAMES:
+                            # Raise exception and break only when the init file is borked
+                            #   otherwise, it will try loading best efforts.
+                            raise IOError(yamlexc)
+                elif file_extension == 'py':
+                    log.debug('Lazy loading Python module %s', file_)
+                    mod_fp, mod_file, mod_data = imp.find_module(file_name, [os_dir])
+                    mod = imp.load_module(file_name, mod_fp, mod_file, mod_data)
+                    if file_name in CONFIG.OS_INIT_FILENAMES:
+                        # Init file defined as Python module
+                        log.debug('%s seems to be an init file', filepath)
+                        # Init files require to define the `extract` function.
+                        # Sample init file:
+                        # def extract(message):
+                        #     return {'tag': 'A_TAG', 'host': 'hostname'}
+                        if hasattr(mod, CONFIG.INIT_RUN_FUN) and\
+                           hasattr(getattr(mod, CONFIG.INIT_RUN_FUN), '__call__'):
+                            # if extract is defined and is callable
+                            config[os_name]['prefix'] = {'__python_mod__': mod}
+                        elif file_name != '__init__':
+                            log.warning('%s does not have the "%s" function defined. Ignoring.',
+                                        filepath, CONFIG.INIT_RUN_FUN)
+                    else:
+                        # Other python files require the `emit` function.
+                        if hasattr(mod, '__tag__'):
+                            mod_tag = getattr(mod, '__tag__')
+                        else:
+                            log.info('%s does not have __tag__, defaulting the tag to %s', filepath, file_name)
+                            mod_tag = file_name
+                        if hasattr(mod, '__error__'):
+                            mod_err = getattr(mod, '__error__')
+                        else:
+                            log.info('%s does not have __error__, defaulting the error to %s', filepath, file_name)
+                            mod_err = file_name
+                        if hasattr(mod, '__match_on__'):
+                            err_match = getattr(mod, '__match_on__')
+                        else:
+                            err_match = 'tag'
+                        log.debug('Mathing on %s', err_match)
+                        if 'messages' not in config[os_name]:
+                            config[os_name]['messages'] = []
+                        if hasattr(mod, CONFIG.CONFIG_RUN_FUN) and\
+                           hasattr(getattr(mod, CONFIG.CONFIG_RUN_FUN), '__call__'):
+                            log.debug('Adding %s with tag:%s, error:%s, matching on:%s',
+                                      file_, mod_tag, mod_err, err_match)
+                            # the structure below must correspond to the VALID_CONFIG structure enforcement
+                            config[os_name]['messages'].append({
+                                'tag': mod_tag,
+                                'error': mod_err,
+                                'match_on': err_match,
+                                '__python_mod__': mod,
+                                'line': '',
+                                'model': '',
+                                'replace': {},
+                                'values': {},
+                                'mapping': {'variables': {}, 'static': {}}
+                            })
+                        else:
+                            log.warning('%s does not have the "%s" function defined. Ignoring.',
+                                        filepath, CONFIG.CONFIG_RUN_FUN)
                 else:
                     log.info('Ignoring %s (extension not allowed)', filepath)
         if not config:
