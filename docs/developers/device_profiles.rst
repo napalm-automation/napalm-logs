@@ -322,11 +322,11 @@ At times, the developer may find very useful several function, in order to
 acomplish recurrent tasks:
 
 - ``napalm_logs.utils.extract``: Extracts the fields from a unstructured text, given a field-regex mapping. Please check the previous paragraph for an usage example.
-- ``napalm_logs.utils.setval``: Set a value under the dictionary hierarchy identified under the key. The key 'foo//bar//baz' will configure the value under the dictionary hierarchy {'foo': {'bar': {'baz': {}}}}. Example:
+- ``napalm_logs.utils.setval``: Set a value under the dictionary hierarchy identified under the key. The key ``'foo//bar//baz'`` will configure the value under the dictionary hierarchy ``{'foo': {'bar': {'baz': {}}}}``. Example:
 
 .. code-block:: python
 
     >>> napalm_logs.utils.setval('foo//bar//baz', 'value')
     {'foo': {'bar': {'baz': 'value'}}}
 
-- ``napalm_logs.utils.traverse``: Traverse a dict or list using a slash delimiter target string. The target 'foo//bar//0' will return data['foo']['bar'][0] if this value exists, otherwise will return empty dict. Return ``None`` when not found. This can be used to verify if a certain key exists under dictionary hierarchy.
+- ``napalm_logs.utils.traverse``: Traverse a dict or list using a slash delimiter target string. The target ``'foo//bar//0'`` will return ``data['foo']['bar'][0]`` if this value exists, otherwise will return empty dict. Return ``None`` when not found. This can be used to verify if a certain key exists under dictionary hierarchy.
