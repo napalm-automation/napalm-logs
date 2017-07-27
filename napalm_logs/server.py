@@ -81,8 +81,11 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 line = prefix.get('line', '')
                 if prefix.get('__python_fun__'):
                     self.compiled_prefixes[dev_os].append({
-                        '__python_fun__' : prefix['__python_fun__']
+                        '__python_fun__' : prefix['__python_fun__'],
+                        '__python_mod__': prefix['__python_mod__']
                     })
+                    continue  # if python profiler defined for this prefix,
+                    # no need to go further, but jump to the next prefix
                 # Add 'pri' and 'message' to the line, and values
                 line = '{{pri}}{}{{message}}'.format(line)
                 # PRI https://tools.ietf.org/html/rfc5424#section-6.2.1
@@ -104,6 +107,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     'prefix_positions': sorted_position,
                     'values': values
                 })
+        log.debug('Compiled prefixes')
+        log.debug(self.compiled_prefixes)
 
     def _identify_os(self, msg):
         '''
@@ -116,15 +121,21 @@ class NapalmLogsServerProc(NapalmLogsProc):
             # [mircea] I think its good from a logging perspective to know at least that
             #   that the server found the matching and it tells that it won't be processed
             #   further. Later, we could potentially add an option to control this.
+            log.debug('Matching under %s', dev_os)
             prefix_id = -1
             for prefix in data:
                 prefix_id += 1
+                match = None
                 if '__python_fun__' in prefix:
-                    log.debug('Trying to match using the custom python profiler')
-                    match = prefix['__python_fun__'](msg)
+                    log.debug('Trying to match using the %s custom python profiler', prefix['__python_mod__'])
+                    try:
+                        match = prefix['__python_fun__'](msg)
+                    except Exception as err:
+                        log.error('Exception while parsing %s with the %s python profiler',
+                                  msg, prefix['__python_mod__'], exc_info=True)
                 else:
                     log.debug('Matching using YAML-defined profiler')
-                    match = prefix.get('prefix', '').search(msg)
+                    match = prefix['prefix'].search(msg)
                 if not match:
                     continue
                 if '__python_fun__' in prefix:

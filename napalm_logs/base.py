@@ -123,6 +123,20 @@ class NapalmLogs:
         logging.basicConfig(format=self.log_format,
                             level=logging_level)
 
+    def _whitelist_blacklist(self, os_name):
+        '''
+        Determines if the OS should be ignored,
+        depending on the whitelist-blacklist logic
+        configured by the user.
+        '''
+        return (self.device_whitelist and
+            hasattr(self.device_whitelist, '__iter__') and
+            os_name not in self.device_whitelist) or\
+           (self.device_blacklist and
+            hasattr(self.device_blacklist, '__iter__') and
+            os_name in self.device_blacklist)
+
+
     def _load_config(self, path):
         '''
         Read the configuration under a specific path
@@ -154,9 +168,14 @@ class NapalmLogs:
         if not os_subdirs:
             log.error('%s does not contain any OS subdirectories', path)
         for os_dir in os_subdirs:
-            log.debug('Looking under %s', os_dir)
-            # TODO skip directories based on the whitelist / blacklist logic
             os_name = os.path.split(os_dir)[1]  # the network OS name
+            if self._whitelist_blacklist(os_name):
+                log.debug('Not building config for %s (whitelist-blacklist logic)', os_name)
+                # Ignore devices that are not in the whitelist (if defined),
+                #   or those operating systems that are on the blacklist.
+                # This way we can prevent starting unwanted sub-processes.
+                continue
+            log.debug('Building config for %s:', os_name)
             if os_name not in config:
                 config[os_name] = {}
             files = os.listdir(os_dir)
@@ -183,7 +202,7 @@ class NapalmLogs:
                     mod = imp.load_module(file_name, mod_fp, mod_file, mod_data)
                     if file_name in CONFIG.OS_INIT_FILENAMES:
                         # Init file defined as Python module
-                        log.debug('%s seems to be an init file', filepath)
+                        log.debug('%s seems to be an Python profiler', filepath)
                         # Init files require to define the `extract` function.
                         # Sample init file:
                         # def extract(message):
@@ -196,7 +215,8 @@ class NapalmLogs:
                             config[os_name]['prefixes'].append({
                                 'values': {'tag': ''},
                                 'line': '',
-                                '__python_fun__': getattr(mod, CONFIG.INIT_RUN_FUN)
+                                '__python_fun__': getattr(mod, CONFIG.INIT_RUN_FUN),
+                                '__python_mod__': filepath  # Will be used for debugging
                             })
                             log.info('Adding the prefix function defined under %s to %s',
                                      filepath, os_name)
@@ -220,6 +240,9 @@ class NapalmLogs:
                             err_match = getattr(mod, '__match_on__')
                         else:
                             err_match = 'tag'
+                        model = CONFIG.OPEN_CONFIG_NO_MODEL
+                        if hasattr(mod, '__yang_model__'):
+                            model = getattr(mod, '__yang_model__')
                         log.debug('Mathing on %s', err_match)
                         if hasattr(mod, CONFIG.CONFIG_RUN_FUN) and\
                            hasattr(getattr(mod, CONFIG.CONFIG_RUN_FUN), '__call__'):
@@ -233,8 +256,9 @@ class NapalmLogs:
                                 'error': mod_err,
                                 'match_on': err_match,
                                 '__python_fun__': getattr(mod, CONFIG.CONFIG_RUN_FUN),
+                                '__python_mod__': filepath,  # Will be used for debugging
                                 'line': '',
-                                'model': '',
+                                'model': model,
                                 'replace': {},
                                 'values': {},
                                 'mapping': {'variables': {}, 'static': {}}
@@ -512,12 +536,8 @@ class NapalmLogs:
             log.info('Starting an additional process to publish messages from identified operating systems.')
             self.config_dict[CONFIG.UNKNOWN_DEVICE_NAME] = {}
         for device_os, device_config in self.config_dict.items():
-            if (self.device_whitelist and
-                hasattr(self.device_whitelist, '__iter__') and
-                device_os not in self.device_whitelist) or\
-               (self.device_blacklist and
-                hasattr(self.device_blacklist, '__iter__') and
-                device_os in self.device_blacklist):
+            if self._whitelist_blacklist(device_os):
+                log.debug('Not starting process for %s (whitelist-blacklist logic)', device_os)
                 # Ignore devices that are not in the whitelist (if defined),
                 #   or those operating systems that are on the blacklist.
                 # This way we can prevent starting unwanted sub-processes.
