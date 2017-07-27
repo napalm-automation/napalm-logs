@@ -71,7 +71,11 @@ class KafkaListener(ListenerBase):
                     log.error(msg, exc_info=True)
                     raise NapalmLogsExit(msg)
             log_source = msg.key
-            decoded = json.loads(msg.value)
+            try:
+                decoded = json.loads(msg.value)
+            except ValueError:
+                log.error('Not in json format: %s', msg.value)
+                continue
             log_message = decoded.get('message')
             log.debug('[%s] Received %s from %s. Adding in the queue', log_message, log_source, time.time())
             self.pipe.send((log_message, log_source))
