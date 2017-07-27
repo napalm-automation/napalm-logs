@@ -48,22 +48,15 @@ Custom directory tree example:
 
 Each syslog message can be divided into two logical sections:
 
-- the identification section, which provides enough information to identify
-the operating system that generated the message, together with other details,
-such as datetime, hostname, PRI_, process daemon, PID, etc. In napalm-logs,
-this section will be referenced as *prefix*.
-- the actual message section, which is the part of the syslog message which
-contains the useful information. In napalm-logs, this section will be referenced
-as *message*.
+- the identification section, which provides enough information to identify the operating system that generated the message, together with other details, such as datetime, hostname, PRI_, process daemon, PID, etc. In napalm-logs, this section will be referenced as *prefix*.
+- the actual message section, which is the part of the syslog message which contains the useful information. In napalm-logs, this section will be referenced as *message*.
 
 .. _PRI: https://www.balabit.com/documents/syslog-ng-ose-latest-guides/en/syslog-ng-ose-guide-admin/html/bsdsyslog-pri.html
 
 Example: given the message ``Mar 30 12:45:19 re0.edge01.bjm01 rpd[15852]: BGP_PREFIX_THRESH_EXCEEDED 1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)``:
 
-- ``Mar 30 12:45:19 re0.edge01.bjm01 rpd[15852]: BGP_PREFIX_THRESH_EXCEEDED`` is
-the *prefix* section.
-- ``1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)``
-is the *message* section.
+- ``Mar 30 12:45:19 re0.edge01.bjm01 rpd[15852]: BGP_PREFIX_THRESH_EXCEEDED`` is the *prefix* section.
+- ``1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)`` is the *message* section.
 
 Both sections are platform-specific, and the *prefix* part can be used to
 idenfiy the operating system that generated a certain syslog message. The
@@ -155,7 +148,6 @@ Here is an example message:
       interfaces//interface//{interface}//state//admin_status: adminStatusString
       interfaces//interface//{interface}//state//oper_status: operStatusString
       static: {}
-
 
 What does each option mean?
 
@@ -251,11 +243,8 @@ following keys are mandatory:
 
 - ``host``: the network device hostname, as provided in the syslog message
 prefix section.
-- ``tag``: which is the unique identification tag of the syslog message, e.g.
-in the message ``Mar 30 12:45:19 re0.edge01.bjm01 rpd[15852]: BGP_PREFIX_THRESH_EXCEEDED 1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)``, the ``tag`` is ``BGP_PREFIX_THRESH_EXCEEDED``. Other tag examples:
-``bgp_read_message``, ``ROUTING-BGP-5-MAXPFX`` or even ``Alarm set``.
-- ``message``: is the message that what we have defied earlier as *the message
-section*, e.g. ``User 'dummy' entering configuration mode``.
+- ``tag``: which is the unique identification tag of the syslog message, e.g. in the message ``Mar 30 12:45:19 re0.edge01.bjm01 rpd[15852]: BGP_PREFIX_THRESH_EXCEEDED 1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)``, the ``tag`` is ``BGP_PREFIX_THRESH_EXCEEDED``. Other tag examples: ``bgp_read_message``, ``ROUTING-BGP-5-MAXPFX`` or even ``Alarm set``.
+- ``message``: is the message that what we have defied earlier as *the message section*, e.g. ``User 'dummy' entering configuration mode``.
 
 The following example is a Python prefix parser for NX-OS:
 
@@ -323,12 +312,5 @@ consider being:
 
 - Define a function called ``emit`` that generates the syslog message.
 - A dunder called ``__yang_model__`` that specifies the YANG model.
-- A variable names ``__tag__`` that specifies the tag name, that is
-used to match when comparing the value of the ``tag`` field extracted from the
-message prefix and determine what parser should process the syslog message.
-However, this variable is optional -- when not defined, it will use the filename
-as tag.
-- A variable called ``__error__`` that defines the name of the global error.
-Each structured message published by napalm-logs has a certain error tag, that
-is unique and cross-platform. This variable is also optional -- when not defined,
-the error ID will be the file name.
+- A variable names ``__tag__`` that specifies the tag name, that is used to match when comparing the value of the ``tag`` field extracted from the message prefix and determine what parser should process the syslog message. However, this variable is optional -- when not defined, it will use the filename as tag.
+- A variable called ``__error__`` that defines the name of the global error. Each structured message published by napalm-logs has a certain error tag, that is unique and cross-platform. This variable is also optional -- when not defined, the error ID will be the file name.
