@@ -26,6 +26,7 @@ import nacl.signing
 import nacl.encoding
 
 # Import napalm-logs pkgs
+import napalm_logs.utils
 import napalm_logs.config as CONFIG
 from napalm_logs.listener import get_listener
 # processes
@@ -191,7 +192,8 @@ class NapalmLogs:
                     try:
                         log.debug('Loading %s as YAML', file_)
                         with open(filepath, 'r') as fstream:
-                            config[os_name].update(yaml.load(fstream))  # TODO switch to deep update with list merge
+                            cfg = yaml.load(fstream)
+                            napalm_logs.utils.dictupdate(config[os_name], cfg)
                     except yaml.YAMLError as yamlexc:
                         log.error('Invalid YAML file: %s', filepath, exc_info=True)
                         if file_name in CONFIG.OS_INIT_FILENAMES:
@@ -204,7 +206,7 @@ class NapalmLogs:
                     mod = imp.load_module(file_name, mod_fp, mod_file, mod_data)
                     if file_name in CONFIG.OS_INIT_FILENAMES:
                         # Init file defined as Python module
-                        log.debug('%s seems to be an Python profiler', filepath)
+                        log.debug('%s seems to be a Python profiler', filepath)
                         # Init files require to define the `extract` function.
                         # Sample init file:
                         # def extract(message):
@@ -277,7 +279,7 @@ class NapalmLogs:
             raise IOError(msg)
         log.debug('Complete config:')
         log.debug(config)
-        log.debug('Config size in bytes: %d', sys.getsizeof(config))
+        log.debug('ConfigParserg size in bytes: %d', sys.getsizeof(config))
         return config
 
     @staticmethod
@@ -370,21 +372,15 @@ class NapalmLogs:
                 )
             log.info('Reading the configuration from %s', self.config_path)
             self.config_dict = self._load_config(self.config_path)
-        if not self.extension_config_dict and self.extension_config_path:
+        if not self.extension_config_dict and\
+           self.extension_config_path and\
+           self.extension_config_path != self.config_path:
             # When extension config is not sent as dict
             # But `extension_config_path` is specified
             log.info('Reading extension configuration from %s', self.extension_config_path)
             self.extension_config_dict = self._load_config(self.extension_config_path)
-        elif not self.extension_config_dict:
-            self.extension_config_dict = {}
-        if not self.extension_config_dict:
-            # No extension config, no extra build
-            return
-        for nos, nos_config in self.extension_config_dict.items():
-            if nos not in self.config_dict and nos_config:
-                self.config_dict[nos] = nos_config
-                continue
-            self.config_dict[nos].update(nos_config)
+        if self.extension_config_dict:
+            napalm_logs.utils.dictupdate(self.config_dict, self.extension_config_dict)  # deep merge
 
     def _respawn_when_dead(self, start_fun, *args, **kwargs):
         '''
