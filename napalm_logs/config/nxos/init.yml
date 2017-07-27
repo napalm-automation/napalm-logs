@@ -3,14 +3,6 @@
 # A single whitespace in `line` will match any number of whitespaces. You should be explicit when
 # Matching white space in `values`
 #
-prefixes:
-  - values:
-      host: ([^ ]+)
-      date: (\d+ \w+ +\d+)
-      time: (\d\d:\d\d:\d\d)
-      timeZone: (\w\w\w)
-      tag: ([\w\d-]+)
-    line: '{host}: {date} {time} {timeZone}: %{tag}:'
 
 messages:
   # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
