@@ -88,6 +88,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     'model': model,
                     '__python_fun__': message_dict['__python_fun__']
                 })
+                continue
             values = message_dict['values']
             replace = message_dict['replace']
             line = message_dict['line']

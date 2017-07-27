@@ -9,6 +9,7 @@ import os
 import re
 import imp
 import ssl
+import sys
 import time
 import yaml
 import signal
@@ -176,6 +177,7 @@ class NapalmLogs:
                 # This way we can prevent starting unwanted sub-processes.
                 continue
             log.debug('Building config for %s:', os_name)
+            log.debug('='*40)
             if os_name not in config:
                 config[os_name] = {}
             files = os.listdir(os_dir)
@@ -268,12 +270,14 @@ class NapalmLogs:
                                         filepath, CONFIG.CONFIG_RUN_FUN)
                 else:
                     log.info('Ignoring %s (extension not allowed)', filepath)
+            log.debug('-'*40)
         if not config:
             msg = 'Could not find proper configuration files under {path}'.format(path=path)
             log.error(msg)
             raise IOError(msg)
         log.debug('Complete config:')
         log.debug(config)
+        log.debug('Config size in bytes: %d', sys.getsizeof(config))
         return config
 
     @staticmethod

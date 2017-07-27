@@ -139,7 +139,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 if not match:
                     continue
                 if '__python_fun__' in prefix:
-                    log.debug('%s matched using the custom python profiler', msg)
+                    log.debug('%s matched using the custom python profiler %s', msg, prefix['__python_mod__'])
                     ret = match  # the output as-is from the custom function
                 else:
                     positions = prefix.get('prefix_positions', {})
