@@ -59,12 +59,14 @@ LOGGING_LEVEL = {
 }
 
 VALID_CONFIG = {
-    'prefix': {
-        'values': {
-            'tag': basestring
-        },
-        'line': basestring
-    },
+    'prefixes': [
+        {
+            'values': {
+                'tag': basestring
+            },
+            'line': basestring
+        }
+    ],
     'messages': [
         {
             # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.

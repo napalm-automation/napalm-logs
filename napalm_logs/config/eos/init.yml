@@ -3,15 +3,15 @@
 # A single whitespace in `line` will match any number of whitespaces. You should be explicit when
 # Matching white space in `values`
 #
-prefix:
-  time_format: "%b %d %H:%M:%S"
-  values:
-    date: (\w+ +\d+)
-    time: (\d\d:\d\d:\d\d)
-    host: ([^ ]+)
-    processName: (\w+)
-    tag: ([\w-]+)
-  line: '{date} {time} {host} {processName}: %{tag}'
+prefixes:
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\w+ +\d+)
+      time: (\d\d:\d\d:\d\d)
+      host: ([^ ]+)
+      processName: (\w+)
+      tag: ([\w-]+)
+    line: '{date} {time} {host} {processName}: %{tag}'
 
 messages:
   # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.

@@ -139,13 +139,15 @@ class NapalmLogs:
             raise IOError(msg)
         # The directory tree should look like the following:
         # .
+        # ├── __init__.py
         # ├── eos
         # │   └── init.yml
-        # ├── __init__.py
         # ├── iosxr
-        # │   └── init.yml
+        # │   └── __init__.py
         # ├── junos
         # │   └── init.yml
+        # │   └── bgp_read_message.py
+        # │   └── BGP_PREFIX_THRESH_EXCEEDED.py
         # └── nxos
         #     └── init.yml
         os_subdirs = [path[0] for path in os.walk(path)][1:]
@@ -165,7 +167,6 @@ class NapalmLogs:
                 file_extension = file_extension.replace('.', '')
                 filepath = os.path.join(os_dir, file_)
                 if file_extension in ('yml', 'yaml'):
-                    # TODO: if python -> load and execute run
                     try:
                         log.debug('Loading %s as YAML', file_)
                         with open(filepath, 'r') as fstream:
@@ -190,8 +191,17 @@ class NapalmLogs:
                         if hasattr(mod, CONFIG.INIT_RUN_FUN) and\
                            hasattr(getattr(mod, CONFIG.INIT_RUN_FUN), '__call__'):
                             # if extract is defined and is callable
-                            config[os_name]['prefix'] = {'__python_mod__': mod}
+                            if 'prefixes' not in config[os_name]:
+                                config[os_name]['prefixes'] = []
+                            config[os_name]['prefixes'] = {
+                                'values': {'tag': {}},
+                                'line': {},
+                                '__python_fun__': getattr(mod, CONFIG.INIT_RUN_FUN)
+                            }
+                            log.info('Adding the prefix function defined under %s to %s',
+                                     filepath, os_name)
                         elif file_name != '__init__':
+                            # If __init__.py does not have the extractor function, no problem.
                             log.warning('%s does not have the "%s" function defined. Ignoring.',
                                         filepath, CONFIG.INIT_RUN_FUN)
                     else:
@@ -211,18 +221,18 @@ class NapalmLogs:
                         else:
                             err_match = 'tag'
                         log.debug('Mathing on %s', err_match)
-                        if 'messages' not in config[os_name]:
-                            config[os_name]['messages'] = []
                         if hasattr(mod, CONFIG.CONFIG_RUN_FUN) and\
                            hasattr(getattr(mod, CONFIG.CONFIG_RUN_FUN), '__call__'):
                             log.debug('Adding %s with tag:%s, error:%s, matching on:%s',
                                       file_, mod_tag, mod_err, err_match)
                             # the structure below must correspond to the VALID_CONFIG structure enforcement
+                            if 'messages' not in config[os_name]:
+                                config[os_name]['messages'] = []
                             config[os_name]['messages'].append({
                                 'tag': mod_tag,
                                 'error': mod_err,
                                 'match_on': err_match,
-                                '__python_mod__': mod,
+                                '__python_fun__': getattr(mod, CONFIG.CONFIG_RUN_FUN),
                                 'line': '',
                                 'model': '',
                                 'replace': {},
