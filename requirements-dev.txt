@@ -3,5 +3,6 @@ coveralls
 pytest
 pytest-cov
 pytest-json
-pytest-catchlog
 pytest-pythonpath
+pytest-travis-fold
+
