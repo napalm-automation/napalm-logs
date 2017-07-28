@@ -20,34 +20,3 @@ prefixes:
       tag: ([\w-]+)
     line: '{messageId}: {host}{nodeId}:{date} {time}{timeZone}: {processName}[{processId}]: %{tag}'
 
-messages:
-  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
-  # This may change if we are able to find a more well defined naming system.
-  - error: BGP_PREFIX_THRESH_EXCEEDED
-    tag: ROUTING-BGP-5-MAXPFX
-    values:
-      peer: (\d+\.\d+\.\d+\.\d+)
-      current: (\d+)
-      limit: (\d+)
-    replace: {}
-    line: 'No. of IPv4 Unicast prefixes received from {peer} has reached {current}, max {limit}'
-    model: openconfig_bgp
-    mapping:
-      variables:
-        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet//ipv4_unicast//prefix_limit//state//max_prefixes: limit
-        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet//state//prefixes//received: current
-      static: {}
-  - error: BGP_PREFIX_THRESH_EXCEEDED
-    tag: ROUTING-BGP-5-MAXPFX
-    values:
-      peer: (\d+\.\d+\.\d+\.\d+)
-      current: (\d+)
-      limit: (\d+)
-    replace: {}
-    line: 'No. of IPv6 Unicast prefixes received from {peer} has reached {current}, max {limit}'
-    model: openconfig_bgp
-    mapping:
-      variables:
-        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet6//ipv6_unicast//prefix_limit//state//max_prefixes: limit
-        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet6//state//prefixes//received: current
-      static: {}
