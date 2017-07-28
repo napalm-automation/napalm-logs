@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 
 import os
 import logging
+import napalm_logs.utils.six as six
 
 # config
 ROOT_DIR = '/'
@@ -64,21 +65,21 @@ VALID_CONFIG = {
     'prefixes': [
         {
             'values': {
-                'tag': basestring
+                'tag': six.string_type
             },
-            'line': basestring
+            'line': six.string_type
         }
     ],
     'messages': [
         {
             # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
             # This may change if we are able to find a more well defined naming system.
-            'error': basestring,
-            'tag': basestring,
+            'error': six.string_type,
+            'tag': six.string_type,
             'values': dict,
             'replace': dict,
-            'line': basestring,
-            'model': basestring,
+            'line': six.string_type,
+            'model': six.string_type,
             'mapping': {
                 'variables': dict,
                 'static': dict
