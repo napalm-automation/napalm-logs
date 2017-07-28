@@ -1,0 +1,21 @@
+messages:
+# The following is a general catch all for system alarms, if you would like to
+# add more specif matches please do so above this comment
+  - error: SYSTEM_ALARM
+    tag: Alarm set
+    values:
+      component: (\w+)
+      color: (\w+)
+      class: (\w+)
+      reason: ([\w ]+)
+    replace:
+      color: color_to_severity
+    line: '{component} color={color}, class={class}, reason={reason}'
+    model: ietf-hardware
+    mapping:
+      variables:
+        hardware-state//component//{component}//name: component
+        hardware-state//component//{component}//class: class
+        hardware-state//component//{component}//state//alarm-state: color
+        hardware-state//component//{component}//state//alarm-reason: reason
+      static: {}
