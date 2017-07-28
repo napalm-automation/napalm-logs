@@ -3,7 +3,6 @@
 Config defaults.
 '''
 from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import os
 import logging
@@ -112,13 +111,13 @@ DEV_IPC_URL_TPL = 'ipc:///tmp/napalm-logs-dev-{os}'
 PUB_IPC_URL = 'ipc:///tmp/napalm-logs-pub'
 
 # auth
-AUTH_KEEP_ALIVE = 'KEEPALIVE'
-AUTH_KEEP_ALIVE_ACK = 'KEEPALIVEACK'
+AUTH_KEEP_ALIVE = b'KEEPALIVE'
+AUTH_KEEP_ALIVE_ACK = b'KEEPALIVEACK'
 AUTH_KEEP_ALIVE_INTERVAL = 10
 AUTH_MAX_CONN = 5
 AUTH_TIMEOUT = 5
-MAGIC_ACK = 'ACK'
-MAGIC_REQ = 'INIT'
+MAGIC_ACK = b'ACK'
+MAGIC_REQ = b'INIT'
 AUTH_CIPHER = 'ECDHE-RSA-AES256-GCM-SHA384'
 
 OPEN_CONFIG_NO_MODEL = 'NO_MODEL'
