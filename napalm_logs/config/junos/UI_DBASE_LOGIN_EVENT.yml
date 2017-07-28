@@ -1,0 +1,14 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: USER_ENTER_CONFIG_MODE
+    tag: UI_DBASE_LOGIN_EVENT
+    values:
+      user: (\w+)
+    replace: {}
+    line: "User '{user}' entering configuration mode"
+    model: NO_MODEL
+    mapping:
+      variables: {}
+      static:
+        users//user//{user}//action//enter_config_mode: True
