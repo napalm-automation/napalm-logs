@@ -96,6 +96,12 @@ Here is the config for ``junos``:
       tag: (\w+)
       line: '{date} {time} {hostPrefix}{host} {processName}{processId}: {tag}: '
 
+
+.. note::
+
+    Prefix parsers are usually defined as ``__init__.yml``, ``init.yml`` or
+    ``index.yml``.
+
 What does each option mean?
 
 ``line``
@@ -123,6 +129,11 @@ Each of these variables will be output in a message dict after processing.
 ^^^^^^^^^^^^
 
 Here is where all log messages that should be matched are specified.
+
+.. note::
+
+    Message parsers are usually defined under a YAML file having the name of
+    the error ID they produce. However, this is not absolutely mandatory.
 
 Here is an example message:
 
@@ -246,6 +257,11 @@ prefix section.
 - ``tag``: which is the unique identification tag of the syslog message, e.g. in the message ``Mar 30 12:45:19 re0.edge01.bjm01 rpd[15852]: BGP_PREFIX_THRESH_EXCEEDED 1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)``, the ``tag`` is ``BGP_PREFIX_THRESH_EXCEEDED``. Other tag examples: ``bgp_read_message``, ``ROUTING-BGP-5-MAXPFX`` or even ``Alarm set``.
 - ``message``: is the message that what we have defied earlier as *the message section*, e.g. ``User 'dummy' entering configuration mode``.
 
+.. note::
+
+    Prefix parsers are usually defined as ``__init__.py``, ``init.py`` or
+    ``index.py``.
+
 The following example is a Python prefix parser for NX-OS:
 
 .. code-block:: python
@@ -314,6 +330,11 @@ consider being:
 - A dunder called ``__yang_model__`` that specifies the YANG model.
 - A variable names ``__tag__`` that specifies the tag name, that is used to match when comparing the value of the ``tag`` field extracted from the message prefix and determine what parser should process the syslog message. However, this variable is optional -- when not defined, it will use the filename as tag.
 - A variable called ``__error__`` that defines the name of the global error. Each structured message published by napalm-logs has a certain error tag, that is unique and cross-platform. This variable is also optional -- when not defined, the error ID will be the file name.
+
+.. note::
+
+    Message parsers are usually defined under a Python file having the name of
+    the error ID they produce. However, this is not absolutely mandatory.
 
 Useful function
 ^^^^^^^^^^^^^^^
