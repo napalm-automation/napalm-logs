@@ -22,6 +22,19 @@ LOG_LEVEL = 'warning'
 LOG_FORMAT = '%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'
 LOG_FILE = os.path.join(ROOT_DIR, 'var', 'log', 'napalm', 'logs')
 LOG_FILE_CLI_OPTIONS = ('cli', 'screen')
+# Allowed names for the init files.
+OS_INIT_FILENAMES = (
+    '__init__',
+    'init',
+    'index'
+)
+# The name of the function to be invoked when extracting the parts from the
+#   raw syslog message.
+INIT_RUN_FUN = 'extract'
+# The name of the function to be invoked when the OpenConfig / IETF object
+#   is generated.
+CONFIG_RUN_FUN = 'emit'
+
 UNKNOWN_DEVICE_NAME = 'unknown'
 LISTENER_OPTS = {
     'kafka_topic': 'syslog.net'
@@ -46,12 +59,14 @@ LOGGING_LEVEL = {
 }
 
 VALID_CONFIG = {
-    'prefix': {
-        'values': {
-            'tag': basestring
-        },
-        'line': basestring
-    },
+    'prefixes': [
+        {
+            'values': {
+                'tag': basestring
+            },
+            'line': basestring
+        }
+    ],
     'messages': [
         {
             # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.

@@ -1,0 +1,15 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: BGP_MD5_INCORRECT
+    tag: tcp_auth_ok
+    values:
+      peer: (\d+\.\d+\.\d+\.\d+)
+      port: (\d+)
+    replace: {}
+    line: 'Packet from {peer}:{port} wrong MD5 digest'
+    model: openconfig_bgp
+    mapping:
+      variables: {}
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session_state: CONNECT

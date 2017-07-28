@@ -18,6 +18,7 @@ import zmq
 import umsgpack
 
 # Import napalm-logs pkgs
+import napalm_logs.utils
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import PUB_IPC_URL
 from napalm_logs.config import DEV_IPC_URL_TPL
@@ -77,10 +78,20 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         for message_dict in self._config.get('messages', {}):
             error = message_dict['error']
             tag = message_dict['tag']
+            model = message_dict['model']
+            match_on = message_dict.get('match_on', 'tag')
+            if '__python_fun__' in message_dict:
+                self.compiled_messages.append({
+                    'error': error,
+                    'tag': tag,
+                    'match_on': match_on,
+                    'model': model,
+                    '__python_fun__': message_dict['__python_fun__']
+                })
+                continue
             values = message_dict['values']
             replace = message_dict['replace']
             line = message_dict['line']
-            model = message_dict['model']
             mapping = message_dict['mapping']
             # We will now figure out which position each value is in so we can use it with the match statement
             position = {}
@@ -97,6 +108,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 {
                     'error': error,
                     'tag': tag,
+                    'match_on': match_on,
                     'line': re.compile(escaped.format(**values)),
                     'positions': sorted_position,
                     'values': values,
@@ -113,8 +125,15 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         '''
         error_present = False
         for message in self.compiled_messages:
-            if message['tag'] != msg_dict['tag']:
+            match_on = message['match_on']
+            if message[match_on] != msg_dict[match_on]:
                 continue
+            if '__python_fun__' in message:
+                return {
+                    'model': message['model'],
+                    'error': message['error'],
+                    '__python_fun__': message['__python_fun__']
+                }
             error_present = True
             match = message['line'].search(msg_dict['message'])
             if not match:
@@ -122,8 +141,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             positions = message.get('positions', {})
             values = message.get('values')
             ret = {
-                'oc_model': message['model'],
-                'oc_mapping': message['mapping'],
+                'model': message['model'],
+                'mapping': message['mapping'],
                 'replace': message['replace'],
                 'error': message['error']
             }
@@ -141,87 +160,17 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         else:
             log.info('Syslog message not configured for os: %s tag %s', self._name, msg_dict.get('tag', ''))
 
-    @staticmethod
-    def _setval(key, val, dict_=None):
-        '''
-        Set a value under the dictionary hierarchy identified
-        under the key. The target 'foo/bar/baz' returns the
-        dictionary hierarchy {'foo': {'bar': {'baz': {}}}}.
-
-        .. note::
-
-            Currently this doesn't work with integers, i.e.
-            cannot build lists dynamically.
-            TODO
-        '''
-        if not dict_:
-            dict_ = {}
-        prev_hier = dict_
-        dict_hier = key.split(DEFAULT_DELIM)
-        for each in dict_hier[:-1]:
-            try:
-                idx = int(each)
-            except ValueError:
-                # not int
-                if each not in prev_hier:
-                    prev_hier[each] = {}
-                prev_hier = prev_hier[each]
-            else:
-                prev_hier[each] = [{}]
-                prev_hier = prev_hier[each]
-        prev_hier[dict_hier[-1]] = val
-        return dict_
-
-    @staticmethod
-    def _traverse(data, key):
-        '''
-        Traverse a dict or list using a slash delimiter target string.
-        The target 'foo/bar/0' will return data['foo']['bar'][0] if
-        this value exists, otherwise will return empty dict.
-        Return None when not found.
-        This can be used to verify if a certain key exists under
-        dictionary hierarchy.
-        '''
-        for each in key.split(DEFAULT_DELIM):
-            if isinstance(data, list):
-                try:
-                    idx = int(each)
-                except ValueError:
-                    embed_match = False
-                    # Index was not numeric, lets look at any embedded dicts
-                    for embedded in (x for x in data if isinstance(x, dict)):
-                        try:
-                            data = embedded[each]
-                            embed_match = True
-                            break
-                        except KeyError:
-                            pass
-                    if not embed_match:
-                        # No embedded dicts matched
-                        return None
-                else:
-                    try:
-                        data = data[idx]
-                    except IndexError:
-                        return None
-            else:
-                try:
-                    data = data[each]
-                except (KeyError, TypeError):
-                    return None
-        return data
-
     def _emit(self, **kwargs):
         '''
         Emit an OpenConfig object given a certain combination of
         fields mappeed in the config to the corresponding hierarchy.
         '''
         oc_dict = {}
-        for mapping, result_key in kwargs['oc_mapping']['variables'].items():
+        for mapping, result_key in kwargs['mapping']['variables'].items():
             result = kwargs[result_key]
-            oc_dict = self._setval(mapping.format(**kwargs), result, oc_dict)
-        for mapping, result in kwargs['oc_mapping']['static'].items():
-            oc_dict = self._setval(mapping.format(**kwargs), result, oc_dict)
+            oc_dict = napalm_logs.utils.setval(mapping.format(**kwargs), result, oc_dict)
+        for mapping, result in kwargs['mapping']['static'].items():
+            oc_dict = napalm_logs.utils.setval(mapping.format(**kwargs), result, oc_dict)
 
         return oc_dict
 
@@ -232,9 +181,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         bin_obj = umsgpack.packb(obj)
         self.pub.send(bin_obj)
 
-    def _format_time(self, time, date):
+    def _format_time(self, time, date, prefix_id):
         # TODO can we work out the time format from the regex? Probably but this is a task for another day
-        time_format = self._config['prefix'].get('time_format', '')
+        time_format = self._config['prefixes'][prefix_id].get('time_format', '')
         if not time or not date or not time_format:
             return int(datetime.now().strftime('%s'))
         # Most syslog do not include the year, so we will add the current year if we are not supplied with one
@@ -287,7 +236,10 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 continue
             # From here on, we're running in a regular OS sub-process.
             host = msg_dict.get('host')
-            timestamp = self._format_time(msg_dict.get('time', ''), msg_dict.get('date', ''))
+            prefix_id = msg_dict.pop('__prefix_id__')
+            timestamp = self._format_time(msg_dict.get('time', ''),
+                                          msg_dict.get('date', ''),
+                                          prefix_id)
             kwargs = self._parse(msg_dict)
             if not kwargs:
                 # Unable to identify what model to generate for the message in cause.
@@ -307,14 +259,18 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     self.pub_pipe.send(to_publish)
                 continue
             try:
-                yang_obj = self._emit(**kwargs)
+                if '__python_fun__' in kwargs:
+                    log.debug('Using the Python parser to determine the YANG-equivalent object')
+                    yang_obj = kwargs['__python_fun__'](msg_dict)
+                else:
+                    yang_obj = self._emit(**kwargs)
             except Exception as err:
                 log.exception('Unexpected error when generating the OC object.', exc_info=True)
                 continue
             log.debug('Generated OC object:')
             log.debug(yang_obj)
             error = kwargs.get('error')
-            model_name = kwargs.get('oc_model')
+            model_name = kwargs.get('model')
             to_publish = {
                 'error': error,
                 'host': host,

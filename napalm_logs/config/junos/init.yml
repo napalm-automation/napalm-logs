@@ -1,0 +1,17 @@
+# You should not use special characture in the value keys
+#
+# A single whitespace in `line` will match any number of whitespaces. You should be explicit when
+# Matching white space in `values`
+#
+prefixes:
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\w+\s+\d+)
+      time: (\d\d:\d\d:\d\d)
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      processName: /?(\w+)
+      # Most log lines have a process ID, however some do not
+      processId: \[?(\d+)?\]?
+      tag: ([\w\s]+)
+    line: '{date} {time} {hostPrefix}{host} {processName}{processId}: {tag}:'

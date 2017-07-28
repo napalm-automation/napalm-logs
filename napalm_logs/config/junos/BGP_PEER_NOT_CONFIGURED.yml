@@ -1,0 +1,17 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: BGP_PEER_NOT_CONFIGURED
+    tag: bgp_read_message
+    values:
+      peer: ([\w\d:\.]+)
+      asn: (\d+)
+      number: (\d+)
+    replace: {}
+    line: '{number}: NOTIFICATION received from {peer} (External AS {asn}): code 6 (Cease) subcode 5 (Connection Rejected)'
+    model: openconfig_bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//peer_as: asn
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session_state: ACTIVE

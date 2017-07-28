@@ -7,7 +7,9 @@ from __future__ import absolute_import
 # Import std lib
 import os
 import re
+import imp
 import ssl
+import sys
 import time
 import yaml
 import signal
@@ -24,6 +26,7 @@ import nacl.signing
 import nacl.encoding
 
 # Import napalm-logs pkgs
+import napalm_logs.utils
 import napalm_logs.config as CONFIG
 from napalm_logs.listener import get_listener
 # processes
@@ -122,12 +125,27 @@ class NapalmLogs:
         logging.basicConfig(format=self.log_format,
                             level=logging_level)
 
+    def _whitelist_blacklist(self, os_name):
+        '''
+        Determines if the OS should be ignored,
+        depending on the whitelist-blacklist logic
+        configured by the user.
+        '''
+        return (self.device_whitelist and
+            hasattr(self.device_whitelist, '__iter__') and
+            os_name not in self.device_whitelist) or\
+           (self.device_blacklist and
+            hasattr(self.device_blacklist, '__iter__') and
+            os_name in self.device_blacklist)
+
+
     def _load_config(self, path):
         '''
         Read the configuration under a specific path
         and return the object.
         '''
         config = {}
+        log.debug('Reading configuration from %s', path)
         if not os.path.isdir(path):
             msg = (
                 'Unable to read from {path}: '
@@ -135,25 +153,133 @@ class NapalmLogs:
             ).format(path=path)
             log.error(msg)
             raise IOError(msg)
-        files = os.listdir(path)
-        # Read all files under the config dir
-        for file in files:
-            # And allow only .yml and .yaml extensions
-            if not file.endswith('.yml') and not file.endswith('.yaml'):
+        # The directory tree should look like the following:
+        # .
+        # ├── __init__.py
+        # ├── eos
+        # │   └── init.yml
+        # ├── iosxr
+        # │   └── __init__.py
+        # ├── junos
+        # │   └── init.yml
+        # │   └── bgp_read_message.py
+        # │   └── BGP_PREFIX_THRESH_EXCEEDED.py
+        # └── nxos
+        #     └── init.yml
+        os_subdirs = [path[0] for path in os.walk(path)][1:]
+        if not os_subdirs:
+            log.error('%s does not contain any OS subdirectories', path)
+        for os_dir in os_subdirs:
+            os_name = os.path.split(os_dir)[1]  # the network OS name
+            if self._whitelist_blacklist(os_name):
+                log.debug('Not building config for %s (whitelist-blacklist logic)', os_name)
+                # Ignore devices that are not in the whitelist (if defined),
+                #   or those operating systems that are on the blacklist.
+                # This way we can prevent starting unwanted sub-processes.
                 continue
-            filename, _ = file.split('.')
-            # The filename is also the network OS name
-            filepath = os.path.join(path, file)
-            try:
-                with open(filepath, 'r') as fstream:
-                    config[filename] = yaml.load(fstream)
-            except yaml.YAMLError as yamlexc:
-                log.error('Invalid YAML file: %s', filepath, exc_info=True)
-                raise IOError(yamlexc)
+            log.debug('Building config for %s:', os_name)
+            log.debug('='*40)
+            if os_name not in config:
+                config[os_name] = {}
+            files = os.listdir(os_dir)
+            # Read all files under the OS dir
+            for file_ in files:
+                log.debug('Inspecting %s', file_)
+                file_name, file_extension = os.path.splitext(file_)
+                file_extension = file_extension.replace('.', '')
+                filepath = os.path.join(os_dir, file_)
+                if file_extension in ('yml', 'yaml'):
+                    try:
+                        log.debug('Loading %s as YAML', file_)
+                        with open(filepath, 'r') as fstream:
+                            cfg = yaml.load(fstream)
+                            napalm_logs.utils.dictupdate(config[os_name], cfg)
+                    except yaml.YAMLError as yamlexc:
+                        log.error('Invalid YAML file: %s', filepath, exc_info=True)
+                        if file_name in CONFIG.OS_INIT_FILENAMES:
+                            # Raise exception and break only when the init file is borked
+                            #   otherwise, it will try loading best efforts.
+                            raise IOError(yamlexc)
+                elif file_extension == 'py':
+                    log.debug('Lazy loading Python module %s', file_)
+                    mod_fp, mod_file, mod_data = imp.find_module(file_name, [os_dir])
+                    mod = imp.load_module(file_name, mod_fp, mod_file, mod_data)
+                    if file_name in CONFIG.OS_INIT_FILENAMES:
+                        # Init file defined as Python module
+                        log.debug('%s seems to be a Python profiler', filepath)
+                        # Init files require to define the `extract` function.
+                        # Sample init file:
+                        # def extract(message):
+                        #     return {'tag': 'A_TAG', 'host': 'hostname'}
+                        if hasattr(mod, CONFIG.INIT_RUN_FUN) and\
+                           hasattr(getattr(mod, CONFIG.INIT_RUN_FUN), '__call__'):
+                            # if extract is defined and is callable
+                            if 'prefixes' not in config[os_name]:
+                                config[os_name]['prefixes'] = []
+                            config[os_name]['prefixes'].append({
+                                'values': {'tag': ''},
+                                'line': '',
+                                '__python_fun__': getattr(mod, CONFIG.INIT_RUN_FUN),
+                                '__python_mod__': filepath  # Will be used for debugging
+                            })
+                            log.info('Adding the prefix function defined under %s to %s',
+                                     filepath, os_name)
+                        elif file_name != '__init__':
+                            # If __init__.py does not have the extractor function, no problem.
+                            log.warning('%s does not have the "%s" function defined. Ignoring.',
+                                        filepath, CONFIG.INIT_RUN_FUN)
+                    else:
+                        # Other python files require the `emit` function.
+                        if hasattr(mod, '__tag__'):
+                            mod_tag = getattr(mod, '__tag__')
+                        else:
+                            log.info('%s does not have __tag__, defaulting the tag to %s', filepath, file_name)
+                            mod_tag = file_name
+                        if hasattr(mod, '__error__'):
+                            mod_err = getattr(mod, '__error__')
+                        else:
+                            log.info('%s does not have __error__, defaulting the error to %s', filepath, file_name)
+                            mod_err = file_name
+                        if hasattr(mod, '__match_on__'):
+                            err_match = getattr(mod, '__match_on__')
+                        else:
+                            err_match = 'tag'
+                        model = CONFIG.OPEN_CONFIG_NO_MODEL
+                        if hasattr(mod, '__yang_model__'):
+                            model = getattr(mod, '__yang_model__')
+                        log.debug('Mathing on %s', err_match)
+                        if hasattr(mod, CONFIG.CONFIG_RUN_FUN) and\
+                           hasattr(getattr(mod, CONFIG.CONFIG_RUN_FUN), '__call__'):
+                            log.debug('Adding %s with tag:%s, error:%s, matching on:%s',
+                                      file_, mod_tag, mod_err, err_match)
+                            # the structure below must correspond to the VALID_CONFIG structure enforcement
+                            if 'messages' not in config[os_name]:
+                                config[os_name]['messages'] = []
+                            config[os_name]['messages'].append({
+                                'tag': mod_tag,
+                                'error': mod_err,
+                                'match_on': err_match,
+                                '__python_fun__': getattr(mod, CONFIG.CONFIG_RUN_FUN),
+                                '__python_mod__': filepath,  # Will be used for debugging
+                                'line': '',
+                                'model': model,
+                                'replace': {},
+                                'values': {},
+                                'mapping': {'variables': {}, 'static': {}}
+                            })
+                        else:
+                            log.warning('%s does not have the "%s" function defined. Ignoring.',
+                                        filepath, CONFIG.CONFIG_RUN_FUN)
+                else:
+                    log.info('Ignoring %s (extension not allowed)', filepath)
+            log.debug('-'*40)
         if not config:
-            msg = 'Unable to find proper configuration files under {path}'.format(path=path)
+            msg = 'Could not find proper configuration files under {path}'.format(path=path)
             log.error(msg)
             raise IOError(msg)
+        log.debug('Complete config:')
+        log.debug(config)
+        log.debug('ConfigParserg size in bytes: %d', sys.getsizeof(config))
         return config
 
     @staticmethod
@@ -162,7 +288,9 @@ class NapalmLogs:
         raise ConfigurationException(error_string)
 
     def _compare_values(self, value, config, dev_os, key_path):
-        if 'line' not in value.keys() or 'values' not in value.keys():
+        if 'line' not in value or\
+           'values' not in value or\
+           '__python_fun__' not in value:  # Check looks good when using a Python-defined profile.
             return
         from_line = re.findall('\{(\w+)\}', config['line'])
         if set(from_line) == set(config['values']):
@@ -244,21 +372,15 @@ class NapalmLogs:
                 )
             log.info('Reading the configuration from %s', self.config_path)
             self.config_dict = self._load_config(self.config_path)
-        if not self.extension_config_dict and self.extension_config_path:
+        if not self.extension_config_dict and\
+           self.extension_config_path and\
+           os.path.normpath(self.extension_config_path) != os.path.normpath(self.config_path):  # same path?
             # When extension config is not sent as dict
             # But `extension_config_path` is specified
             log.info('Reading extension configuration from %s', self.extension_config_path)
             self.extension_config_dict = self._load_config(self.extension_config_path)
-        elif not self.extension_config_dict:
-            self.extension_config_dict = {}
-        if not self.extension_config_dict:
-            # No extension config, no extra build
-            return
-        for nos, nos_config in self.extension_config_dict.items():
-            if nos not in self.config_dict and nos_config:
-                self.config_dict[nos] = nos_config
-                continue
-            self.config_dict[nos].update(nos_config)
+        if self.extension_config_dict:
+            napalm_logs.utils.dictupdate(self.config_dict, self.extension_config_dict)  # deep merge
 
     def _respawn_when_dead(self, start_fun, *args, **kwargs):
         '''
@@ -277,18 +399,18 @@ class NapalmLogs:
                 log.warning('Unable to read %s', proc_file, exc_info=True)
                 proc_flag = 'X'
             if proc_flag in CONFIG.PROC_DEAD_FLAGS:
-                log.warning('Process %s with %s is dead, restarting', proc._name, pid)
+                log.warning('Process %s with %d is dead, restarting', proc._name, pid)
                 log.debug('Killing the previous process')
                 try:
                     os.kill(pid, 9)
                 except OSError as err:
-                    log.error('Unable to kill %s', pid)
+                    log.error('Unable to kill %d', pid)
                     if err.strerror == 'No such process':
                         log.warning('The following error may not be critical:')
                         log.warning('Unable to kill PID %s', pid, exc_info=True)
                 # Restarting proc
                 proc = start_fun(*args, **kwargs)
-                log.warning('%s %s restarted as PID %s', proc._name, pid, proc.pid)
+                log.warning('%s (PID %d) restarted with PID %d', proc._name, pid, proc.pid)
                 pid = proc.pid
 
     def _start_auth_proc(self, auth_skt):
@@ -414,12 +536,8 @@ class NapalmLogs:
             log.info('Starting an additional process to publish messages from identified operating systems.')
             self.config_dict[CONFIG.UNKNOWN_DEVICE_NAME] = {}
         for device_os, device_config in self.config_dict.items():
-            if (self.device_whitelist and
-                hasattr(self.device_whitelist, '__iter__') and
-                device_os not in self.device_whitelist) or\
-               (self.device_blacklist and
-                hasattr(self.device_blacklist, '__iter__') and
-                device_os in self.device_blacklist):
+            if self._whitelist_blacklist(device_os):
+                log.debug('Not starting process for %s (whitelist-blacklist logic)', device_os)
                 # Ignore devices that are not in the whitelist (if defined),
                 #   or those operating systems that are on the blacklist.
                 # This way we can prevent starting unwanted sub-processes.

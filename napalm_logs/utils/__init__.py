@@ -6,13 +6,16 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # Import pythond stdlib
+import re
 import os
 import ssl
+import copy
 import time
 import signal
 import socket
 import logging
 import threading
+import collections
 
 # Import python stdlib
 import umsgpack
@@ -130,6 +133,7 @@ class ClientAuth:
             raise CryptoException('Unable to decrypt')
         return umsgpack.unpackb(packed)
 
+
 def unserialize(binary):
     '''
     Unpack the original OpenConfig object,
@@ -137,3 +141,133 @@ def unserialize(binary):
     This is to be used when disable_security is set.
     '''
     return umsgpack.unpackb(binary)
+
+
+def extract(rgx, msg, mapping):
+    ret = {}
+    log.debug('Matching regex "%s" on "%s"', rgx, msg)
+    matched = re.search(rgx, msg, re.I)
+    if not matched:
+        log.info('The regex didnt match')
+        return None
+    else:
+        group_index = 0
+        for group_value in matched.groups():
+            group_name = mapping.keys()[group_index]
+            ret[group_name] = group_value
+            group_index += 1
+        log.debug('Regex matched')
+        log.debug(ret)
+    return ret
+
+
+def setval(key, val, dict_=None, delim=defaults.DEFAULT_DELIM):
+    '''
+    Set a value under the dictionary hierarchy identified
+    under the key. The target 'foo/bar/baz' returns the
+    dictionary hierarchy {'foo': {'bar': {'baz': {}}}}.
+
+    .. note::
+
+        Currently this doesn't work with integers, i.e.
+        cannot build lists dynamically.
+        TODO
+    '''
+    if not dict_:
+        dict_ = {}
+    prev_hier = dict_
+    dict_hier = key.split(delim)
+    for each in dict_hier[:-1]:
+        try:
+            idx = int(each)
+        except ValueError:
+            # not int
+            if each not in prev_hier:
+                prev_hier[each] = {}
+            prev_hier = prev_hier[each]
+        else:
+            prev_hier[each] = [{}]
+            prev_hier = prev_hier[each]
+    prev_hier[dict_hier[-1]] = val
+    return dict_
+
+
+def traverse(data, key, delim=defaults.DEFAULT_DELIM):
+    '''
+    Traverse a dict or list using a slash delimiter target string.
+    The target 'foo/bar/0' will return data['foo']['bar'][0] if
+    this value exists, otherwise will return empty dict.
+    Return None when not found.
+    This can be used to verify if a certain key exists under
+    dictionary hierarchy.
+    '''
+    for each in key.split(delim):
+        if isinstance(data, list):
+            try:
+                idx = int(each)
+            except ValueError:
+                embed_match = False
+                # Index was not numeric, lets look at any embedded dicts
+                for embedded in (x for x in data if isinstance(x, dict)):
+                    try:
+                        data = embedded[each]
+                        embed_match = True
+                        break
+                    except KeyError:
+                        pass
+                if not embed_match:
+                    # No embedded dicts matched
+                    return None
+            else:
+                try:
+                    data = data[idx]
+                except IndexError:
+                    return None
+        else:
+            try:
+                data = data[each]
+            except (KeyError, TypeError):
+                return None
+    return data
+
+
+def dictupdate(dest, upd):
+    '''
+    Recursive version of the default dict.update
+    Merges upd recursively into dest.
+    '''
+    recursive_update = True
+    if (not isinstance(dest, collections.Mapping)) \
+            or (not isinstance(upd, collections.Mapping)):
+        raise TypeError('Cannot update using non-dict types in dictupdate.update()')
+    updkeys = list(upd.keys())
+    if not set(list(dest.keys())) & set(updkeys):
+        recursive_update = False
+    if recursive_update:
+        for key in updkeys:
+            val = upd[key]
+            try:
+                dest_subkey = dest.get(key, None)
+            except AttributeError:
+                dest_subkey = None
+            if isinstance(dest_subkey, collections.Mapping) \
+                    and isinstance(val, collections.Mapping):
+                ret = dictupdate(dest_subkey, val)
+                dest[key] = ret
+            elif isinstance(dest_subkey, list) \
+                     and isinstance(val, list):
+                merged = copy.deepcopy(dest_subkey)
+                merged.extend([x for x in val if x not in merged])
+                dest[key] = merged
+            else:
+                dest[key] = upd[key]
+        return dest
+    else:
+        try:
+            for k in upd:
+                dest[k] = upd[k]
+        except AttributeError:
+            # this mapping is not a dict
+            for k in upd:
+                dest[k] = upd[k]
+        return dest

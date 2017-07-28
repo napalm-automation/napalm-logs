@@ -1,0 +1,15 @@
+# You should not use special characture in the value keys
+#
+# A single whitespace in `line` will match any number of whitespaces. You should be explicit when
+# Matching white space in `values`
+#
+prefixes:
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\w+ +\d+)
+      time: (\d\d:\d\d:\d\d)
+      host: ([^ ]+)
+      processName: (\w+)
+      tag: ([\w-]+)
+    line: '{date} {time} {host} {processName}: %{tag}'
+
