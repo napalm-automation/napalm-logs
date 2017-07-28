@@ -374,7 +374,7 @@ class NapalmLogs:
             self.config_dict = self._load_config(self.config_path)
         if not self.extension_config_dict and\
            self.extension_config_path and\
-           self.extension_config_path != self.config_path:
+           os.path.normpath(self.extension_config_path) != os.path.normpath(self.config_path):  # same path?
             # When extension config is not sent as dict
             # But `extension_config_path` is specified
             log.info('Reading extension configuration from %s', self.extension_config_path)
@@ -399,18 +399,18 @@ class NapalmLogs:
                 log.warning('Unable to read %s', proc_file, exc_info=True)
                 proc_flag = 'X'
             if proc_flag in CONFIG.PROC_DEAD_FLAGS:
-                log.warning('Process %s with %s is dead, restarting', proc._name, pid)
+                log.warning('Process %s with %d is dead, restarting', proc._name, pid)
                 log.debug('Killing the previous process')
                 try:
                     os.kill(pid, 9)
                 except OSError as err:
-                    log.error('Unable to kill %s', pid)
+                    log.error('Unable to kill %d', pid)
                     if err.strerror == 'No such process':
                         log.warning('The following error may not be critical:')
                         log.warning('Unable to kill PID %s', pid, exc_info=True)
                 # Restarting proc
                 proc = start_fun(*args, **kwargs)
-                log.warning('%s %s restarted as PID %s', proc._name, pid, proc.pid)
+                log.warning('%s (PID %d) restarted with PID %d', proc._name, pid, proc.pid)
                 pid = proc.pid
 
     def _start_auth_proc(self, auth_skt):
