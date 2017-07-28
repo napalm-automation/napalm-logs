@@ -27,6 +27,7 @@ from nacl.exceptions import BadSignatureError
 
 # Import napalm-logs pkgs
 import napalm_logs.config as defaults
+from napalm_logs.exceptions import ClientConnectException
 from napalm_logs.exceptions import CryptoException
 from napalm_logs.exceptions import BadSignatureException
 
@@ -40,15 +41,21 @@ class ClientAuth:
     def __init__(self,
                  certificate,
                  address=defaults.AUTH_ADDRESS,
-                 port=defaults.AUTH_PORT):
+                 port=defaults.AUTH_PORT,
+                 timeout=defaults.AUTH_TIMEOUT,
+                 max_try=defaults.AUTH_MAX_TRY):
         self.certificate = certificate
         self.address = address
         self.port = port
+        self.timeout = timeout
+        self.max_try = max_try
+        self.try_id = 0
         self.priv_key = None
         self.verify_key = None
         self.ssl_skt = None
         self.authenticate()
         self._start_keep_alive()
+        self.__up = True
 
     def _start_keep_alive(self):
         '''
@@ -63,7 +70,8 @@ class ClientAuth:
         Send a keep alive request periodically to make sure that the server
         is still alive. If not then try to reconnect.
         '''
-        while True:
+        self.ssl_skt.settimeout(defaults.AUTH_KEEP_ALIVE_INTERVAL)
+        while self.__up:
             self.ssl_skt.send(defaults.AUTH_KEEP_ALIVE)
             msg = self.ssl_skt.recv(len(defaults.AUTH_KEEP_ALIVE_ACK))
             if msg != defaults.AUTH_KEEP_ALIVE_ACK:
@@ -75,7 +83,7 @@ class ClientAuth:
         '''
         Try to reconnect and re-authenticate with the server.
         '''
-        while True:
+        while self.__up:
             try:
                 self.authenticate()
             except socket.error:
@@ -98,9 +106,17 @@ class ClientAuth:
             skt_ver = socket.AF_INET
         skt = socket.socket(skt_ver, socket.SOCK_STREAM)
         self.ssl_skt = ssl.wrap_socket(skt,
-                                  ca_certs=self.certificate,
-                                  cert_reqs=ssl.CERT_REQUIRED)
-        self.ssl_skt.connect((self.address, self.port))
+                                       ca_certs=self.certificate,
+                                       cert_reqs=ssl.CERT_REQUIRED)
+        try:
+            self.ssl_skt.connect((self.address, self.port))
+        except socket.error as err:
+            self.try_id += 1
+            if self.try_id < self.max_try:
+                time.sleep(self.timeout)
+                self.authenticate()
+            raise ClientConnectException(err)
+
         # Explicit INIT
         self.ssl_skt.write(defaults.MAGIC_REQ)
         # Receive the private key
@@ -132,6 +148,12 @@ class ClientAuth:
             log.error('Unable to decrypt', exc_info=True)
             raise CryptoException('Unable to decrypt')
         return umsgpack.unpackb(packed)
+
+    def stop(self):
+        '''
+        Stop the client.
+        '''
+        self.__up = False
 
 
 def unserialize(binary):

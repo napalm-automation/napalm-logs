@@ -22,6 +22,7 @@ from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import AUTH_MAX_CONN
 from napalm_logs.config import AUTH_KEEP_ALIVE
 from napalm_logs.config import AUTH_KEEP_ALIVE_ACK
+from napalm_logs.exceptions import BindException
 from napalm_logs.exceptions import SSLMismatchException
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
