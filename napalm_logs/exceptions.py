@@ -70,3 +70,10 @@ class SSLMismatchException(NapalmLogsException):
     Raised when the SSL certificate and key do not match
     '''
     pass
+
+
+class ClientConnectException(NapalmLogsException):
+    '''
+    Raised when the client is unable to connect.
+    '''
+    pass

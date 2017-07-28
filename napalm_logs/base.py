@@ -414,7 +414,7 @@ class NapalmLogs:
                 log.warning('%s (PID %d) restarted with PID %d', proc._name, pid, proc.pid)
                 pid = proc.pid
 
-    def _start_auth_proc(self, auth_skt):
+    def _start_auth_proc(self):
         '''
         Start the authenticator process.
         '''
@@ -426,7 +426,8 @@ class NapalmLogs:
                                   self.keyfile,
                                   self.__priv_key,
                                   sgn_verify_hex,
-                                  auth_skt)
+                                  self.auth_address,
+                                  self.auth_port)
         auth.verify_cert()
         proc = Process(target=auth.start)
         proc.start()
@@ -504,19 +505,6 @@ class NapalmLogs:
         '''
         Start the child processes (one per device OS)
         '''
-        # main listener socket
-        # auth proc section
-        log.debug('Creating the auth socket')
-        if ':' in self.auth_address:
-            auth_skt = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-        else:
-            auth_skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            auth_skt.bind((self.auth_address, self.auth_port))
-        except socket.error as msg:
-            error_string = 'Unable to bind (auth) to port {} on {}: {}'.format(self.auth_port, self.auth_address, msg)
-            log.error(error_string, exc_info=True)
-            raise BindException(error_string)
         if self.disable_security is True:
             log.warning('***Not starting the authenticator process due to disable_security being set to True***')
         else:
@@ -525,7 +513,7 @@ class NapalmLogs:
             log.debug('Generating the signing key')
             self.__signing_key = nacl.signing.SigningKey.generate()
             # start the keepalive thread for the auth sub-process
-            self._processes.append(self._start_auth_proc(auth_skt))
+            self._processes.append(self._start_auth_proc())
         # publisher process start
         pub_pipe, dev_pub_pipe = Pipe(duplex=False)
         self._processes.append(self._start_pub_proc(pub_pipe))

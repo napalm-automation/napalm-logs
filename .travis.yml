@@ -3,18 +3,17 @@ python:
   - 2.7
   - 3.4
   - 3.5
-before_install:
-  - pip install -r requirements-dev.txt
 install:
-  - pip install .
+  - pip install tox-travis
 deploy:
   provider: pypi
   user: mirucha
   password:
     secure: "uSMbPGF+iSjhNALEse35mNFDP34kwHwDTA8QZefSaDMlHy/SphPbcmwp4BQpY/cgrP83kYDHssNsjexNVU4lqZZ4PbNU3LB/O+UHL4Vd/RgehC9MceRDmzTUXQ1V5nwRo+KO2K4u9mp6xv1HRtx+3auF7PIBYk5T/C3jb/kztjnbVIFVtcX9YB01xXftm3qmDi1JEmXqgiFuhMD7AGZjVU9y166EHT6TlHvWeOQUwN8wTtwd0NqRoeTTGEXUK0o1HI3fVxXH5bGaVHk+xHuA6tUr8PLJHPV1rS39lwolfpfKWPX9OMmo43r7E8gZ37jUMWHRnPj/iBoJq344s9gtmyN8QEEfC9QCbE7X4vafccisLVI+F2c6leXTn1WrVLfJNp7opDhf2d6Q8n0uHP8/xL6bW+p1XZNT0qF0U57xRMaxpPqFM8sZvck8zKT4IFYS3mdUiSCZGXC3lakcuaO+ASquMHH9DY/2FSU9X0+t3tBrSQB53AUCSOblR3QIpOkinpJoPAPc9hmg+23rz4HxLAC4zkoOmZdpoZfRrP1V9TdYWMfnvSzrv/YoskzaQP0sZuAzkj7b/FelyCJ9BuYWLCF3jqQfSjeKlyx3C2Gf66GPWOspxWCR6MB6KN630k22YzDJqqZM1zxetxUjq/Lyvs0BQqeWbH9aHRJFd4l7iBs="
+  on:
     tags: true
+    branch: master
 script:
-  - cp examples/server.crt /tmp/__napalm_logs.crt
-  - cp examples/server.key /tmp/__napalm_logs.key
-#  - cd napalm_logs/scripts/
-#  - sudo python cli.py --log-file cli -l debug --certificate /tmp/__napalm_logs.crt --keyfile /tmp/__napalm_logs.key
+  - tox
+after_success:
+  - coveralls

@@ -14,12 +14,15 @@ import logging
 import threading
 
 # Import napalm-logs pkgs
+from napalm_logs.config import AUTH_ADDRESS
+from napalm_logs.config import AUTH_PORT
 from napalm_logs.config import MAGIC_REQ
 from napalm_logs.config import MAGIC_ACK
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import AUTH_MAX_CONN
 from napalm_logs.config import AUTH_KEEP_ALIVE
 from napalm_logs.config import AUTH_KEEP_ALIVE_ACK
+from napalm_logs.exceptions import BindException
 from napalm_logs.exceptions import SSLMismatchException
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
@@ -56,12 +59,14 @@ class NapalmLogsAuthProc(NapalmLogsProc):
                  keyfile,
                  private_key,
                  signature_hex,
-                 skt):
+                 auth_address=AUTH_ADDRESS,
+                 auth_port=AUTH_PORT):
         self.certificate = certificate
         self.keyfile = keyfile
         self.__key = private_key
         self.__sgn = signature_hex
-        self.socket = skt
+        self.auth_address = auth_address
+        self.auth_port = auth_port
         self.__up = False
 
     def _exit_gracefully(self, signum, _):
@@ -115,6 +120,8 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         '''
         Checks that the provided cert and key are valid and usable
         '''
+        log.debug('Verifying the %s certificate, keyfile: %s',
+                  self.certificate, self.keyfile)
         try:
             ssl.create_default_context().load_cert_chain(self.certificate, keyfile=self.keyfile)
         except ssl.SSLError:
@@ -124,6 +131,20 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         except IOError:
             log.error('Unable to open either certificate or key file')
             raise
+        log.debug('Certificate looks good.')
+
+    def _create_skt(self):
+        log.debug('Creating the auth socket')
+        if ':' in self.auth_address:
+            self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        else:
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            self.socket.bind((self.auth_address, self.auth_port))
+        except socket.error as msg:
+            error_string = 'Unable to bind (auth) to port {} on {}: {}'.format(self.auth_port, self.auth_address, msg)
+            log.error(error_string, exc_info=True)
+            raise BindException(error_string)
 
     def start(self):
         '''
@@ -131,10 +152,13 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         Each client connection starts a new thread.
         '''
         # Start suicide polling thread
+        log.debug('Starting the auth process')
+        self.verify_cert()
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
+        self._create_skt()
         self.socket.listen(AUTH_MAX_CONN)
         while self.__up:
             try:

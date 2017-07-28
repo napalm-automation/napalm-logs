@@ -1,1 +1,8 @@
 -r requirements.txt
+coveralls
+pytest
+pytest-cov
+pytest-json
+pytest-pythonpath
+pytest-travis-fold
+

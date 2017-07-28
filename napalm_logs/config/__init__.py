@@ -3,10 +3,10 @@
 Config defaults.
 '''
 from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import os
 import logging
+import napalm_logs.ext.six as six
 
 # config
 ROOT_DIR = '/'
@@ -18,6 +18,8 @@ PUBLISH_ADDRESS = '0.0.0.0'
 PUBLISH_PORT = 49017
 AUTH_ADDRESS = '0.0.0.0'
 AUTH_PORT = 49018
+AUTH_MAX_TRY = 1
+AUTH_TIMEOUT = 1
 LOG_LEVEL = 'warning'
 LOG_FORMAT = '%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'
 LOG_FILE = os.path.join(ROOT_DIR, 'var', 'log', 'napalm', 'logs')
@@ -62,21 +64,21 @@ VALID_CONFIG = {
     'prefixes': [
         {
             'values': {
-                'tag': basestring
+                'tag': six.string_type
             },
-            'line': basestring
+            'line': six.string_type
         }
     ],
     'messages': [
         {
             # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
             # This may change if we are able to find a more well defined naming system.
-            'error': basestring,
-            'tag': basestring,
+            'error': six.string_type,
+            'tag': six.string_type,
             'values': dict,
             'replace': dict,
-            'line': basestring,
-            'model': basestring,
+            'line': six.string_type,
+            'model': six.string_type,
             'mapping': {
                 'variables': dict,
                 'static': dict
@@ -109,13 +111,13 @@ DEV_IPC_URL_TPL = 'ipc:///tmp/napalm-logs-dev-{os}'
 PUB_IPC_URL = 'ipc:///tmp/napalm-logs-pub'
 
 # auth
-AUTH_KEEP_ALIVE = 'KEEPALIVE'
-AUTH_KEEP_ALIVE_ACK = 'KEEPALIVEACK'
+AUTH_KEEP_ALIVE = b'KEEPALIVE'
+AUTH_KEEP_ALIVE_ACK = b'KEEPALIVEACK'
 AUTH_KEEP_ALIVE_INTERVAL = 10
 AUTH_MAX_CONN = 5
 AUTH_TIMEOUT = 5
-MAGIC_ACK = 'ACK'
-MAGIC_REQ = 'INIT'
+MAGIC_ACK = b'ACK'
+MAGIC_REQ = b'INIT'
 AUTH_CIPHER = 'ECDHE-RSA-AES256-GCM-SHA384'
 
 OPEN_CONFIG_NO_MODEL = 'NO_MODEL'
