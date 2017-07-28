@@ -13,19 +13,3 @@ prefixes:
       tag: ([\w-]+)
     line: '{date} {time} {host} {processName}: %{tag}'
 
-messages:
-  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
-  # This may change if we are able to find a more well defined naming system.
-  - error: BGP_PREFIX_LIMIT_EXCEEDED
-    tag: BGP-3-NOTIFICATION
-    values:
-      peer: (\d+\.\d+\.\d+\.\d+)
-      asn: (\d+)
-    replace: {}
-    line: 'received from neighbor {peer} (AS {asn}) 6/1 (Cease/maximum number of prefixes reached) 0 bytes'
-    model: openconfig_bgp
-    mapping:
-      variables:
-        bgp//neighbors//neighbor//{peer}//state//peer_as: asn
-      static:
-        bgp//neighbors//neighbor//{peer}//state//session_state: IDLE
