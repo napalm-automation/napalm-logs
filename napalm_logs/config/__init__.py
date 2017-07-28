@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 
 import os
 import logging
-import napalm_logs.utils.six as six
+import napalm_logs.ext.six as six
 
 # config
 ROOT_DIR = '/'
