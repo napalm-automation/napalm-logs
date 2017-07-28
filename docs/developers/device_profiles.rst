@@ -128,26 +128,26 @@ Here is an example message:
 
 .. code-block:: yaml
 
-  messages:
-    - error: INTERFACE_DOWN
-    tag: SNMP_TRAP_LINK_DOWN
-    values:
-      snmpID: (\d+)
-      adminStatusString: (\w+)
-      adminStatusValue: (\d)
-      operStatusString: (\w+)
-      operStatusValue: (\d)
-      interface: ([\w\-\/]+)
-    replace:
-      adminStatusString: uppercase
-      operStatusString: uppercase
-    line: 'ifIndex {snmpID}, ifAdminStatus {adminStatusString}({adminStatusValue}), ifOperStatus {operStatusString}({operStatusValue}), ifName {interface}'
-    model: openconfig_interfaces
-    mapping:
-      variables:
-      interfaces//interface//{interface}//state//admin_status: adminStatusString
-      interfaces//interface//{interface}//state//oper_status: operStatusString
-      static: {}
+    messages:
+      - error: INTERFACE_DOWN
+        tag: SNMP_TRAP_LINK_DOWN
+        values:
+          snmpID: (\d+)
+          adminStatusString: (\w+)
+          adminStatusValue: (\d)
+          operStatusString: (\w+)
+          operStatusValue: (\d)
+          interface: ([\w\-\/]+)
+        replace:
+          adminStatusString: uppercase
+          operStatusString: uppercase
+        line: 'ifIndex {snmpID}, ifAdminStatus {adminStatusString}({adminStatusValue}), ifOperStatus {operStatusString}({operStatusValue}), ifName {interface}'
+        model: openconfig_interfaces
+        mapping:
+          variables:
+          interfaces//interface//{interface}//state//admin_status: adminStatusString
+          interfaces//interface//{interface}//state//oper_status: operStatusString
+          static: {}
 
 What does each option mean?
 
