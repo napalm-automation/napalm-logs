@@ -14,6 +14,8 @@ import logging
 import threading
 
 # Import napalm-logs pkgs
+from napalm_logs.config import AUTH_ADDRESS
+from napalm_logs.config import AUTH_PORT
 from napalm_logs.config import MAGIC_REQ
 from napalm_logs.config import MAGIC_ACK
 from napalm_logs.proc import NapalmLogsProc
@@ -56,8 +58,8 @@ class NapalmLogsAuthProc(NapalmLogsProc):
                  keyfile,
                  private_key,
                  signature_hex,
-                 auth_address,
-                 auth_port):
+                 auth_address=AUTH_ADDRESS,
+                 auth_port=AUTH_PORT):
         self.certificate = certificate
         self.keyfile = keyfile
         self.__key = private_key
@@ -117,6 +119,8 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         '''
         Checks that the provided cert and key are valid and usable
         '''
+        log.debug('Verifying the %s certificate, keyfile: %s',
+                  self.certificate, self.keyfile)
         try:
             ssl.create_default_context().load_cert_chain(self.certificate, keyfile=self.keyfile)
         except ssl.SSLError:
@@ -126,7 +130,7 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         except IOError:
             log.error('Unable to open either certificate or key file')
             raise
-        return True
+        log.debug('Certificate looks good.')
 
     def _create_skt(self):
         log.debug('Creating the auth socket')
@@ -147,9 +151,8 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         Each client connection starts a new thread.
         '''
         # Start suicide polling thread
-        if not self.verify_cert():
-            log.error('Exiting the auth process')
-            return
+        log.debug('Starting the auth process')
+        self.verify_cert()
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
