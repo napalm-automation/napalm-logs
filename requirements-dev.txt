@@ -1,5 +1,7 @@
 -r requirements.txt
+coveralls
 pytest
 pytest-cov
+pytest-json
 pytest-catchlog
-
+pytest-pythonpath
