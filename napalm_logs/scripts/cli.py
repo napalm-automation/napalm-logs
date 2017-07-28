@@ -310,7 +310,7 @@ def napalm_logs_engine():
     signal.signal(signal.SIGINT, _exit_gracefully)
     signal.signal(signal.SIGTERM, _exit_gracefully)
     # Keep this function running until we receive instruction to terminate
-    while _up is True:
+    while _up is True and nl.up is True:
         time.sleep(1)
     nl.stop_engine()
 

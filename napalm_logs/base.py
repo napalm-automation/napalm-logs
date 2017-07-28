@@ -107,6 +107,7 @@ class NapalmLogs:
         self.__priv_key = None
         self.__signing_key = None
         self._processes = []
+        self.up = True
 
     def _exit_gracefully(self, signum, _):
         self.stop_engine()
@@ -553,8 +554,22 @@ class NapalmLogs:
         self._processes.append(self._start_srv_proc(srv_pipe, os_pipes))
         # start listener process
         self._processes.append(self._start_lst_proc(lst_pipe))
+        thread = threading.Thread(target=self._check_children)
+        thread.start()
+
+    def _check_children(self):
+        '''
+        Check all of the child processes are still running
+        '''
+        while self.up == True:
+            time.sleep(1)
+            for process in self._processes:
+                if process.is_alive() is True:
+                    continue
+                self.stop_engine()
 
     def stop_engine(self):
+        self.up = False
         log.info('Shutting down the engine')
         # Set SIGTERM to all child processes, then join them
         for proc in self._processes:
