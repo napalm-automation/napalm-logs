@@ -6,7 +6,6 @@ from __future__ import absolute_import
 
 # Import pythond stdlib
 import os
-import time
 import signal
 import logging
 import threading
