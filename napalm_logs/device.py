@@ -22,11 +22,8 @@ import napalm_logs.utils
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import PUB_IPC_URL
 from napalm_logs.config import DEV_IPC_URL_TPL
-from napalm_logs.config import DEFAULT_DELIM
 from napalm_logs.config import REPLACEMENTS
 from napalm_logs.config import UNKNOWN_DEVICE_NAME
-from napalm_logs.config import OPEN_CONFIG_NO_MODEL
-from napalm_logs.exceptions import OpenConfigPathException
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
 
@@ -264,7 +261,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     yang_obj = kwargs['__python_fun__'](msg_dict)
                 else:
                     yang_obj = self._emit(**kwargs)
-            except Exception as err:
+            except Exception:
                 log.exception('Unexpected error when generating the OC object.', exc_info=True)
                 continue
             log.debug('Generated OC object:')
