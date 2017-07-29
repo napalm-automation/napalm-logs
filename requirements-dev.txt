@@ -3,6 +3,7 @@ coveralls
 pytest
 pytest-cov
 pytest-json
+pytest-pylint
 pytest-pythonpath
 pytest-travis-fold
 
