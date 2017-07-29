@@ -15,7 +15,6 @@ import threading
 
 # Import third party libs
 import zmq
-import umsgpack
 
 # Import napalm-logs pkgs
 from napalm_logs.config import LST_IPC_URL
@@ -81,7 +80,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 line = prefix.get('line', '')
                 if prefix.get('__python_fun__'):
                     self.compiled_prefixes[dev_os].append({
-                        '__python_fun__' : prefix['__python_fun__'],
+                        '__python_fun__': prefix['__python_fun__'],
                         '__python_mod__': prefix['__python_mod__']
                     })
                     continue  # if python profiler defined for this prefix,
@@ -130,7 +129,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     log.debug('Trying to match using the %s custom python profiler', prefix['__python_mod__'])
                     try:
                         match = prefix['__python_fun__'](msg)
-                    except Exception as err:
+                    except Exception:
                         log.error('Exception while parsing %s with the %s python profiler',
                                   msg, prefix['__python_mod__'], exc_info=True)
                 else:
