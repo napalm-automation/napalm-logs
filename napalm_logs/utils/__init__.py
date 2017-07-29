@@ -53,9 +53,10 @@ class ClientAuth:
         self.priv_key = None
         self.verify_key = None
         self.ssl_skt = None
+        self.__up = True
         self.authenticate()
         self._start_keep_alive()
-        self.__up = True
+
 
     def _start_keep_alive(self):
         '''
