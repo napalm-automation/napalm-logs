@@ -118,6 +118,7 @@ def test_client_auth():
     that retrieves the pk and sgn key.
     '''
     assert AUTH_PROC.is_alive()
+    time.sleep(.1)  # waiting for the auth socket
     client = ClientAuth('tests/auth/server.crt')
     client.stop()
 
