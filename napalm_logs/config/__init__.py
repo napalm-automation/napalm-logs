@@ -71,7 +71,8 @@ VALID_CONFIG = {
     ],
     'messages': [
         {
-            # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+            # 'error' should be unique and vendor agnostic.
+            # Currently we are using the JUNOS syslog message name as the canonical name.
             # This may change if we are able to find a more well defined naming system.
             'error': six.string_type,
             'tag': six.string_type,
