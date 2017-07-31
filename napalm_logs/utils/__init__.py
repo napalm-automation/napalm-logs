@@ -70,9 +70,25 @@ class ClientAuth:
         '''
         self.ssl_skt.settimeout(defaults.AUTH_KEEP_ALIVE_INTERVAL)
         while self.__up:
-            self.ssl_skt.send(defaults.AUTH_KEEP_ALIVE)
+            try:
+                log.debug('Sending keep-alive message to the server')
+                self.ssl_skt.send(defaults.AUTH_KEEP_ALIVE)
+            except socket.error:
+                log.error('Unable to send keep-alive message to the server.')
+                log.error('Re-init the SSL socket.')
+                try:
+                    self.ssl_skt.close()
+                except socket.error:
+                    log.error('The socket seems to be closed already.')
+                self.reconnect()
+                log.debug('Trying to re-send the keep-alive message to the server.')
+                self.ssl_skt.send(defaults.AUTH_KEEP_ALIVE)
             msg = self.ssl_skt.recv(len(defaults.AUTH_KEEP_ALIVE_ACK))
+            log.debug('Received %s from the keep-alive server', msg)
             if msg != defaults.AUTH_KEEP_ALIVE_ACK:
+                log.error('Received %s instead of %s form the auth keep-alive server',
+                          msg, defaults.AUTH_KEEP_ALIVE_ACK)
+                log.error('Re-init the SSL socket.')
                 self.ssl_skt.close()
                 self.reconnect()
             time.sleep(defaults.AUTH_KEEP_ALIVE_INTERVAL)
