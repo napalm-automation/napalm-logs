@@ -84,20 +84,22 @@ def test_successful_start():
     AUTH_PROC = Process(target=nlap.start)
     AUTH_PROC.start()
 
-# TODO: check why unable to stop this proc
-# def test_twice_bind():
-#     '''
-#     Test that binding twice on the same host/port fails,
-#     and raises napalm_logs.exceptions.BindException.
-#     '''
-#     pk, sgn_key = _generate_test_keys()
-#     nlap = NapalmLogsAuthProc('tests/auth/server.crt',
-#                               'tests/auth/server.key',
-#                               pk,
-#                               sgn_key)
-#     with pytest.raises(napalm_logs.exceptions.BindException):
-#         nlap.start()
-#     nlap.stop()
+
+def test_twice_bind():
+    '''
+    Test that binding twice on the same host/port fails,
+    and raises napalm_logs.exceptions.BindException.
+    '''
+    pk, sgn_key = _generate_test_keys()
+    nlap = NapalmLogsAuthProc('tests/auth/server.crt',
+                              'tests/auth/server.key',
+                              pk,
+                              sgn_key)
+    assert AUTH_PROC.is_alive()
+    time.sleep(.1)  # waiting for the auth socket
+    with pytest.raises(napalm_logs.exceptions.BindException):
+        nlap.start()
+    nlap.stop()
 
 
 def test_client_auth_fail_wrong_port():
