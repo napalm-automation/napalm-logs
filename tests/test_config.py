@@ -22,6 +22,7 @@ from napalm_logs.base import NapalmLogs
 
 log = logging.getLogger(__name__)
 
+NL_BASE = None
 NL_PROC = None
 TEST_SKT = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 TEST_CLIENT = None
@@ -40,15 +41,16 @@ def startup_proc():
     '''
     Startup the napalm-logs process.
     '''
+    global NL_BASE
     global NL_PROC
     log.debug('Starting up the napalm-logs process')
-    nl_base = NapalmLogs(disable_security=True,
+    NL_BASE = NapalmLogs(disable_security=True,
                          address=NAPALM_LOGS_TEST_ADDR,
                          port=NAPALM_LOGS_TEST_PORT,
                          publish_address=NAPALM_LOGS_TEST_PUB_ADDR,
                          publish_port=NAPALM_LOGS_TEST_PUB_PORT,
                          log_level=NAPALM_LOGS_TEST_LOG_LEVEL)
-    NL_PROC = Process(target=nl_base.start_engine)
+    NL_PROC = Process(target=NL_BASE.start_engine)
     NL_PROC.start()
 
 
@@ -78,19 +80,35 @@ def generate_tests():
     '''
     Generate the list of tests.
     '''
+    expected_os_errors = {}
+    for os_name, os_cfg in NL_BASE.config_dict.items():
+        expected_os_errors[os_name] = []
+        for message in os_cfg['messages']:
+            expected_os_errors[os_name].append(message['error'])
     test_cases = []
     cwd = os.path.dirname(__file__)
     test_path = os.path.join(cwd, 'config')
-    os_list = [sdpath[0] for sdpath in os.walk(test_path)][1:]
-    for os_path in os_list:
+    os_dir_list = [name for name in os.listdir(test_path) if os.path.isdir(os.path.join(test_path, name))]
+    expected_oss = set(expected_os_errors.keys())
+    tested_oss = set(os_dir_list)
+    missing_oss = expected_oss - tested_oss
+    for missing_os in missing_oss:
+        test_cases.append(('__missing__{}'.format(missing_os), '', ''))
+    for os_name in os_dir_list:
         # Subdir is the OS name
-        os_name = os.path.split(os_path)[1]
-        errors = [sdpath[0] for sdpath in os.walk(os_path)][1:]
-        for error_path in errors:
-            error_name = os.path.split(error_path)[1]
-            cases = [sdpath[0] for sdpath in os.walk(error_path)][1:]
-            for test_path in cases:
-                test_case = os.path.split(test_path)[1]
+        os_path = os.path.join(test_path, os_name)
+        errors = [name for name in os.listdir(os_path) if os.path.isdir(os.path.join(os_path, name))]
+        expected_errors = set(expected_os_errors[os_name])
+        defined_errors = set(errors)
+        missing_errors = expected_errors - defined_errors
+        for mising_err in missing_errors:
+            test_cases.append((os_name, '__missing__{}'.format(mising_err), ''))
+        for error_name in errors:
+            error_path = os.path.join(os_path, error_name)
+            cases = [name for name in os.listdir(error_path) if os.path.isdir(os.path.join(error_path, name))]
+            if not cases:
+                test_cases.append((os_name, error_name, '__missing__'))
+            for test_case in cases:
                 test_cases.append((os_name, error_name, test_case))
     return test_cases
 
@@ -101,6 +119,10 @@ tests = generate_tests()
 
 @pytest.mark.parametrize("os_name,error_name,test_case", tests)
 def test_config(os_name, error_name, test_case):
+    assert not os_name.startswith('__missing__'), 'No tests defined for {}'.format(os_name.replace('__missing__', ''))
+    assert not error_name.startswith('__missing__'),\
+        'No tests defined for {}, under {}'.format(error_name.replace('__missing__', ''), os_name)
+    assert test_case != '__missing__', 'No test cases defined for {}, under {}'.format(error_name, os_name)
     print('Testing {} for {}, under the test case "{}"'.format(
           error_name, os_name, test_case))
     cwd = os.path.dirname(__file__)
