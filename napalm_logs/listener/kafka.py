@@ -20,6 +20,7 @@ except ImportError as err:
 
 # Import napalm-logs pkgs
 from napalm_logs.listener.base import ListenerBase
+from napalm_logs.exceptions import NapalmLogsExit
 from napalm_logs.exceptions import ListenerException
 
 log = logging.getLogger(__name__)

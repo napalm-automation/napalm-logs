@@ -68,8 +68,12 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         self.auth_address = auth_address
         self.auth_port = auth_port
         self.__up = False
+        self.socket = None
 
-    def _exit_gracefully(self, signum, _):
+    def _exit_gracefully(self, signum, _):  # pylint: disable=unused-argument
+        '''
+        Exit gracefully.
+        '''
         self.stop()
 
     def _handshake(self, conn, addr):
@@ -134,6 +138,9 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         log.debug('Certificate looks good.')
 
     def _create_skt(self):
+        '''
+        Create the authentication socket.
+        '''
         log.debug('Creating the auth socket')
         if ':' in self.auth_address:
             self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
@@ -184,6 +191,9 @@ class NapalmLogsAuthProc(NapalmLogsProc):
             client_thread.start()
 
     def stop(self):
+        '''
+        Stop the auth proc.
+        '''
         log.info('Stopping auth process')
         self.__up = False
         self.socket.close()

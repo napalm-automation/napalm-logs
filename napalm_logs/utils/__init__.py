@@ -7,11 +7,9 @@ from __future__ import unicode_literals
 
 # Import pythond stdlib
 import re
-import os
 import ssl
 import copy
 import time
-import signal
 import socket
 import logging
 import threading
@@ -56,7 +54,6 @@ class ClientAuth:
         self.__up = True
         self.authenticate()
         self._start_keep_alive()
-
 
     def _start_keep_alive(self):
         '''
@@ -140,12 +137,12 @@ class ClientAuth:
         '''
         try:
             encrypted = self.verify_key.verify(binary)
-        except BadSignatureError as bserr:
+        except BadSignatureError:
             log.error('Signature was forged or corrupt', exc_info=True)
             raise BadSignatureException('Signature was forged or corrupt')
         try:
             packed = self.priv_key.decrypt(encrypted)
-        except CryptoError as cerr:
+        except CryptoError:
             log.error('Unable to decrypt', exc_info=True)
             raise CryptoException('Unable to decrypt')
         return umsgpack.unpackb(packed)
@@ -202,7 +199,7 @@ def setval(key, val, dict_=None, delim=defaults.DEFAULT_DELIM):
     dict_hier = key.split(delim)
     for each in dict_hier[:-1]:
         try:
-            idx = int(each)
+            idx = int(each)  # noqa
         except ValueError:
             # not int
             if each not in prev_hier:
@@ -278,7 +275,7 @@ def dictupdate(dest, upd):
                 ret = dictupdate(dest_subkey, val)
                 dest[key] = ret
             elif isinstance(dest_subkey, list) \
-                     and isinstance(val, list):
+                    and isinstance(val, list):
                 merged = copy.deepcopy(dest_subkey)
                 merged.extend([x for x in val if x not in merged])
                 dest[key] = merged

@@ -8,8 +8,8 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # Import stdlib
-import json
-import logging, logging.handlers
+import logging
+import logging.handlers
 
 # Import napalm-logs pkgs
 from napalm_logs.transport.base import TransportBase

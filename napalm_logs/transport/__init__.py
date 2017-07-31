@@ -6,12 +6,12 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # Import napalm-logs pkgs
-from napalm_logs.transport.base import TransportBase
 from napalm_logs.transport.zeromq import ZMQTransport
-from napalm_logs.transport.kafka import KafkaTransport
-from napalm_logs.transport.kafka import HAS_KAFKA
 from napalm_logs.transport.cli import CLITransport
 from napalm_logs.transport.log import LogTransport
+# extras: require additional underlying libraries
+from napalm_logs.transport.kafka import HAS_KAFKA
+from napalm_logs.transport.kafka import KafkaTransport
 # from napalm_logs.transport.kafka import KafkaTransport
 # from napalm_logs.transport.rabbitmq import RabbitMQTransport
 
@@ -30,11 +30,13 @@ TRANSPORT_LOOKUP = {
 if HAS_KAFKA:
     TRANSPORT_LOOKUP['kafka'] = KafkaTransport
 
+
 def get_transport(name):
     '''
     Return the transport class.
     '''
     return TRANSPORT_LOOKUP.get(name, TRANSPORT_LOOKUP['*'])
+
 
 __all__ = (
     'get_transport',

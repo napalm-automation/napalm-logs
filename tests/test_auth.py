@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 
 # Import pythond stdlib
 import time
-import socket
 import logging
 from multiprocessing import Process
 
@@ -68,7 +67,7 @@ def test_client_auth_fail_server_down():
     Test client connect failure when server is not started yet.
     '''
     with pytest.raises(napalm_logs.exceptions.ClientConnectException):
-        client = ClientAuth('tests/auth/server.crt')
+        client = ClientAuth('tests/auth/server.crt')  # noqa
 
 
 def test_successful_start():

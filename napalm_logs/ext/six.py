@@ -15,6 +15,6 @@ if PY3:
     text_type = str
     binary_type = bytes
 else:
-    string_type = basestring
-    text_type = unicode
+    string_type = basestring  # noqa
+    text_type = unicode  # noqa
     binary_type = str

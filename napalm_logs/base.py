@@ -8,18 +8,15 @@ from __future__ import absolute_import
 import os
 import re
 import imp
-import ssl
 import sys
 import time
 import yaml
-import signal
-import socket
 import logging
 import threading
 from multiprocessing import Process, Pipe
 
 # Import third party libs
-### crypto
+# crypto
 import nacl.utils
 import nacl.secret
 import nacl.signing
@@ -35,7 +32,6 @@ from napalm_logs.device import NapalmLogsDeviceProc
 from napalm_logs.server import NapalmLogsServerProc
 from napalm_logs.publisher import NapalmLogsPublisherProc
 # exceptions
-from napalm_logs.exceptions import BindException
 from napalm_logs.exceptions import ConfigurationException
 
 log = logging.getLogger(__name__)
@@ -133,12 +129,11 @@ class NapalmLogs:
         configured by the user.
         '''
         return (self.device_whitelist and
-            hasattr(self.device_whitelist, '__iter__') and
-            os_name not in self.device_whitelist) or\
-           (self.device_blacklist and
-            hasattr(self.device_blacklist, '__iter__') and
-            os_name in self.device_blacklist)
-
+                hasattr(self.device_whitelist, '__iter__') and
+                os_name not in self.device_whitelist) or\
+               (self.device_blacklist and
+                hasattr(self.device_blacklist, '__iter__') and
+                os_name in self.device_blacklist)
 
     def _load_config(self, path):
         '''
@@ -167,7 +162,7 @@ class NapalmLogs:
         # │   └── BGP_PREFIX_THRESH_EXCEEDED.py
         # └── nxos
         #     └── init.yml
-        os_subdirs = [path[0] for path in os.walk(path)][1:]
+        os_subdirs = [sdpath[0] for sdpath in os.walk(path)][1:]
         if not os_subdirs:
             log.error('%s does not contain any OS subdirectories', path)
         for os_dir in os_subdirs:
@@ -549,7 +544,7 @@ class NapalmLogs:
         '''
         Check all of the child processes are still running
         '''
-        while self.up == True:
+        while self.up:
             time.sleep(1)
             for process in self._processes:
                 if process.is_alive() is True:

@@ -3,9 +3,8 @@
 Prefix profiler for Nexus devices.
 This profiler matches messages having the following form:
 
-sw01.bjm01: 2017 Jul 26 14:42:46 UTC: %AUTHPRIV-6-SYSTEM_MSG: pam_unix(dcos_sshd:session): session opened for user luke by (uid=0) - dcos_sshd[12977]
+sw01.bjm01: 2017 Jul 26 14:42:46 UTC: %AUTHPRIV-6-SYSTEM_MSG: pam_unix(dcos_sshd:session): session opened for user luke by (uid=0) - dcos_sshd[12977]  # noqa
 '''
-import re
 from collections import OrderedDict
 
 import napalm_logs.utils

@@ -6,7 +6,7 @@ Message example:
 
 .. code-block:: text
 
-    sw01.bjm01: 2017 Jul 26 14:42:46 UTC: %AUTHPRIV-6-SYSTEM_MSG: pam_unix(dcos_sshd:session): session opened for user luke by (uid=0) - dcos_sshd[12977]
+    sw01.bjm01: 2017 Jul 26 14:42:46 UTC: %AUTHPRIV-6-SYSTEM_MSG: pam_unix(dcos_sshd:session): session opened for user luke by (uid=0) - dcos_sshd[12977]  # noqa
 
 Output example:
 
@@ -28,7 +28,6 @@ Output example:
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import re
 import logging
 from collections import OrderedDict
 

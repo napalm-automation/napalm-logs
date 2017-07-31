@@ -1,8 +1,9 @@
 -r requirements.txt
-coveralls
 pytest
+pylama
+coveralls
 pytest-cov
 pytest-json
+pytest-catchlog
 pytest-pythonpath
-pytest-travis-fold
-
+flake8-import-order
