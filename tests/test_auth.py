@@ -19,6 +19,7 @@ import nacl.encoding
 
 # Import napalm-logs
 import napalm_logs.exceptions
+import napalm_logs.config as defaults
 from napalm_logs.utils import ClientAuth
 from napalm_logs.auth import NapalmLogsAuthProc
 
@@ -121,6 +122,20 @@ def test_client_auth():
     assert AUTH_PROC.is_alive()
     time.sleep(.1)  # waiting for the auth socket
     client = ClientAuth('tests/auth/server.crt')
+    client.stop()
+
+
+def test_client_keep_alive():
+    '''
+    Test that the client receives keepalives from
+    the auth process.
+    '''
+    assert AUTH_PROC.is_alive()
+    time.sleep(.1)
+    client = ClientAuth('tests/auth/server.crt')
+    time.sleep(.1)
+    client.ssl_skt.close()
+    time.sleep(defaults.AUTH_KEEP_ALIVE_INTERVAL)
     client.stop()
 
 

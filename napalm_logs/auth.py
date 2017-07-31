@@ -115,7 +115,7 @@ class NapalmLogsAuthProc(NapalmLogsProc):
                 return
             try:
                 conn.send(AUTH_KEEP_ALIVE_ACK)
-            except IOError as err:
+            except (IOError, socket.error) as err:
                 log.error('Unable to send auth keep alive: %s', err)
                 conn.close()
                 return
