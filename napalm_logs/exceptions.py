@@ -23,9 +23,30 @@ class BindException(NapalmLogsException):
     pass
 
 
+class TransportException(NapalmLogsException):
+    '''
+    Exception raised when encounering an error in a transport process.
+    '''
+    pass
+
+
+class InvalidTransportException(TransportException):
+    '''
+    Raised when the user selects a transport that does not exist.
+    '''
+    pass
+
+
 class ListenerException(NapalmLogsException):
     '''
-    Exception raised when encountering an exception in a listener process
+    Exception raised when encountering an exception in a listener process.
+    '''
+    pass
+
+
+class InvalidListenerException(ListenerException):
+    '''
+    Raised when the user selets a listener that does not exist.
     '''
     pass
 
