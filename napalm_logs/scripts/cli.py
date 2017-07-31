@@ -256,14 +256,14 @@ class NLOptionParser(OptionParser, object):
             'port': self.options.port or file_cfg.get('port') or defaults.PORT,
             'listener': self.options.listener or file_cfg.get('listener') or defaults.LISTENER,
             'transport': self.options.transport or file_cfg.get('transport'),
-            'publish_address': self.options.publish_address or file_cfg.get('publish_address')\
-                               or defaults.PUBLISH_ADDRESS,
-            'publish_port': self.options.publish_port or file_cfg.get('publish_port')\
-                            or defaults.PUBLISH_PORT,
-            'auth_address': self.options.auth_address or file_cfg.get('auth_address')\
-                               or defaults.AUTH_ADDRESS,
-            'auth_port': self.options.auth_port or file_cfg.get('auth_port')\
-                            or defaults.AUTH_PORT,
+            'publish_address': self.options.publish_address or file_cfg.get('publish_address') or
+                               defaults.PUBLISH_ADDRESS,  # noqa
+            'publish_port': self.options.publish_port or file_cfg.get('publish_port') or
+                            defaults.PUBLISH_PORT,  # noqa
+            'auth_address': self.options.auth_address or file_cfg.get('auth_address') or
+                            defaults.AUTH_ADDRESS,  # noqa
+            'auth_port': self.options.auth_port or file_cfg.get('auth_port') or
+                         defaults.AUTH_PORT,
             'certificate': cert,
             'keyfile': self.options.keyfile or file_cfg.get('keyfile'),
             'disable_security': disable_security,
@@ -288,7 +288,9 @@ def _exit_gracefully(signum, _):
     global _up
     _up = False
 
+
 _up = True
+
 
 def napalm_logs_engine():
     if '' in sys.path:
@@ -313,6 +315,7 @@ def napalm_logs_engine():
     while _up is True and nl.up is True:
         time.sleep(1)
     nl.stop_engine()
+
 
 if __name__ == '__main__':
     napalm_logs_engine()
