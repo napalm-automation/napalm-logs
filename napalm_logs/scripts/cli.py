@@ -17,6 +17,7 @@ import yaml
 # Import napalm-logs
 import napalm_logs
 import napalm_logs.config as defaults
+import napalm_logs.ext.six as six
 
 log = logging.getLogger(__name__)
 
@@ -174,7 +175,7 @@ class NLOptionParser(OptionParser, object):
 
     def convert_env_dict(self, d):
         for k, v in d.items():
-            if isinstance(v, basestring):
+            if isinstance(v, six.string_type):
                 if not v.startswith('${') or not v.endswith('}'):
                     continue
                 if not os.environ.get(v[2:-1]):
@@ -188,7 +189,7 @@ class NLOptionParser(OptionParser, object):
 
     def convert_env_list(self, l):
         for n, v in enumerate(l):
-            if isinstance(v, basestring):
+            if isinstance(v, six.string_type):
                 if not v.startswith('${') or not v.endswith('}'):
                     continue
                 if not os.environ.get(v[2:-1]):
