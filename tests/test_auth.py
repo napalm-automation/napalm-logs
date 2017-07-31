@@ -131,12 +131,15 @@ def test_client_keep_alive():
     the auth process.
     '''
     assert AUTH_PROC.is_alive()
-    time.sleep(.1)
     client = ClientAuth('tests/auth/server.crt')
-    time.sleep(.1)
-    client.ssl_skt.close()
+    time.sleep(.1)  # wait for the client socket
+    client.ssl_skt.close()  # force client socket close
+    # wait for another keepalive exchange
     time.sleep(defaults.AUTH_KEEP_ALIVE_INTERVAL)
     client.stop()
+    # client.stop() tries to close the auth SSL socket
+    # if not alive anymore, this will raise an exception
+    # therefore the test will fail
 
 
 def test_successful_stop():
