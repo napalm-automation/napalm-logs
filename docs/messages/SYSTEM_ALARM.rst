@@ -22,31 +22,33 @@ Example:
 		  "component": {
 			"FPC 0": {
 			  "state": {
-				"alarm-reason": "FPC 0 Major Errors",
+				"alarm-reason": "Major Errors",
 				"alarm-state": 3
 			  },
 			  "name": "FPC 0",
-			  "class": "CHASSIS"
+			  "class": "class"
 			}
 		  }
 		}
 	  },
 	  "message_details": {
-		"processId": "2449",
+		"processId": "2411",
 		"hostPrefix": null,
-		"pri": "29",
+		"pri": "28",
 		"processName": "alarmd",
 		"host": "vmx01",
 		"tag": "Alarm set",
-		"time": "23:04:13",
-		"date": "Jul  8",
+		"time": "13:13:16",
+		"date": "Jul 17",
 		"message": "FPC color=RED, class=CHASSIS, reason=FPC 0 Major Errors"
 	  },
-	  "timestamp": "1499551453",
+	  "timestamp": 1500293596,
+	  "facility": 3,
 	  "ip": "127.0.0.1",
 	  "host": "vmx01",
 	  "yang_model": "ietf-hardware",
-	  "error": "SYSTEM_ALARM",
-	  "os": "junos"
+	  "error": "SYSTEM_ALARM_FPC",
+	  "os": "junos",
+	  "severity": 4
 	}
 

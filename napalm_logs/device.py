@@ -237,6 +237,10 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             timestamp = self._format_time(msg_dict.get('time', ''),
                                           msg_dict.get('date', ''),
                                           prefix_id)
+            # The pri has to be an int as it is retrived using regex '\<(\d+)\>' in server.py
+            priority = int(msg_dict.get('pri', 0))
+            facility = priority / 8
+            severity = priority - (facility * 8)
             kwargs = self._parse(msg_dict)
             if not kwargs:
                 # Unable to identify what model to generate for the message in cause.
@@ -249,7 +253,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                         'message_details': msg_dict,
                         'os': self._name,
                         'error': 'RAW',
-                        'model_name': 'raw'
+                        'model_name': 'raw',
+                        'facility': facility,
+                        'severity': severity
                     }
                     log.debug('Queueing to be published:')
                     log.debug(to_publish)
@@ -276,7 +282,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'yang_message': yang_obj,
                 'message_details': msg_dict,
                 'yang_model': model_name,
-                'os': self._name
+                'os': self._name,
+                'facility': facility,
+                'severity': severity
             }
             log.debug('Queueing to be published:')
             log.debug(to_publish)

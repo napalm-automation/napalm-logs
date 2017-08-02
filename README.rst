@@ -15,53 +15,58 @@ Will produce the following object:
 
 .. code-block:: json
 
-  {
-    "ip": "172.17.17.1",
-    "host": "edge01.bjm01",
-    "message_details": {
-      "processId": "15852",
-      "error": "BGP_PREFIX_THRESH_EXCEEDED",
-      "pri": "149",
-      "processName": "rpd",
-      "host": "edge01.bjm01",
-      "time": "12:45:19",
-      "date": "Mar 30",
-      "message": "1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)"
-    },
-    "open_config": {
-      "bgp": {
-        "neighbors": {
-          "neighbor": {
-            "1.2.3.4": {
-              "neighbor-address": "1.2.3.4",
-              "state": {
-                "peer-as": 15169
-              },
-              "afi-safis": {
-                "afi-safi": {
-                  "inet": {
-                    "state": {
-                      "prefixes": {
-                        "received": 181
-                      }
-                    },
-                    "ipv4-unicast": {
-                      "prefix-limit": {
-                        "state": {
-                          "max-prefixes": 160
-                        }
-                      }
-                    },
-                    "afi-safi-name": "inet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "timestamp": "1490877919"
+	{
+	  "yang_message": {
+		"bgp": {
+		  "neighbors": {
+			"neighbor": {
+			  "192.168.140.254": {
+				"state": {
+				  "peer_as": "65001"
+				},
+				"afi_safis": {
+				  "afi_safi": {
+					"inet4": {
+					  "state": {
+						"prefixes": {
+						  "received": "141"
+						}
+					  },
+					  "ipv4_unicast": {
+						"prefix_limit": {
+						  "state": {
+							"max_prefixes": "140"
+						  }
+						}
+					  }
+					}
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  },
+	  "message_details": {
+		"processId": "2902",
+		"hostPrefix": null,
+		"pri": "149",
+		"processName": "rpd",
+		"host": "vmx01",
+		"tag": "BGP_PREFIX_THRESH_EXCEEDED",
+		"time": "14:03:12",
+		"date": "Jun 21",
+		"message": "192.168.140.254 (External AS 65001): Configured maximum prefix-limit threshold(140) exceeded for inet4-unicast nlri: 141 (instance master)"
+	  },
+	  "timestamp": 1498050192,
+	  "facility": 18,
+	  "ip": "127.0.0.1",
+	  "host": "vmx01",
+	  "yang_model": "openconfig_bgp",
+	  "error": "BGP_PREFIX_THRESH_EXCEEDED",
+	  "os": "junos",
+	  "severity": 5
+	}
   }
 
 
