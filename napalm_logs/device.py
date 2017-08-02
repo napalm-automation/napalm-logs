@@ -237,10 +237,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             timestamp = self._format_time(msg_dict.get('time', ''),
                                           msg_dict.get('date', ''),
                                           prefix_id)
-            # The pri has to be an int as it is retrived using regex '\<(\d+)\>' in server.py
-            priority = int(msg_dict.get('pri', 0))
-            facility = priority / 8
-            severity = priority - (facility * 8)
+            facility = msg_dict.get('facility')
+            severity = msg_dict.get('severity')
+
             kwargs = self._parse(msg_dict)
             if not kwargs:
                 # Unable to identify what model to generate for the message in cause.
