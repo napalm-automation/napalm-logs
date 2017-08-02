@@ -149,6 +149,11 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 # Remove whitespace from the start or end of the message
                 ret['__prefix_id__'] = prefix_id
                 ret['message'] = ret['message'].strip()
+
+                # The pri has to be an int as it is retrived using regex '\<(\d+)\>'
+                if 'pri' in ret:
+                    ret['facility'] = int(ret['pri']) / 8
+                    ret['severity'] = int(ret['pri']) - (ret['facility'] * 8)
                 # TODO Should we stop searching and just return, or should we return all matches OS?
                 return dev_os, ret
             log.debug('No prefix matched under %s', dev_os)
