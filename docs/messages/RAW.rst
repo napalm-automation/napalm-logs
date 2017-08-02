@@ -41,5 +41,7 @@ Example:
     "timestamp": 1499682723,
     "os": "junos",
     "model_name": "raw",
-    "error": "RAW"
+    "error": "RAW",
+    "facility": 4,
+    "severity": 5
   }

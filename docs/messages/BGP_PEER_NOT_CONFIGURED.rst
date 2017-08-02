@@ -15,10 +15,24 @@ Example:
 .. code-block:: json
 
 	{
+	  "yang_message": {
+		"bgp": {
+		  "neighbors": {
+			"neighbor": {
+			  "1.2.3.4": {
+				"state": {
+				  "session_state": "ACTIVE",
+				  "peer_as": "1234"
+				}
+			  }
+			}
+		  }
+		}
+	  },
 	  "message_details": {
 		"processId": "1848",
 		"hostPrefix": null,
-		"pri": "28",
+		"pri": "87",
 		"processName": "rpd",
 		"host": "vmx01",
 		"tag": "bgp_read_message",
@@ -26,26 +40,13 @@ Example:
 		"date": "Jul  5",
 		"message": "2764: NOTIFICATION received from 1.2.3.4 (External AS 1234): code 6 (Cease) subcode 5 (Connection Rejected)"
 	  },
-	  "open_config": {
-		"bgp": {
-		  "neighbors": {
-			"neighbor": {
-			  "1.2.3.4": {
-				"state": {
-				  "session_state": "ACTIVE",
-				  "peer_as": 1234
-				},
-				"neighbor_address": "1.2.3.4"
-			  }
-			}
-		  }
-		}
-	  },
-	  "ip": "127.0.0.1",
-	  "error": "BGP_PEER_NOT_CONFIGURED",
-	  "host": "vmx01",
 	  "timestamp": 1499230364,
+	  "facility": 10,
+	  "ip": "127.0.0.1",
+	  "host": "vmx01",
+	  "yang_model": "openconfig_bgp",
+	  "error": "BGP_PEER_NOT_CONFIGURED",
 	  "os": "junos",
-	  "model_name": "openconfig_bgp"
+	  "severity": 7
 	}
 
