@@ -151,7 +151,7 @@ def test_config(os_name, error_name, test_case):
     deserialised_zmq_msg = napalm_logs.utils.unserialize(zmq_msg)
     log.debug('Received from the napalm-logs daemon:')
     log.debug(deserialised_zmq_msg)
-    assert DeepDiff(struct_yang_message, deserialised_zmq_msg)
+    assert struct_yang_message == json.loads(json.dumps(deserialised_zmq_msg))
 
 
 def test_napalm_logs_shut():
