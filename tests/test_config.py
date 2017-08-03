@@ -158,6 +158,7 @@ def test_napalm_logs_shut():
     '''
     Shutdown the napalm-logs engine.
     '''
+    NL_BASE.stop_engine()
     assert NL_PROC.is_alive()
     NL_PROC.terminate()
     NL_PROC.join()
