@@ -14,6 +14,7 @@ import socket
 import logging
 import threading
 import collections
+from datetime import datetime
 
 # Import python stdlib
 import umsgpack
@@ -163,7 +164,7 @@ def unserialize(binary):
     return umsgpack.unpackb(binary)
 
 
-def extract(rgx, msg, mapping):
+def extract(rgx, msg, mapping, time_format=None):
     ret = {}
     log.debug('Matching regex "%s" on "%s"', rgx, msg)
     matched = re.search(rgx, msg, re.I)
@@ -178,6 +179,11 @@ def extract(rgx, msg, mapping):
             group_index += 1
         log.debug('Regex matched')
         log.debug(ret)
+    if time_format:
+        try:
+            ret['timestamp'] = int(datetime.strptime(time_format[0].format(**ret), time_format[1]).strftime('%s'))
+        except ValueError as error:
+            log.error('Unable to convert date and time into a timestamp: %s', error)
     return ret
 
 
