@@ -3,22 +3,19 @@
     "bgp": {
       "neighbors": {
         "neighbor": {
-          "192.168.140.254": {
-            "state": {
-              "peer_as": "4230"
-            },
+          "1.2.3.4": {
             "afi_safis": {
               "afi_safi": {
-                "inet4": {
+                "inet": {
                   "state": {
                     "prefixes": {
-                      "received": "141"
+                      "received": "94106"
                     }
                   },
                   "ipv4_unicast": {
                     "prefix_limit": {
                       "state": {
-                        "max_prefixes": "140"
+                        "max_prefixes": "125000"
                       }
                     }
                   }
@@ -31,20 +28,22 @@
     }
   },
   "message_details": {
-    "processId": "2902",
-    "hostPrefix": null,
+    "processId": "1051",
+    "time": "15:08:30.941",
     "pri": "149",
-    "processName": "rpd",
-    "host": "vmx01",
-    "tag": "BGP_PREFIX_THRESH_EXCEEDED",
-    "time": "14:03:12",
-    "date": "Jun 21",
-    "message": "192.168.140.254 (External AS 4230): Configured maximum prefix-limit threshold(140) exceeded for inet4-unicast nlri: 141 (instance master)"
+    "nodeId": "RP/0/RSP1/CPU0",
+    "processName": "bgp",
+    "host": "vmx01 ",
+    "tag": "ROUTING-BGP-5-MAXPFX",
+    "messageId": "2647599",
+    "date": "Mar 28",
+    "timeZone": "UTC",
+    "message": ": No. of IPv4 Unicast prefixes received from 1.2.3.4 has reached 94106, max 125000"
   },
-  "timestamp": 1498050192,
+  "timestamp": 1501769997,
   "ip": "127.0.0.1",
-  "host": "vmx01",
+  "host": "vmx01 ",
   "yang_model": "openconfig_bgp",
   "error": "BGP_PREFIX_THRESH_EXCEEDED",
-  "os": "junos"
+  "os": "iosxr"
 }

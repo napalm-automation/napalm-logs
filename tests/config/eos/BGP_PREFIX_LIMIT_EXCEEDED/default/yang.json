@@ -1,0 +1,31 @@
+{
+  "yang_message": {
+    "bgp": {
+      "neighbors": {
+        "neighbor": {
+          "194.53.172.97": {
+            "state": {
+              "session_state": "IDLE",
+              "peer_as": "2611"
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "pri": "149",
+    "processName": "Rib",
+    "host": "edge01",
+    "tag": "BGP-3-NOTIFICATION",
+    "time": "11:04:17",
+    "date": "Apr 16",
+    "message": ": received from neighbor 194.53.172.97 (AS 2611) 6/1 (Cease/maximum number of prefixes reached) 0 bytes"
+  },
+  "timestamp": 1492337057,
+  "ip": "127.0.0.1",
+  "host": "edge01",
+  "yang_model": "openconfig_bgp",
+  "error": "BGP_PREFIX_LIMIT_EXCEEDED",
+  "os": "eos"
+}

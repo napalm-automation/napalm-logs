@@ -1,0 +1,33 @@
+{
+  "yang_message": {
+    "hardware-state": {
+      "component": {
+        "supply": {
+          "state": {
+            "alarm-reason": "PEM 1 Fan Failed",
+            "alarm-state": 4
+          },
+          "name": "supply",
+          "class": "CHASSIS"
+        }
+      }
+    }
+  },
+  "message_details": {
+    "processId": "2449",
+    "hostPrefix": null,
+    "pri": "28",
+    "processName": "alarmd",
+    "host": "vmx01",
+    "tag": "Alarm set",
+    "time": "23:04:13",
+    "date": "Jul  8",
+    "message": "Pwr supply color=YELLOW, class=CHASSIS, reason=PEM 1 Fan Failed"
+  },
+  "timestamp": 1499551453,
+  "ip": "127.0.0.1",
+  "host": "vmx01",
+  "yang_model": "ietf-hardware",
+  "error": "SYSTEM_ALARM",
+  "os": "junos"
+}

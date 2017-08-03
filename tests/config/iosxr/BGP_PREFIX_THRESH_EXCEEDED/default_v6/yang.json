@@ -1,0 +1,49 @@
+{
+  "yang_message": {
+    "bgp": {
+      "neighbors": {
+        "neighbor": {
+          "fc00::1001": {
+            "afi_safis": {
+              "afi_safi": {
+                "inet6": {
+                  "ipv6_unicast": {
+                    "prefix_limit": {
+                      "state": {
+                        "max_prefixes": "125000"
+                      }
+                    }
+                  },
+                  "state": {
+                    "prefixes": {
+                      "received": "94106"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "processId": "1051",
+    "time": "15:08:30.941",
+    "pri": "149",
+    "nodeId": "RP/0/RSP1/CPU0",
+    "processName": "bgp",
+    "host": "vmx01 ",
+    "tag": "ROUTING-BGP-5-MAXPFX",
+    "messageId": "2647599",
+    "date": "Mar 28",
+    "timeZone": "UTC",
+    "message": ": No. of IPv6 Unicast prefixes received from fc00::1001 has reached 94106, max 125000"
+  },
+  "timestamp": 1501770360,
+  "ip": "127.0.0.1",
+  "host": "vmx01 ",
+  "yang_model": "openconfig_bgp",
+  "error": "BGP_PREFIX_THRESH_EXCEEDED",
+  "os": "iosxr"
+}
