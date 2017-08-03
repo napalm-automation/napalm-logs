@@ -29,5 +29,6 @@ class NapalmLogsProc:
             except OSError:
                 # Forcibly exit
                 # Regular sys.exit raises an exception
+                self.stop()
                 log.warning('The parent is not alive, exiting.')
                 os._exit(999)
