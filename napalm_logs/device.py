@@ -235,7 +235,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             host = msg_dict.get('host')
             prefix_id = msg_dict.pop('__prefix_id__')
             if 'timestamp' in msg_dict:
-                timestamp = msg_dict['timestamp']
+                timestamp = msg_dict.pop('timestamp')
             else:
                 timestamp = self._format_time(msg_dict.get('time', ''),
                                               msg_dict.get('date', ''),
