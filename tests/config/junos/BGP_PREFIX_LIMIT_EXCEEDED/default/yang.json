@@ -43,7 +43,7 @@
     "date": "Jul 20",
     "message": "192.168.140.254 (External AS 65001): Configured maximum prefix-limit(27) exceeded for inet-unicast nlri: 28 (instance master)"
   },
-  "timestamp": 1500583297,
+  "timestamp": 1500586897,
   "facility": 3,
   "ip": "127.0.0.1",
   "host": "vmx01",

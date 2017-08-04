@@ -24,7 +24,7 @@
     "date": "Jul 20",
     "message": "ifIndex 502, ifAdminStatus down(2), ifOperStatus down(2), ifName xe-0/0/0"
   },
-  "timestamp": 1500583559,
+  "timestamp": 1500587159,
   "facility": 3,
   "ip": "127.0.0.1",
   "host": "vmx01",

@@ -26,7 +26,7 @@
     "date": "Jul  8",
     "message": "Pwr supply color=YELLOW, class=CHASSIS, reason=PEM 1 Fan Failed"
   },
-  "timestamp": 1499551453,
+  "timestamp": 1499555053,
   "facility": 3,
   "ip": "127.0.0.1",
   "host": "vmx01",

@@ -24,7 +24,7 @@
     "date": "Apr 16",
     "message": ": received from neighbor 194.53.172.97 (AS 2611) 6/1 (Cease/maximum number of prefixes reached) 0 bytes"
   },
-  "timestamp": 1492337057,
+  "timestamp": 1492340657,
   "facility": 18,
   "ip": "127.0.0.1",
   "host": "edge01",

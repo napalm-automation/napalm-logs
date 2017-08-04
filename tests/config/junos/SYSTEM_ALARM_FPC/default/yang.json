@@ -2,13 +2,13 @@
   "yang_message": {
     "hardware-state": {
       "component": {
-        "FPC 0": {
+        "FPC": {
           "state": {
-            "alarm-reason": "Major Errors",
+            "alarm-reason": "FPC 0 Major Errors",
             "alarm-state": 3
           },
-          "name": "FPC 0",
-          "class": "class"
+          "name": "FPC",
+          "class": "CHASSIS"
         }
       }
     }
@@ -26,7 +26,7 @@
     "date": "Jul  8",
     "message": "FPC color=RED, class=CHASSIS, reason=FPC 0 Major Errors"
   },
-  "timestamp": 1499551453,
+  "timestamp": 1499555053,
   "facility": 3,
   "ip": "127.0.0.1",
   "host": "vmx01",
