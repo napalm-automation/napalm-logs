@@ -184,7 +184,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         if not time or not date or not time_format:
             return int(datetime.now().strftime('%s'))
         # Most syslog do not include the year, so we will add the current year if we are not supplied with one
-        if '%y' in date or '%Y' in date:
+        if '%y' in time_format or '%Y' in time_format:
             timestamp = datetime.strptime('{} {}'.format(date, time), time_format)
         else:
             year = datetime.now().year
@@ -234,9 +234,12 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             # From here on, we're running in a regular OS sub-process.
             host = msg_dict.get('host')
             prefix_id = msg_dict.pop('__prefix_id__')
-            timestamp = self._format_time(msg_dict.get('time', ''),
-                                          msg_dict.get('date', ''),
-                                          prefix_id)
+            if 'timestamp' in msg_dict:
+                timestamp = msg_dict['timestamp']
+            else:
+                timestamp = self._format_time(msg_dict.get('time', ''),
+                                              msg_dict.get('date', ''),
+                                              prefix_id)
             facility = msg_dict.get('facility')
             severity = msg_dict.get('severity')
 
