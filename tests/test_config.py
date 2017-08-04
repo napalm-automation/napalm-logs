@@ -14,7 +14,6 @@ from multiprocessing import Process
 # Import third party lib
 import zmq
 import pytest
-from deepdiff import DeepDiff
 
 # Import napalm-logs pkgs
 import napalm_logs.config
