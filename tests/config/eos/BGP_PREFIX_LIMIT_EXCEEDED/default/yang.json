@@ -14,6 +14,8 @@
     }
   },
   "message_details": {
+    "severity": 5,
+    "facility": 18,
     "pri": "149",
     "processName": "Rib",
     "host": "edge01",
@@ -23,9 +25,11 @@
     "message": ": received from neighbor 194.53.172.97 (AS 2611) 6/1 (Cease/maximum number of prefixes reached) 0 bytes"
   },
   "timestamp": 1492337057,
+  "facility": 18,
   "ip": "127.0.0.1",
   "host": "edge01",
   "yang_model": "openconfig_bgp",
   "error": "BGP_PREFIX_LIMIT_EXCEEDED",
-  "os": "eos"
+  "os": "eos",
+  "severity": 5
 }

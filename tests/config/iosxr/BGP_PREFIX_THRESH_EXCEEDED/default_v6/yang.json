@@ -29,7 +29,9 @@
   },
   "message_details": {
     "processId": "1051",
-    "time": "15:08:30.941",
+    "severity": 5,
+    "facility": 18,
+    "time": "15:08:30",
     "pri": "149",
     "nodeId": "RP/0/RSP1/CPU0",
     "processName": "bgp",
@@ -38,12 +40,15 @@
     "messageId": "2647599",
     "date": "Mar 28",
     "timeZone": "UTC",
-    "message": ": No. of IPv6 Unicast prefixes received from fc00::1001 has reached 94106, max 125000"
+    "message": ": No. of IPv6 Unicast prefixes received from fc00::1001 has reached 94106, max 125000",
+    "milliseconds": ".941"
   },
-  "timestamp": 1501770360,
+  "timestamp": 1490710110,
+  "facility": 18,
   "ip": "127.0.0.1",
   "host": "vmx01 ",
   "yang_model": "openconfig_bgp",
   "error": "BGP_PREFIX_THRESH_EXCEEDED",
-  "os": "iosxr"
+  "os": "iosxr",
+  "severity": 5
 }

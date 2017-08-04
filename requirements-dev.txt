@@ -1,7 +1,6 @@
 -r requirements.txt
 pytest
 pylama
-deepdiff
 coveralls
 pytest-cov
 pytest-json

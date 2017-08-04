@@ -13,6 +13,8 @@
   },
   "message_details": {
     "processId": "2424",
+    "severity": 4,
+    "facility": 3,
     "hostPrefix": null,
     "pri": "28",
     "processName": "mib2d",
@@ -23,9 +25,11 @@
     "message": "ifIndex 502, ifAdminStatus down(2), ifOperStatus down(2), ifName xe-0/0/0"
   },
   "timestamp": 1500583559,
+  "facility": 3,
   "ip": "127.0.0.1",
   "host": "vmx01",
   "yang_model": "openconfig_interfaces",
   "error": "INTERFACE_DOWN",
-  "os": "junos"
+  "os": "junos",
+  "severity": 4
 }

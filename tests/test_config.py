@@ -7,6 +7,7 @@ from __future__ import absolute_import
 # Import python std lib
 import os
 import json
+import time
 import socket
 import logging
 from multiprocessing import Process
@@ -61,6 +62,7 @@ def startup_local_client():
     '''
     Startup a local ZMQ client to receive the published messages.
     '''
+    time.sleep(0.1)
     global TEST_CLIENT
     context = zmq.Context()
     TEST_CLIENT = context.socket(zmq.SUB)
@@ -68,7 +70,7 @@ def startup_local_client():
         addr=NAPALM_LOGS_TEST_PUB_ADDR,
         port=NAPALM_LOGS_TEST_PUB_PORT)
     )
-    TEST_CLIENT.setsockopt(zmq.SUBSCRIBE, b'')
+    TEST_CLIENT.setsockopt(zmq.SUBSCRIBE, '')
 
 
 # Startup the local ZMQ client.
@@ -145,7 +147,6 @@ def test_config(os_name, error_name, test_case):
     log.debug(struct_yang_message)
     log.debug('Sending the raw message to the napalm-logs daemon')
     TEST_SKT.sendto(raw_message.strip(), (NAPALM_LOGS_TEST_ADDR, NAPALM_LOGS_TEST_PORT))
-    log.debug('Waiting fro napalm-logs reply:')
     zmq_msg = TEST_CLIENT.recv()
     deserialised_zmq_msg = napalm_logs.utils.unserialize(zmq_msg)
     log.debug('Received from the napalm-logs daemon:')
