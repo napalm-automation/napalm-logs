@@ -22,7 +22,7 @@
     "timeZone": "UTC",
     "message": "pam_unix(dcos_sshd:session): session opened for user luke by (uid=0) - dcos_sshd[12977]"
   },
-  "timestamp": 1501249366,
+  "timestamp": 1501252966,
   "facility": 23,
   "ip": "127.0.0.1",
   "host": "sw01.pdx01",
