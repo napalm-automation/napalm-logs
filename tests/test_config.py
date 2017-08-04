@@ -62,7 +62,7 @@ def startup_local_client():
     '''
     Startup a local ZMQ client to receive the published messages.
     '''
-    time.sleep(0.1)
+    time.sleep(2)
     global TEST_CLIENT
     context = zmq.Context()
     TEST_CLIENT = context.socket(zmq.SUB)
