@@ -32,6 +32,8 @@
   },
   "message_details": {
     "processId": "2902",
+    "severity": 5,
+    "facility": 18,
     "hostPrefix": null,
     "pri": "149",
     "processName": "rpd",
@@ -42,9 +44,11 @@
     "message": "192.168.140.254 (External AS 4230): Configured maximum prefix-limit threshold(140) exceeded for inet4-unicast nlri: 141 (instance master)"
   },
   "timestamp": 1498050192,
+  "facility": 18,
   "ip": "127.0.0.1",
   "host": "vmx01",
   "yang_model": "openconfig_bgp",
   "error": "BGP_PREFIX_THRESH_EXCEEDED",
-  "os": "junos"
+  "os": "junos",
+  "severity": 5
 }

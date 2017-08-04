@@ -32,6 +32,8 @@
   },
   "message_details": {
     "processId": "2965",
+    "severity": 4,
+    "facility": 3,
     "hostPrefix": null,
     "pri": "28",
     "processName": "rpd",
@@ -42,9 +44,11 @@
     "message": "192.168.140.254 (External AS 65001): Configured maximum prefix-limit(27) exceeded for inet-unicast nlri: 28 (instance master)"
   },
   "timestamp": 1500583297,
+  "facility": 3,
   "ip": "127.0.0.1",
   "host": "vmx01",
   "yang_model": "openconfig_bgp",
   "error": "BGP_PREFIX_LIMIT_EXCEEDED",
-  "os": "junos"
+  "os": "junos",
+  "severity": 4
 }

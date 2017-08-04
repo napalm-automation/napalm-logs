@@ -70,7 +70,7 @@ def startup_local_client():
         addr=NAPALM_LOGS_TEST_PUB_ADDR,
         port=NAPALM_LOGS_TEST_PUB_PORT)
     )
-    TEST_CLIENT.setsockopt(zmq.SUBSCRIBE, '')
+    TEST_CLIENT.setsockopt(zmq.SUBSCRIBE, b'')
 
 
 # Startup the local ZMQ client.

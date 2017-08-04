@@ -14,6 +14,8 @@
   },
   "message_details": {
     "processId": null,
+    "severity": 4,
+    "facility": 0,
     "hostPrefix": null,
     "pri": "4",
     "processName": "kernel",
@@ -24,9 +26,11 @@
     "message": "Packet from 192.168.140.254:61664 wrong MD5 digest"
   },
   "timestamp": 1500582180,
+  "facility": 0,
   "ip": "127.0.0.1",
   "host": "vmx01",
   "yang_model": "openconfig_bgp",
   "error": "BGP_MD5_INCORRECT",
-  "os": "junos"
+  "os": "junos",
+  "severity": 4
 }

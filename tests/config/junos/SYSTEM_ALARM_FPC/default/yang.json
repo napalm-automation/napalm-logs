@@ -15,6 +15,8 @@
   },
   "message_details": {
     "processId": "2449",
+    "severity": 4,
+    "facility": 3,
     "hostPrefix": null,
     "pri": "28",
     "processName": "alarmd",
@@ -25,9 +27,11 @@
     "message": "FPC color=RED, class=CHASSIS, reason=FPC 0 Major Errors"
   },
   "timestamp": 1499551453,
+  "facility": 3,
   "ip": "127.0.0.1",
   "host": "vmx01",
   "yang_model": "ietf-hardware",
   "error": "SYSTEM_ALARM_FPC",
-  "os": "junos"
+  "os": "junos",
+  "severity": 4
 }
