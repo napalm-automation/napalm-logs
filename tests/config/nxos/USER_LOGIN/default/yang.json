@@ -1,0 +1,33 @@
+{
+  "yang_message": {
+    "users": {
+      "user": {
+        "luke": {
+          "action": {
+            "login": true
+          },
+          "uid": 0
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 6,
+    "facility": 23,
+    "pri": "190",
+    "host": "sw01.pdx01",
+    "tag": "AUTHPRIV-6-SYSTEM_MSG",
+    "time": "14:42:46",
+    "date": "2017 Jul 28",
+    "timeZone": "UTC",
+    "message": "pam_unix(dcos_sshd:session): session opened for user luke by (uid=0) - dcos_sshd[12977]"
+  },
+  "timestamp": 1501249366,
+  "facility": 23,
+  "ip": "127.0.0.1",
+  "host": "sw01.pdx01",
+  "yang_model": "NO_MODEL",
+  "error": "USER_LOGIN",
+  "os": "nxos",
+  "severity": 6
+}
