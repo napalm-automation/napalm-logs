@@ -2,12 +2,12 @@
   "yang_message": {
     "hardware-state": {
       "component": {
-        "FPC": {
+        "FPC 0": {
           "state": {
-            "alarm-reason": "FPC 0 Major Errors",
+            "alarm-reason": "Major Errors",
             "alarm-state": 3
           },
-          "name": "FPC",
+          "name": "FPC 0",
           "class": "CHASSIS"
         }
       }

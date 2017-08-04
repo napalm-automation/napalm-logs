@@ -200,9 +200,10 @@ def extract(rgx, msg, mapping, time_format=None):
         log.debug(ret)
     if time_format:
         try:
-            ret['timestamp'] = int(datetime.strptime(time_format[0].format(**ret), time_format[1]).strftime('%s'))
+            parsed_time = datetime.strptime(time_format[0].format(**ret), time_format[1])
         except ValueError as error:
             log.error('Unable to convert date and time into a timestamp: %s', error)
+        ret['timestamp'] = int((parsed_time - datetime(1970, 1, 1)).total_seconds())
     return ret
 
 

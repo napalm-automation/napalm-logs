@@ -17,7 +17,7 @@ messages:
         hardware-state//component//{component}//state//alarm-state: color
         hardware-state//component//{component}//state//alarm-reason: reason
       static:
-        hardware-state//component//{component}//class: class
+        hardware-state//component//{component}//class: CHASSIS
 # The following is a general catch all for system alarms, if you would like to
 # add more specif matches please do so above this comment
   - error: SYSTEM_ALARM

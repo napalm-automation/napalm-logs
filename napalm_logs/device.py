@@ -184,14 +184,12 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         if not time or not date or not time_format:
             return int(datetime.now().strftime('%s'))
         # Most syslog do not include the year, so we will add the current year if we are not supplied with one
-        if '%z' not in time_format and '%Z' not in time_format:
-            time_format = '{} %Z'.format(time_format)
         if '%y' in time_format or '%Y' in time_format:
-            timestamp = datetime.strptime('{} {} {}'.format(date, time, timezone), time_format)
+            parsed_time = datetime.strptime('{} {}'.format(date, time), time_format)
         else:
             year = datetime.now().year
-            timestamp = datetime.strptime('{} {} {} {}'.format(year, date, time, timezone), '%Y {}'.format(time_format))
-        return int(timestamp.strftime('%s'))
+            parsed_time = datetime.strptime('{} {} {}'.format(year, date, time), '%Y {}'.format(time_format))
+        return int((parsed_time - datetime(1970, 1, 1)).total_seconds())
 
     def start(self):
         '''
