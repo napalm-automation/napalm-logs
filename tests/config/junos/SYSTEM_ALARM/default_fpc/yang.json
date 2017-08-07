@@ -31,7 +31,7 @@
   "ip": "127.0.0.1",
   "host": "vmx01",
   "yang_model": "ietf-hardware",
-  "error": "SYSTEM_ALARM_FPC",
+  "error": "SYSTEM_ALARM",
   "os": "junos",
   "severity": 4
 }
