@@ -146,8 +146,7 @@ def test_config(os_name, error_name, test_case):
     log.debug('Struct YANG message:')
     log.debug(struct_yang_message)
     log.debug('Sending the raw message to the napalm-logs daemon')
-    TEST_SKT.sendto(napalm_logs.ext.six.binary_type(raw_message.strip().encode('utf-8')),
-                    (NAPALM_LOGS_TEST_ADDR, NAPALM_LOGS_TEST_PORT))
+    TEST_SKT.sendto(raw_message.strip(), (NAPALM_LOGS_TEST_ADDR, NAPALM_LOGS_TEST_PORT))
     zmq_msg = TEST_CLIENT.recv()
     deserialised_zmq_msg = napalm_logs.utils.unserialize(zmq_msg)
     log.debug('Received from the napalm-logs daemon:')
