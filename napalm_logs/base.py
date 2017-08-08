@@ -25,12 +25,12 @@ import nacl.encoding
 # Import napalm-logs pkgs
 import napalm_logs.utils
 import napalm_logs.config as CONFIG
-from napalm_logs.listener import get_listener
 # processes
 from napalm_logs.auth import NapalmLogsAuthProc
 from napalm_logs.device import NapalmLogsDeviceProc
 from napalm_logs.server import NapalmLogsServerProc
 from napalm_logs.publisher import NapalmLogsPublisherProc
+from napalm_logs.listener_proc import NapalmLogsListenerProc
 # exceptions
 from napalm_logs.exceptions import ConfigurationException
 
@@ -74,7 +74,7 @@ class NapalmLogs:
         '''
         self.address = address
         self.port = port
-        self.listener = listener
+        self.listener_type = listener
         self.publish_address = publish_address
         self.publish_port = publish_port
         self.auth_address = auth_address
@@ -426,7 +426,6 @@ class NapalmLogs:
                                   sgn_verify_hex,
                                   self.auth_address,
                                   self.auth_port)
-        auth.verify_cert()
         proc = Process(target=auth.start)
         proc.start()
         log.debug('Started auth process as %s with PID %s', proc._name, proc.pid)
@@ -438,8 +437,11 @@ class NapalmLogs:
         '''
         log.debug('Starting the listener process')
         # Get the correct listener class
-        listener_class = get_listener(self.listener)
-        listener = listener_class(self.address, self.port, pipe, **self.listener_opts)
+        listener = NapalmLogsListenerProc(self.address,
+                                          self.port,
+                                          self.listener_type,
+                                          pipe,
+                                          listener_opts=self.listener_opts)
         proc = Process(target=listener.start)
         proc.start()
         log.debug('Started listener process as %s with PID %s', proc._name, proc.pid)

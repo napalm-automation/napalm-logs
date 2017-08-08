@@ -2,10 +2,9 @@
 '''
 napalm-logs listener base.
 '''
-from napalm_logs.proc import NapalmLogsProc
 
 
-class ListenerBase(NapalmLogsProc):
+class ListenerBase:
     '''
     The base class for the listener.
     '''
@@ -13,10 +12,20 @@ class ListenerBase(NapalmLogsProc):
         pass
 
     def start(self):
+        '''
+        Starts the listener.
+        '''
         pass
 
-    def publish(self, obj):
+    def receive(self):
+        '''
+        Return an object read from the source,
+        and the location identification object.
+        '''
         pass
 
     def stop(self):
+        '''
+        Shuts down the listener.
+        '''
         pass
