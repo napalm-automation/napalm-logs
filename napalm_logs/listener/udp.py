@@ -16,6 +16,7 @@ import logging
 from napalm_logs.config import BUFFER_SIZE
 from napalm_logs.listener.base import ListenerBase
 # exceptions
+from napalm_logs.exceptions import BindException
 from napalm_logs.exceptions import ListenerException
 
 log = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ class UDPListener(ListenerBase):
         except socket.error as msg:
             error_string = 'Unable to bind to port {} on {}: {}'.format(self.port, self.address, msg)
             log.error(error_string, exc_info=True)
-            raise ListenerException(error_string)
+            raise BindException(error_string)
 
     def receive(self):
         '''

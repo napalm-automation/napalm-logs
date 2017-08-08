@@ -13,6 +13,8 @@ import threading
 # Import napalm-logs pkgs
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.listener import get_listener
+from napalm_logs.exceptions import NapalmLogsExit
+from napalm_logs.exceptions import ListenerException
 
 log = logging.getLogger(__name__)
 
@@ -54,14 +56,18 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         # self._setup_ipc()
         log.debug('Using the %s listener', self._listener_type)
         self._setup_listener()
+        self.listener.start()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
-        self.listener.start()
         self.__up = True
         while self.__up:
-            log_message, log_source = self.listener.receive()
+            try:
+                log_message, log_source = self.listener.receive()
+            except ListenerException as lerr:
+                # Exit on listener exception.
+                raise NapalmLogsExit(lerr)
             log.debug('Received %s from %s. Queueing to the server.', log_message, log_source)
             self.pipe.send((log_message, log_source))
 

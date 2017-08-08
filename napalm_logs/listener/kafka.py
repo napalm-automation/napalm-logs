@@ -6,12 +6,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # Import stdlib
-import os
 import json
 import time
-import signal
 import logging
-import threading
 
 # Import third party libs
 try:
@@ -22,7 +19,6 @@ except ImportError as err:
 
 # Import napalm-logs pkgs
 from napalm_logs.listener.base import ListenerBase
-from napalm_logs.exceptions import NapalmLogsExit
 from napalm_logs.exceptions import ListenerException
 
 log = logging.getLogger(__name__)
@@ -32,62 +28,54 @@ class KafkaListener(ListenerBase):
     '''
     Kafka listener class.
     '''
-    def __init__(self, address, port, pipe, **kwargs):
-        self.pipe = pipe
-        self.__up = False
+    def __init__(self, address, port, **kwargs):
         if kwargs.get('address'):
             address = kwargs['address']
         if kwargs.get('port'):
-            address = kwargs['port']
-        if kwargs.get('bootstrap_servers'):
-            self.bootstrap_servers = kwargs['bootstrap_servers']
-        else:
-            self.bootstrap_servers = '{}:{}'.format(address, port)
-        self.kafka_topic = kwargs['kafka_topic']
-
-    def _exit_gracefully(self, signum, _):
-        log.debug('Caught signal in listener process')
-        self.stop()
+            port = kwargs['port']
+        self.bootstrap_servers = kwargs.get('bootstrap_servers',
+                                            '{}:{}'.format(address, port))
+        self.group_id = kwargs.get('group_id', 'napalm-logs')
+        self.topic = kwargs['kafka_topic']
 
     def start(self):
         '''
-        Start listening for messages
+        Startup the kafka consumer.
         '''
-        # Start suicide polling thread
-        thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
-        thread.start()
-        signal.signal(signal.SIGTERM, self._exit_gracefully)
-        self.__up = True
+        log.debug('Creating the consumer using the bootstrap servers: %s and the group ID: %s',
+                  self.bootstrap_servers,
+                  self.group_id)
         try:
             self.consumer = kafka.KafkaConsumer(bootstrap_servers=self.bootstrap_servers,
-                                                group_id='napalm-logs')
+                                                group_id=self.group_id)
         except kafka.errors.NoBrokersAvailable as err:
             log.error(err, exc_info=True)
             raise ListenerException(err)
-        self.consumer.subscribe(topics=[self.kafka_topic])
-        while self.__up:
-            try:
-                msg = next(self.consumer)
-            except ValueError as error:
-                if self.__up is False:
-                    return
-                else:
-                    msg = 'Received kafka error: {}'.format(error)
-                    log.error(msg, exc_info=True)
-                    raise NapalmLogsExit(msg)
-            log_source = msg.key
-            try:
-                decoded = json.loads(msg.value)
-            except ValueError:
-                log.error('Not in json format: %s', msg.value)
-                continue
-            log_message = decoded.get('message')
-            log.debug('[%s] Received %s from %s. Adding in the queue', log_message, log_source, time.time())
-            self.pipe.send((log_message, log_source))
+        log.debug('Subscribing to the %s topic', self.topic)
+        self.consumer.subscribe(topics=[self.topic])
+
+    def receive(self):
+        '''
+        Return the message received and the address.
+        '''
+        try:
+            msg = next(self.consumer)
+        except ValueError as error:
+            log.error('Received kafka error: %s', error, exc_info=True)
+            raise ListenerException(error)
+        log_source = msg.key
+        try:
+            decoded = json.loads(msg.value)
+        except ValueError:
+            log.error('Not in json format: %s', msg.value)
+        log_message = decoded.get('message')
+        log.debug('[%s] Received %s from %s', log_message, log_source, time.time())
+        return log_message, log_source
 
     def stop(self):
-        log.info('Stopping listener process')
-        self.__up = False
+        '''
+        Shutdown kafka consumer.
+        '''
+        log.info('Stopping te kafka listener class')
         self.consumer.unsubscribe()
         self.consumer.close()
-        self.pipe.close()
