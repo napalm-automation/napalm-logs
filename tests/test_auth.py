@@ -68,7 +68,9 @@ def test_client_auth_fail_server_down():
     Test client connect failure when server is not started yet.
     '''
     with pytest.raises(napalm_logs.exceptions.ClientConnectException):
-        client = ClientAuth('tests/auth/server.crt')  # noqa
+        client = ClientAuth('tests/auth/server.crt',  # noqa
+                            max_try=1,
+                            timeout=.1)
 
 
 def test_successful_start():
@@ -110,7 +112,9 @@ def test_client_auth_fail_wrong_port():
     assert AUTH_PROC.is_alive()
     with pytest.raises(napalm_logs.exceptions.ClientConnectException):
         client = ClientAuth('tests/auth/server.crt',
-                            port=1234)
+                            port=1234,
+                            max_try=1,
+                            timeout=.1)
         client.stop()
 
 
@@ -131,7 +135,9 @@ def test_client_keep_alive():
     the auth process.
     '''
     assert AUTH_PROC.is_alive()
-    client = ClientAuth('tests/auth/server.crt')
+    client = ClientAuth('tests/auth/server.crt',
+                        max_try=1,
+                        timeout=.1)
     time.sleep(.1)  # wait for the client socket
     client.ssl_skt.close()  # force client socket close
     # wait for another keepalive exchange
