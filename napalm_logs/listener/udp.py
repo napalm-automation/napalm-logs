@@ -74,6 +74,7 @@ class UDPListener(ListenerBase):
         while self.__up:
             try:
                 msg, addr = self.skt.recvfrom(BUFFER_SIZE)
+                msg.decode('utf-8')
             except socket.error as error:
                 if self.__up is False:
                     return

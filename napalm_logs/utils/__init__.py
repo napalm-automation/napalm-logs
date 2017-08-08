@@ -193,7 +193,7 @@ def extract(rgx, msg, mapping, time_format=None):
     else:
         group_index = 0
         for group_value in matched.groups():
-            group_name = mapping.keys()[group_index]
+            group_name = list(mapping.keys())[group_index]
             ret[group_name] = group_value
             group_index += 1
         log.debug('Regex matched')

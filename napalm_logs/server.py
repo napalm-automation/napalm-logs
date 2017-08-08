@@ -17,6 +17,7 @@ import threading
 import zmq
 
 # Import napalm-logs pkgs
+import napalm_logs.ext.six as six
 from napalm_logs.config import LST_IPC_URL
 from napalm_logs.config import DEV_IPC_URL_TPL
 from napalm_logs.config import UNKNOWN_DEVICE_NAME
@@ -152,8 +153,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
 
                 # The pri has to be an int as it is retrived using regex '\<(\d+)\>'
                 if 'pri' in ret:
-                    ret['facility'] = int(ret['pri']) / 8
-                    ret['severity'] = int(ret['pri']) - (ret['facility'] * 8)
+                    ret['facility'] = int(int(ret['pri']) / 8)
+                    ret['severity'] = int(int(ret['pri']) - (ret['facility'] * 8))
                 # TODO Should we stop searching and just return, or should we return all matches OS?
                 return dev_os, ret
             log.debug('No prefix matched under %s', dev_os)
@@ -204,7 +205,10 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     msg = 'Received IOError from server pipe: {}'.format(error)
                     log.error(msg, exc_info=True)
                     raise NapalmLogsExit(msg)
-            msg = msg.encode('utf8')
+            if six.PY3:
+                msg = str(msg, 'utf-8')
+            else:
+                msg = msg.encode('utf-8')
             log.debug('[%s] Dequeued message from %s: %s', address, msg, time.time())
             dev_os, msg_dict = self._identify_os(msg)
             log.debug('Identified OS: %s', dev_os)
