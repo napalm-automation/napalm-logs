@@ -37,7 +37,7 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         self.listener_opts = {} or listener_opts
 
     def _exit_gracefully(self, signum, _):
-        log.debug('Caught signal in publisher process')
+        log.debug('Caught signal in the listener process')
         self.stop()
 
     def _setup_listener(self):
@@ -69,9 +69,12 @@ class NapalmLogsListenerProc(NapalmLogsProc):
                 # Exit on listener exception.
                 raise NapalmLogsExit(lerr)
             log.debug('Received %s from %s. Queueing to the server.', log_message, log_source)
+            if not log_message:
+                log.info('Empty message received from %s. Not queueing to the server.', log_source)
+                continue
             self.pipe.send((log_message, log_source))
 
     def stop(self):
-        log.info('Stopping listener process')
+        log.info('Stopping the listener process')
         self.__up = False
         self.listener.stop()

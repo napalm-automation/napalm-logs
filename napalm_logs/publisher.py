@@ -111,7 +111,6 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                     msg = 'Received IOError on publisher pipe: {}'.format(error)
                     log.error(msg, exc_info=True)
                     raise NapalmLogsExit(msg)
-
             log.debug('Publishing the OC object (serialised)')
             if not self.disable_security:
                 bin_obj = self._prepare(obj)
