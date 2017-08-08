@@ -5,9 +5,8 @@ messages:
     tag: ROUTING-BGP-5-MAXPFX
     values:
       peer: (\d+\.\d+\.\d+\.\d+)
-      current: (\d+)
-      limit: (\d+)
-    replace: {}
+      current|int: (\d+)
+      limit|int: (\d+)
     line: 'No. of IPv4 Unicast prefixes received from {peer} has reached {current}, max {limit}'
     model: openconfig_bgp
     mapping:
@@ -19,9 +18,8 @@ messages:
     tag: ROUTING-BGP-5-MAXPFX
     values:
       peer: ([\w\d:]+)
-      current: (\d+)
-      limit: (\d+)
-    replace: {}
+      current|int: (\d+)
+      limit|int: (\d+)
     line: 'No. of IPv6 Unicast prefixes received from {peer} has reached {current}, max {limit}'
     model: openconfig_bgp
     mapping:

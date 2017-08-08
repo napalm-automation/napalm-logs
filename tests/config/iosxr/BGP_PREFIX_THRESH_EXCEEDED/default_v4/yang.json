@@ -9,13 +9,13 @@
                 "inet": {
                   "state": {
                     "prefixes": {
-                      "received": "94106"
+                      "received": 94106
                     }
                   },
                   "ipv4_unicast": {
                     "prefix_limit": {
                       "state": {
-                        "max_prefixes": "125000"
+                        "max_prefixes": 125000
                       }
                     }
                   }

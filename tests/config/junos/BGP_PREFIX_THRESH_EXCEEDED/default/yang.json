@@ -12,13 +12,13 @@
                 "inet4": {
                   "state": {
                     "prefixes": {
-                      "received": "141"
+                      "received": 141
                     }
                   },
                   "ipv4_unicast": {
                     "prefix_limit": {
                       "state": {
-                        "max_prefixes": "140"
+                        "max_prefixes": 140
                       }
                     }
                   }

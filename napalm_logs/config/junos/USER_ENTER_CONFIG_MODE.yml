@@ -5,7 +5,6 @@ messages:
     tag: UI_DBASE_LOGIN_EVENT
     values:
       user: (\w+)
-    replace: {}
     line: "User '{user}' entering configuration mode"
     model: NO_MODEL
     mapping:

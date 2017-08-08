@@ -144,14 +144,11 @@ Here is an example message:
         tag: SNMP_TRAP_LINK_DOWN
         values:
           snmpID: (\d+)
-          adminStatusString: (\w+)
+          adminStatusString|uppercase: (\w+)
           adminStatusValue: (\d)
-          operStatusString: (\w+)
+          operStatusString|uppercase: (\w+)
           operStatusValue: (\d)
           interface: ([\w\-\/]+)
-        replace:
-          adminStatusString: uppercase
-          operStatusString: uppercase
         line: 'ifIndex {snmpID}, ifAdminStatus {adminStatusString}({adminStatusValue}), ifOperStatus {operStatusString}({operStatusValue}), ifName {interface}'
         model: openconfig_interfaces
         mapping:
@@ -195,15 +192,10 @@ This is the same as ``line`` above.
 ----------
 
 This is the same as ``values`` above, other than the fact they can be used in
-``mapping`` (this will be covered under ``mapping``).
+``mapping`` (this will be covered under ``mapping``). You can manipulate these
+values using replace functions found in napalm_logs.utils.Replace i.e
+``adminStatusString|uppercase``.
 
-``replace``
------------
-
-This is used to manipulate a variable taken from the message via a lambda
-function which are defined under ``napalm_logs/config/__init__.py``. The reason
-for this is that sometimes the YANG model expects variables in a certain
-format, i.e uppercase rather than lowercase.
 
 ``model``
 ---------

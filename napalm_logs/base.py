@@ -262,7 +262,6 @@ class NapalmLogs:
                                 '__python_mod__': filepath,  # Will be used for debugging
                                 'line': '',
                                 'model': model,
-                                'replace': {},
                                 'values': {},
                                 'mapping': {'variables': {}, 'static': {}}
                             })

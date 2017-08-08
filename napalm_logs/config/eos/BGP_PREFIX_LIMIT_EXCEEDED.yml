@@ -6,7 +6,6 @@ messages:
     values:
       peer: (\d+\.\d+\.\d+\.\d+)
       asn: (\d+)
-    replace: {}
     line: 'received from neighbor {peer} (AS {asn}) 6/1 (Cease/maximum number of prefixes reached) 0 bytes'
     model: openconfig_bgp
     mapping:
