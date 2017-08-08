@@ -1,0 +1,37 @@
+{
+  "yang_message": {
+    "hardware-state": {
+      "component": {
+        "FPC 0": {
+          "state": {
+            "alarm-reason": "Major Errors",
+            "alarm-state": 3
+          },
+          "name": "FPC 0",
+          "class": "CHASSIS"
+        }
+      }
+    }
+  },
+  "message_details": {
+    "processId": "2449",
+    "severity": 4,
+    "facility": 3,
+    "hostPrefix": null,
+    "pri": "28",
+    "processName": "alarmd",
+    "host": "vmx01",
+    "tag": "Alarm set",
+    "time": "23:04:13",
+    "date": "Jul  8",
+    "message": "FPC color=RED, class=CHASSIS, reason=FPC 0 Major Errors"
+  },
+  "timestamp": 1499555053,
+  "facility": 3,
+  "ip": "127.0.0.1",
+  "host": "vmx01",
+  "yang_model": "ietf-hardware",
+  "error": "SYSTEM_ALARM",
+  "os": "junos",
+  "severity": 4
+}

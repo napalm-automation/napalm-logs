@@ -115,7 +115,7 @@ class NapalmLogsAuthProc(NapalmLogsProc):
                 return
             try:
                 conn.send(AUTH_KEEP_ALIVE_ACK)
-            except IOError as err:
+            except (IOError, socket.error) as err:
                 log.error('Unable to send auth keep alive: %s', err)
                 conn.close()
                 return
@@ -161,12 +161,13 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         # Start suicide polling thread
         log.debug('Starting the auth process')
         self.verify_cert()
+        self._create_skt()
+        log.debug('The auth process can receive at most %d parallel connections', AUTH_MAX_CONN)
+        self.socket.listen(AUTH_MAX_CONN)
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
-        self._create_skt()
-        self.socket.listen(AUTH_MAX_CONN)
         while self.__up:
             try:
                 (clientsocket, address) = self.socket.accept()

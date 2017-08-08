@@ -2,9 +2,10 @@
 '''
 napalm-logs listener base.
 '''
+from napalm_logs.proc import NapalmLogsProc
 
 
-class ListenerBase:
+class ListenerBase(NapalmLogsProc):
     '''
     The base class for the listener.
     '''

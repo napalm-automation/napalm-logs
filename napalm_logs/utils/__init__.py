@@ -48,7 +48,7 @@ class ClientAuth:
         self.port = port
         self.timeout = timeout
         self.max_try = max_try
-        self.try_id = 0
+        self.auth_try_id = 0
         self.priv_key = None
         self.verify_key = None
         self.ssl_skt = None
@@ -71,10 +71,21 @@ class ClientAuth:
         '''
         self.ssl_skt.settimeout(defaults.AUTH_KEEP_ALIVE_INTERVAL)
         while self.__up:
-            self.ssl_skt.send(defaults.AUTH_KEEP_ALIVE)
+            try:
+                log.debug('Sending keep-alive message to the server')
+                self.ssl_skt.send(defaults.AUTH_KEEP_ALIVE)
+            except socket.error:
+                log.error('Unable to send keep-alive message to the server.')
+                log.error('Re-init the SSL socket.')
+                self.reconnect()
+                log.debug('Trying to re-send the keep-alive message to the server.')
+                self.ssl_skt.send(defaults.AUTH_KEEP_ALIVE)
             msg = self.ssl_skt.recv(len(defaults.AUTH_KEEP_ALIVE_ACK))
+            log.debug('Received %s from the keep-alive server', msg)
             if msg != defaults.AUTH_KEEP_ALIVE_ACK:
-                self.ssl_skt.close()
+                log.error('Received %s instead of %s form the auth keep-alive server',
+                          msg, defaults.AUTH_KEEP_ALIVE_ACK)
+                log.error('Re-init the SSL socket.')
                 self.reconnect()
             time.sleep(defaults.AUTH_KEEP_ALIVE_INTERVAL)
 
@@ -82,13 +93,13 @@ class ClientAuth:
         '''
         Try to reconnect and re-authenticate with the server.
         '''
-        while self.__up:
-            try:
-                self.authenticate()
-            except socket.error:
-                time.sleep(1)
-            else:
-                return
+        log.debug('Closing the SSH socket.')
+        try:
+            self.ssl_skt.close()
+        except socket.error:
+            log.error('The socket seems to be closed already.')
+        log.debug('Re-opening the SSL socket.')
+        self.authenticate()
 
     def authenticate(self):
         '''
@@ -99,6 +110,8 @@ class ClientAuth:
         then do the handshake using the napalm-logs
         auth algorithm.
         '''
+        log.debug('Authenticate to %s:%d, using the certificate %s',
+                  self.address, self.port, self.certificate)
         if ':' in self.address:
             skt_ver = socket.AF_INET6
         else:
@@ -109,11 +122,16 @@ class ClientAuth:
                                        cert_reqs=ssl.CERT_REQUIRED)
         try:
             self.ssl_skt.connect((self.address, self.port))
+            self.auth_try_id = 0
         except socket.error as err:
-            self.try_id += 1
-            if self.try_id < self.max_try:
+            log.error('Unable to open the SSL socket.')
+            self.auth_try_id += 1
+            if not self.max_try or self.auth_try_id < self.max_try:
+                log.error('Trying to authenticate again in %d seconds', self.timeout)
                 time.sleep(self.timeout)
                 self.authenticate()
+            log.critical('Giving up, unable to authenticate to %s:%d using the certificate %s',
+                         self.address, self.port, self.certificate)
             raise ClientConnectException(err)
 
         # Explicit INIT
@@ -153,6 +171,7 @@ class ClientAuth:
         Stop the client.
         '''
         self.__up = False
+        self.ssl_skt.close()
 
 
 def unserialize(binary):
@@ -174,16 +193,17 @@ def extract(rgx, msg, mapping, time_format=None):
     else:
         group_index = 0
         for group_value in matched.groups():
-            group_name = mapping.keys()[group_index]
+            group_name = list(mapping.keys())[group_index]
             ret[group_name] = group_value
             group_index += 1
         log.debug('Regex matched')
         log.debug(ret)
     if time_format:
         try:
-            ret['timestamp'] = int(datetime.strptime(time_format[0].format(**ret), time_format[1]).strftime('%s'))
+            parsed_time = datetime.strptime(time_format[0].format(**ret), time_format[1])
         except ValueError as error:
             log.error('Unable to convert date and time into a timestamp: %s', error)
+        ret['timestamp'] = int((parsed_time - datetime(1970, 1, 1)).total_seconds())
     return ret
 
 

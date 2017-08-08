@@ -178,18 +178,18 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         bin_obj = umsgpack.packb(obj)
         self.pub.send(bin_obj)
 
-    def _format_time(self, time, date, prefix_id):
+    def _format_time(self, time, date, timezone, prefix_id):
         # TODO can we work out the time format from the regex? Probably but this is a task for another day
         time_format = self._config['prefixes'][prefix_id].get('time_format', '')
         if not time or not date or not time_format:
             return int(datetime.now().strftime('%s'))
         # Most syslog do not include the year, so we will add the current year if we are not supplied with one
         if '%y' in time_format or '%Y' in time_format:
-            timestamp = datetime.strptime('{} {}'.format(date, time), time_format)
+            parsed_time = datetime.strptime('{} {}'.format(date, time), time_format)
         else:
             year = datetime.now().year
-            timestamp = datetime.strptime('{} {} {}'.format(year, date, time), '%Y {}'.format(time_format))
-        return int(timestamp.strftime('%s'))
+            parsed_time = datetime.strptime('{} {} {}'.format(year, date, time), '%Y {}'.format(time_format))
+        return int((parsed_time - datetime(1970, 1, 1)).total_seconds())
 
     def start(self):
         '''
@@ -235,10 +235,11 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             host = msg_dict.get('host')
             prefix_id = msg_dict.pop('__prefix_id__')
             if 'timestamp' in msg_dict:
-                timestamp = msg_dict['timestamp']
+                timestamp = msg_dict.pop('timestamp')
             else:
                 timestamp = self._format_time(msg_dict.get('time', ''),
                                               msg_dict.get('date', ''),
+                                              msg_dict.get('timeZone', 'UTC'),
                                               prefix_id)
             facility = msg_dict.get('facility')
             severity = msg_dict.get('severity')

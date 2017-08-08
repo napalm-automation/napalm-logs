@@ -1,0 +1,54 @@
+{
+  "yang_message": {
+    "bgp": {
+      "neighbors": {
+        "neighbor": {
+          "192.168.140.254": {
+            "state": {
+              "peer_as": "65001"
+            },
+            "afi_safis": {
+              "afi_safi": {
+                "inet": {
+                  "state": {
+                    "prefixes": {
+                      "received": "28"
+                    }
+                  },
+                  "ipv4_unicast": {
+                    "prefix_limit": {
+                      "state": {
+                        "max_prefixes": "27"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "processId": "2965",
+    "severity": 4,
+    "facility": 3,
+    "hostPrefix": null,
+    "pri": "28",
+    "processName": "rpd",
+    "host": "vmx01",
+    "tag": "BGP_PREFIX_LIMIT_EXCEEDED",
+    "time": "21:41:37",
+    "date": "Jul 20",
+    "message": "192.168.140.254 (External AS 65001): Configured maximum prefix-limit(27) exceeded for inet-unicast nlri: 28 (instance master)"
+  },
+  "timestamp": 1500586897,
+  "facility": 3,
+  "ip": "127.0.0.1",
+  "host": "vmx01",
+  "yang_model": "openconfig_bgp",
+  "error": "BGP_PREFIX_LIMIT_EXCEEDED",
+  "os": "junos",
+  "severity": 4
+}

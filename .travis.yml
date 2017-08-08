@@ -5,6 +5,7 @@ python:
   - 3.5
 install:
   - pip install tox-travis
+  - pip install coveralls
 deploy:
   provider: pypi
   user: mirucha

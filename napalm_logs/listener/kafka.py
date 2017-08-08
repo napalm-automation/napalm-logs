@@ -6,10 +6,12 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # Import stdlib
+import os
 import json
 import time
 import signal
 import logging
+import threading
 
 # Import third party libs
 try:
@@ -52,6 +54,8 @@ class KafkaListener(ListenerBase):
         Start listening for messages
         '''
         # Start suicide polling thread
+        thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
+        thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
         try:

@@ -1,0 +1,34 @@
+{
+  "yang_message": {
+    "users": {
+      "user": {
+        "luke": {
+          "action": {
+            "enter_config_mode": true
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "processId": "7729",
+    "severity": 5,
+    "facility": 23,
+    "hostPrefix": null,
+    "pri": "189",
+    "processName": "mgd",
+    "host": "vmx01",
+    "tag": "UI_DBASE_LOGIN_EVENT",
+    "time": "21:44:00",
+    "date": "Jul 20",
+    "message": "User 'luke' entering configuration mode"
+  },
+  "timestamp": 1500587040,
+  "facility": 23,
+  "ip": "127.0.0.1",
+  "host": "vmx01",
+  "yang_model": "NO_MODEL",
+  "error": "USER_ENTER_CONFIG_MODE",
+  "os": "junos",
+  "severity": 5
+}

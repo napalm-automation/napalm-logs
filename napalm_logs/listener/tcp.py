@@ -6,6 +6,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # Import pythond stdlib
+import os
 import time
 import signal
 import socket
@@ -76,6 +77,8 @@ class TCPListener(ListenerBase):
         '''
         Start listening for messages
         '''
+        thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
+        thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
         self.skt = self._open_socket(socket.SOCK_STREAM)

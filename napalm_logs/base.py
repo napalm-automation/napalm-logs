@@ -167,6 +167,9 @@ class NapalmLogs:
             log.error('%s does not contain any OS subdirectories', path)
         for os_dir in os_subdirs:
             os_name = os.path.split(os_dir)[1]  # the network OS name
+            if os_name.startswith('__'):
+                log.debug('Ignoring %s', os_name)
+                continue
             if self._whitelist_blacklist(os_name):
                 log.debug('Not building config for %s (whitelist-blacklist logic)', os_name)
                 # Ignore devices that are not in the whitelist (if defined),

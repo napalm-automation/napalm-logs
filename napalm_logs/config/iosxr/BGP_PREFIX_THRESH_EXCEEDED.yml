@@ -18,7 +18,7 @@ messages:
   - error: BGP_PREFIX_THRESH_EXCEEDED
     tag: ROUTING-BGP-5-MAXPFX
     values:
-      peer: (\d+\.\d+\.\d+\.\d+)
+      peer: ([\w\d:]+)
       current: (\d+)
       limit: (\d+)
     replace: {}
