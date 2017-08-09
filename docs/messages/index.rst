@@ -66,7 +66,7 @@ For example, the following syslog message:
 	  "os": "junos",
 	  "severity": 5
 	}
-    
+
 Under this section, we present the possible error tags, together with their corresponding YANG model and examples.
 
 .. toctree::
