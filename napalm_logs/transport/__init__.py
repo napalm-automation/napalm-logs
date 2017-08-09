@@ -48,7 +48,7 @@ def get_transport(name):
         log.debug('Using %s as transport', name)
         return TRANSPORT_LOOKUP[name]
     except KeyError:
-        msg = 'Transport {} is not available.'.format(name)
+        msg = 'Transport {} is not available. Are the dependencies installed?'.format(name)
         log.error(msg, exc_info=True)
         raise InvalidTransportException(msg)
 

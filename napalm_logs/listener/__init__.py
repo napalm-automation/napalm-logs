@@ -38,7 +38,7 @@ def get_listener(name):
         log.debug('Using %s as listener', name)
         return LISTENER_LOOKUP[name]
     except KeyError:
-        msg = 'Listener {} is not available.'.format(name)
+        msg = 'Listener {} is not available. Are the dependencies installed?'.format(name)
         log.error(msg, exc_info=True)
         raise InvalidListenerException(msg)
 
