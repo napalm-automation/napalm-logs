@@ -35,7 +35,7 @@ class KafkaTransport(TransportBase):
             self.bootstrap_servers = kwargs['bootstrap_servers']
         else:
             self.bootstrap_servers = '{}:{}'.format(address, port)
-        self.kafka_topic = kwargs['kafka_topic']
+        self.kafka_topic = kwargs.get('topic', 'napalm-logs')
 
     def start(self):
         try:

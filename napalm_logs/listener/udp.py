@@ -36,6 +36,7 @@ class UDPListener(ListenerBase):
         else:
             self.port = port
         self.buffer_size = kwargs.get('buffer_size', BUFFER_SIZE)
+        log.debug('Buffer size: %d', self.buffer_size)
 
     def start(self):
         '''
