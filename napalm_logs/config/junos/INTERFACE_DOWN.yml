@@ -5,14 +5,11 @@ messages:
     tag: SNMP_TRAP_LINK_DOWN
     values:
       snmpID: (\d+)
-      adminStatusString: (\w+)
+      adminStatusString|upper: (\w+)
       adminStatusValue: (\d)
-      operStatusString: (\w+)
+      operStatusString|upper: (\w+)
       operStatusValue: (\d)
       interface: ([\w\-\/]+)
-    replace:
-      adminStatusString: uppercase
-      operStatusString: uppercase
     line: 'ifIndex {snmpID}, ifAdminStatus {adminStatusString}({adminStatusValue}), ifOperStatus {operStatusString}({operStatusValue}), ifName {interface}'
     model: openconfig_interfaces
     mapping:

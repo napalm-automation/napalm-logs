@@ -22,7 +22,6 @@ import napalm_logs.utils
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import PUB_IPC_URL
 from napalm_logs.config import DEV_IPC_URL_TPL
-from napalm_logs.config import REPLACEMENTS
 from napalm_logs.config import UNKNOWN_DEVICE_NAME
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
@@ -87,12 +86,16 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 })
                 continue
             values = message_dict['values']
-            replace = message_dict['replace']
             line = message_dict['line']
             mapping = message_dict['mapping']
             # We will now figure out which position each value is in so we can use it with the match statement
             position = {}
+            replace = {}
             for key in values.keys():
+                if '|' in key:
+                    new_key, replace[new_key] = key.replace(' ', '').split('|')
+                    values[new_key] = values.pop(key)
+                    key = new_key
                 position[line.find('{' + key + '}')] = key
             sorted_position = {}
             for i, elem in enumerate(sorted(position.items())):
@@ -145,9 +148,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             }
             for key in values.keys():
                 # Check if the value needs to be replaced
-                if message['replace'].get(key):
-                    fun = REPLACEMENTS.get(message['replace'].get(key))
-                    result = fun(match.group(positions.get(key)))
+                if key in message['replace']:
+                    result = napalm_logs.utils.cast(match.group(positions.get(key)), message['replace'][key])
                 else:
                     result = match.group(positions.get(key))
                 ret[key] = result

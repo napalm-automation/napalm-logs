@@ -6,7 +6,6 @@ messages:
     values:
       peer: (\d+\.\d+\.\d+\.\d+)
       port: (\d+)
-    replace: {}
     line: 'Packet from {peer}:{port} wrong MD5 digest'
     model: openconfig_bgp
     mapping:

@@ -7,7 +7,6 @@ messages:
       peer: ([\w\d:\.]+)
       asn: (\d+)
       number: (\d+)
-    replace: {}
     line: '{number}: NOTIFICATION received from {peer} (External AS {asn}): code 6 (Cease) subcode 5 (Connection Rejected)'
     model: openconfig_bgp
     mapping:

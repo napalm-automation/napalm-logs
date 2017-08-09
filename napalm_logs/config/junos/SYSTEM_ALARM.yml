@@ -5,10 +5,8 @@ messages:
     tag: Alarm set
     values:
       component: (FPC \d)
-      color: (\w+)
+      color|color_to_severity: (\w+)
       reason: ([\w ]+)
-    replace:
-      color: color_to_severity
     line: 'FPC color={color}, class=CHASSIS, reason={component} {reason}'
     model: ietf-hardware
     mapping:
@@ -24,11 +22,9 @@ messages:
     tag: Alarm set
     values:
       component: (\w+)
-      color: (\w+)
+      color|color_to_severity: (\w+)
       class: (\w+)
       reason: ([\w ]+)
-    replace:
-      color: color_to_severity
     line: '{component} color={color}, class={class}, reason={reason}'
     model: ietf-hardware
     mapping:

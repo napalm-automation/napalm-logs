@@ -78,7 +78,6 @@ VALID_CONFIG = {
             'error': six.string_type,
             'tag': six.string_type,
             'values': dict,
-            'replace': dict,
             'line': six.string_type,
             'model': six.string_type,
             'mapping': {
@@ -123,16 +122,3 @@ MAGIC_REQ = b'INIT'
 AUTH_CIPHER = 'ECDHE-RSA-AES256-GCM-SHA384'
 
 OPEN_CONFIG_NO_MODEL = 'NO_MODEL'
-
-# replacement lambdas
-REPLACEMENTS = {
-    'uppercase': lambda var: var.upper(),
-    'lowercase': lambda var: var.lower(),
-    'color_to_severity': lambda var: _COLOR_TO_severity.get(var, 0)
-}
-
-# For use with replacement lamdas
-_COLOR_TO_severity = {
-    'RED': 3,
-    'YELLOW': 4
-    }

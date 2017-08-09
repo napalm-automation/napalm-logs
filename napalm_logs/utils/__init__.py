@@ -14,6 +14,7 @@ import socket
 import logging
 import threading
 import collections
+from pydoc import locate
 from datetime import datetime
 
 # Import python stdlib
@@ -172,6 +173,31 @@ class ClientAuth:
         '''
         self.__up = False
         self.ssl_skt.close()
+
+
+def cast(var, function):
+    # If the function is a build in function
+    if locate(function) and hasattr(locate(function), '__call__'):
+        try:
+            return locate(function)(var)
+        except ValueError:
+            log.error('Unable to use function %s on value %s', function, var, exc_info=True)
+    # If the function is str function
+    if hasattr(str, function) and\
+            hasattr(getattr(str, function), '__call__'):
+        return getattr(str, function)(var)
+    glob = globals()
+    # If the function is defined in this module
+    if function in glob and hasattr(glob[function], '__call__'):
+        return glob[function](var)
+    # If none of the above, just return the original var
+    return var
+
+
+def color_to_severity(var):
+    colour_dict = {'RED': 3,
+                   'YELLOW': 4}
+    return colour_dict.get(var, var)
 
 
 def unserialize(binary):
