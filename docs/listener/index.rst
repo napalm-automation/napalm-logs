@@ -41,7 +41,8 @@ Example: listener configuration using custom options
   :ref:`configuration-options-address` and :ref:`configuration-options-port`
   configuration options.
 
-Available listeners and their options:
+Available listeners and their options
+-------------------------------------
 
 .. toctree::
    :maxdepth: 1
