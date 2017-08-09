@@ -16,8 +16,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
+import os
+import sys
+import json
 # sys.path.insert(0, os.path.abspath('.'))
 
 
@@ -167,7 +168,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'napalm-logs', u'napalm-logs Documentation',
-     author, 'napalm-logs', 'napalm-logs is a Python library that listens to syslog messages from network devices and returns strucuted data following the OpenConfig or IETF YANG models.',
+     author, 'napalm-logs', 'napalm-logs is a Python library that listens to syslog messages from network devices and returns strucuted data following the OpenConfig or IETF YANG models',
      'Miscellaneous'),
 ]
 
@@ -192,3 +193,16 @@ epub_copyright = copyright
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
+
+
+def gen_messages_rst():
+    with open('../report.json', 'r') as report_fh:
+        report_dict = json.loads(report_fh.read())
+    passed_tests = False
+    for data in report_dict['data']:
+        if data['type'] == 'report':
+            passed_tests = data['attributes']['summary'].get('failed', 0) == 0
+    if passed_tests:
+        raise Exception('Didnt pass the tests, not generating doc')
+
+gen_messages_rst()
