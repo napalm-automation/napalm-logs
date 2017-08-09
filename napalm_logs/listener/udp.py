@@ -35,6 +35,7 @@ class UDPListener(ListenerBase):
             self.port = kwargs['port']
         else:
             self.port = port
+        self.buffer_size = kwargs.get('buffer_size', BUFFER_SIZE)
 
     def start(self):
         '''
@@ -56,7 +57,7 @@ class UDPListener(ListenerBase):
         Return the message received and the address.
         '''
         try:
-            msg, addr = self.skt.recvfrom(BUFFER_SIZE)
+            msg, addr = self.skt.recvfrom(self.buffer_size)
         except socket.error as error:
             log.error('Received listener socket error: %s', error, exc_info=True)
             raise ListenerException(error)

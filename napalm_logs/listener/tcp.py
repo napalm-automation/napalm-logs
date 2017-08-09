@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 # Import pythond stdlib
 try:
     import Queue as queue
-except ImportError
+except ImportError:
     import queue
 import time
 import random
