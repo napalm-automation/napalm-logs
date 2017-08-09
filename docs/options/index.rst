@@ -11,7 +11,7 @@ Command Line
 
 All of the command line arguments can also be added to a config file.
 
-.. _address:
+.. _configuration-options-address:
 
 ``address``
 -----------
@@ -24,8 +24,8 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs -a 172.17.17.1
-  napalm-logs --address 172.17.17.1
+  $ napalm-logs -a 172.17.17.1
+  $ napalm-logs --address 172.17.17.1
 
 Configuration file example:
 
@@ -33,7 +33,7 @@ Configuration file example:
 
   address: 172.17.17.1
 
-.. _auth-address:
+.. _configuration-options-auth-address:
 
 ``auth-address``
 ----------------
@@ -46,7 +46,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs --auth-address 172.17.17.2
+  $ napalm-logs --auth-address 172.17.17.2
 
 Configuration file example:
 
@@ -54,7 +54,7 @@ Configuration file example:
 
   auth_address: 172.17.17.2
 
-.. _auth-port:
+.. _configuration-options-auth-port:
 
 ``auth-port``
 -------------
@@ -67,7 +67,7 @@ CLI usgae example:
 
 .. code-block:: bash
 
-  napalm-logs --auth-port 2022
+  $ napalm-logs --auth-port 2022
 
 Configuration file example:
 
@@ -75,7 +75,7 @@ Configuration file example:
 
   auth_port: 2022
 
-.. _certificate:
+.. _configuration-options-certificate:
 
 ``certificate``
 ---------------
@@ -86,7 +86,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs --certificate /var/cache/server.crt
+  $ napalm-logs --certificate /var/cache/server.crt
 
 Configuration file example:
 
@@ -94,7 +94,7 @@ Configuration file example:
 
   certificate: /var/cache/server.crt
 
-.. _config-file:
+.. _configuration-options-config-file:
 
 ``config-file``
 ---------------
@@ -107,10 +107,10 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs -c /srv/napalm-logs
-  napalm-logs --config-file /srv/napalm-logs
+  $ napalm-logs -c /srv/napalm-logs
+  $ napalm-logs --config-file /srv/napalm-logs
 
-.. _config-path:
+.. _configuration-options-config-path:
 
 ``config-path``
 ---------------
@@ -121,7 +121,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs --config-path /home/admin/napalm-logs/
+  $ napalm-logs --config-path /home/admin/napalm-logs/
 
 Configuration file example:
 
@@ -129,7 +129,7 @@ Configuration file example:
 
   config_path: /home/admin/napalm-logs/
 
-.. _disable-security:
+.. _configuration-options-disable-security:
 
 ``disable-security``
 --------------------
@@ -142,7 +142,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs --disable-security
+  $ napalm-logs --disable-security
 
 Configuration file example:
 
@@ -150,7 +150,7 @@ Configuration file example:
 
   disable_security: true
 
-.. _extension-config-path:
+.. _configuration-options-extension-config-path:
 
 ``extension-config-path``
 -------------------------
@@ -161,7 +161,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs --extension-config-path /home/admin/napalm-logs/
+  $ napalm-logs --extension-config-path /home/admin/napalm-logs/
 
 Configuration file example:
 
@@ -169,7 +169,7 @@ Configuration file example:
 
   extension_config_path: /home/admin/napalm-logs/
 
-.. _keyfile:
+.. _configuration-options-keyfile:
 
 ``keyfile``
 -----------
@@ -180,7 +180,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs --keyfile /var/cache/server.key
+  $ napalm-logs --keyfile /var/cache/server.key
 
 Configuration file example:
 
@@ -188,7 +188,7 @@ Configuration file example:
 
   keyfile: /var/cache/server.key
 
-.. _listener:
+.. _configuration-options-listener:
 
 ``listener``
 ------------
@@ -201,7 +201,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs --listener kafka
+  $ napalm-logs --listener kafka
 
 Configuration file example:
 
@@ -209,7 +209,7 @@ Configuration file example:
 
   listener: kafka
 
-.. _log-file:
+.. _configuration-options-log-file:
 
 ``log-file``
 ------------
@@ -224,7 +224,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs --log-file /var/log/napalm-logs
+  $ napalm-logs --log-file /var/log/napalm-logs
 
 Configuration file example:
 
@@ -232,7 +232,7 @@ Configuration file example:
 
   log_file: /var/log/napalm-logs
 
-.. _log-format:
+.. _configuration-options-log-format:
 
 ``log-format``
 --------------
@@ -247,7 +247,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs --log-format '%(asctime)s,%(msecs)03.0f [%(levelname)] %(message)s'
+  $ napalm-logs --log-format '%(asctime)s,%(msecs)03.0f [%(levelname)] %(message)s'
 
 Configuration file example:
 
@@ -255,7 +255,7 @@ Configuration file example:
 
   log_format: '%(asctime)s,%(msecs)03.0f [%(levelname)] %(message)s'
 
-.. _log-level:
+.. _configuration-options-log-level:
 
 ``log-level``
 -------------
@@ -268,8 +268,8 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs -l debug
-  napalm-logs --log-level info
+  $ napalm-logs -l debug
+  $ napalm-logs --log-level info
 
 Configuration file example:
 
@@ -277,7 +277,7 @@ Configuration file example:
 
   log_level: info
 
-.. _port:
+.. _configuration-options-port:
 
 ``port``
 --------
@@ -292,8 +292,8 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs -p 1024
-  napalm-logs --port 1024
+  $ napalm-logs -p 1024
+  $ napalm-logs --port 1024
 
 Configuration file example:
 
@@ -301,7 +301,7 @@ Configuration file example:
 
   port: 1024
 
-.. _publish-address:
+.. _configuration-options-publish-address:
 
 ``publish-address``
 -------------------
@@ -314,7 +314,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs --publish-address 172.17.17.3
+  $ napalm-logs --publish-address 172.17.17.3
 
 Configuration file example:
 
@@ -322,7 +322,7 @@ Configuration file example:
 
   publish_address: 172.17.17.3
 
-.. _publish-port:
+.. _configuration-options-publish-port:
 
 ``publish-port``
 ----------------
@@ -335,7 +335,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs --publish-port  2048
+  $ napalm-logs --publish-port  2048
 
 Configuration file example:
 
@@ -343,7 +343,7 @@ Configuration file example:
 
   publish_port: 2048
 
-.. _transport:
+.. _configuration-options-transport:
 
 ``transport``
 -------------
@@ -356,8 +356,8 @@ CLI usage example:
 
 .. code-block:: bash
 
-  napalm-logs -t kafka
-  napalm-logs --transport kafka
+  $ napalm-logs -t kafka
+  $ napalm-logs --transport kafka
 
 Configuration file example:
 
@@ -370,7 +370,7 @@ Config File Only Options
 
 The options to be used inside of the pluggable modules are not provided via the command line, they need to be provided in the config file.
 
-.. _device-whitelist:
+.. _configuration-options-device-whitelist:
 
 ``device_whitelist``
 ++++++++++++++++++++
@@ -385,7 +385,7 @@ Example:
     - junos
     - iosxr
 
-.. _device-blacklist:
+.. _configuration-options-device-blacklist:
 
 ``device_blacklist``
 ++++++++++++++++++++
@@ -399,52 +399,9 @@ Example:
   device_blacklist:
     - eos
 
-Each of the following should be a ``dictionary`` containing the ``keys`` provided below each one.
-
-.. _listener-opts:
-
-``listener_opts``
-+++++++++++++++++
-
-Configuration options for the listener module used to receive the syslog messages.
-
-.. _listener-opts-bootstrap-servers:
-
-``bootstrap_servers``
----------------------
-
-For use with the ``kafka`` listener.
-
-``host[:port]`` string (or list of ``host[:port]`` strings) that the consumer should contact to bootstrap initial cluster metadata. This does not have to be the full node list. It just needs to have at least one broker that will respond to a Metadata API Request.
-
-Example:
-
-.. code-block:: yaml
-
-  listener_opts:
-    bootstrap_servers:
-      - kk1.brokers.example.org
-      - kk1.brokers.example.org:1234
-      - 192.168.0.1
-      - 192.168.0.2:5678
-
 .. _listener-opts-kafka-topic:
 
-``kafka_topic``
----------------
 
-For use with the ``kafka`` listener.
-
-The topic to subscribe to and receive messages for.
-
-Default: ``syslog.net``.
-
-Example:
-
-.. code-block:: yaml
-
-  listener_opts:
-    kafka_topic: napalm-logs-in
 
 .. _logger:
 
@@ -523,81 +480,6 @@ Example:
 ----------------
 
 If this option is set, all processed syslog messages, even ones that have not matched a certain operating system, will be output via the specified transport.
-This can be used to forward to log server for storage.
-
-Example:
-
-.. code-block:: yaml
-
-  listener_opts:
-    send_unknown: true
-
-.. _publisher-opts:
-
-``publisher_opts``
-+++++++++++++++++
-
-Options for the transport module used to publish the structured objects.
-
-.. _publisher-opts-bootstrap-servers:
-
-``bootstrap_servers``
----------------------
-
-For use with the ``kafka`` transport.
-
-``host[:port]`` string (or list of ``host[:port]`` strings) that the consumer should contact to bootstrap initial cluster metadata. This does not have to be the full node list. It just needs to have at least one broker that will respond to a Metadata API Request.
-
-Example:
-
-.. code-block:: yaml
-
-  logger_opts:
-    bootstrap_servers:
-      - kk1.brokers.example.org
-      - kk1.brokers.example.org:1234
-      - 192.168.0.1
-      - 192.168.0.2:5678
-
-.. _publisher-opts-kafka-topic:
-
-``kafka_topic``
----------------
-
-For use with: ``kafka``
-
-The Kafka topic to use when publishing messages.
-
-Default: ``napalm-logs``.
-
-Example:
-
-.. code-block:: yaml
-
-  publisher_opts:
-    kafka_topic: napalm-logs-out
-
-.. _publisher-opts-send-raw:
-
-``send_raw``
-------------
-
-If this option is set, all processed syslog messages, even ones that have not matched a configured error, will be published over the specified transport.
-This can be used to forward to log server for storage.
-
-Example:
-
-.. code-block:: yaml
-
-  listener_opts:
-    send_raw: true
-
-.. _publisher-opts-send-unknown:
-
-``send_unknown``
-----------------
-
-If this option is set, all processed syslog messages, even ones that have not matched a certain operating system, will be published over the specified transport.
 This can be used to forward to log server for storage.
 
 Example:

@@ -14,10 +14,10 @@ option, e.g.:
 
 .. code-block:: bash
 
-  napalm-logs --listener tcp
+  $ napalm-logs --listener tcp
 
 From the configuration file, the listener can be specified using the ``listener``
-option, eventually with several options. The listener options depend on the
+option, eventually with several options. The options depend on the
 nature of the listener.
 
 Example: listener configuration using the default configuration
