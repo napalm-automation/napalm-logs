@@ -39,7 +39,10 @@ Example: publisher configuration using custom options
   :ref:`configuration-options-publish-port`
   configuration options.
 
-Available publishers and their options:
+.. _publisher-modules:
+
+Available publishers and their options
+---------------------------------------
 
 .. toctree::
    :maxdepth: 1
