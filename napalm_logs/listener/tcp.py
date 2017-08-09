@@ -6,7 +6,10 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # Import pythond stdlib
-import Queue
+try:
+    import Queue as queue
+except ImportError
+    import queue
 import time
 import random
 import socket
@@ -43,7 +46,7 @@ class TCPListener(ListenerBase):
         self.buffer_size = kwargs.get('buffer_size', BUFFER_SIZE)
         self.socket_timeout = kwargs.get('socket_timeout', TIMEOUT)
         self.max_clients = kwargs.get('max_clients', MAX_TCP_CLIENTS)
-        self.buffer = Queue.Queue()
+        self.buffer = queue.Queue()
 
     def _client_connection(self, conn, addr):
         '''
