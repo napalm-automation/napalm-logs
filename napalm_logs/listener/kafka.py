@@ -36,7 +36,7 @@ class KafkaListener(ListenerBase):
         self.bootstrap_servers = kwargs.get('bootstrap_servers',
                                             '{}:{}'.format(address, port))
         self.group_id = kwargs.get('group_id', 'napalm-logs')
-        self.topic = kwargs['kafka_topic']
+        self.topic = kwargs.get('topic', 'syslog.net')
 
     def start(self):
         '''
