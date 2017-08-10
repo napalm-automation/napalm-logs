@@ -17,7 +17,6 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
 import json
 import logging
 
@@ -38,11 +37,13 @@ log = logging.getLogger(__name__)
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
+extensions = [
+    'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages']
+    'sphinx.ext.githubpages'
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -175,11 +176,11 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'napalm-logs', u'napalm-logs Documentation',
-     author, 'napalm-logs', 'napalm-logs is a Python library that listens to syslog messages from network devices and returns strucuted data following the OpenConfig or IETF YANG models',
+     author, 'napalm-logs',
+     ('napalm-logs is a Python library that listens to syslog messages from network devices and returns strucuted data'
+      'following the OpenConfig or IETF YANG models'),
      'Miscellaneous'),
 ]
-
-
 
 # -- Options for Epub output ----------------------------------------------
 
@@ -280,5 +281,6 @@ def gen_messages_rst():
     rendered_template = index_tpl_file.render(error_list=list(defined_errors.keys()))
     with open('messages/index.rst', 'w') as index_fh:
         index_fh.write(rendered_template)
+
 
 gen_messages_rst()
