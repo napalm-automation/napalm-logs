@@ -1,0 +1,36 @@
+.. _{{ error_name }}
+
+================
+{{ error_name }}
+================
+
+{{ error_doc }}
+
+Maps to the ``{{ error_yang }}`` YANG model.
+
+.. _{{ error_name }}-os-list:
+
+Implemented for
+---------------
+
+{% for os_name in error_os_list -%}
+- {{ os_name }}
+{% endfor %}
+
+.. _{{ error_name }}-txt:
+
+Syslog message example
+----------------------
+
+.. code-block:: text
+
+  {{ error_txt_example }}
+
+.. _{{ error_name }}-json:
+
+Structured message example
+--------------------------
+
+.. code-block:: json
+
+  {{ error_json_example }}

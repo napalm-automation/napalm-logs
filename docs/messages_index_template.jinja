@@ -1,0 +1,84 @@
+.. _messages
+
+===================
+Structured Messages
+===================
+
+Each message has a certain identification tag which is unique and cross-platform.
+
+For example, the following syslog message:
+
+.. code-block:: text
+
+	<28>Jul  4 13:40:55 vmx2 rpd[2942]: BGP_PREFIX_LIMIT_EXCEEDED: 10.0.0.31 (Internal AS 65001): Configured maximum prefix-limit(1) exceeded for inet-unicast nlri: 7 (instance master)
+
+``napalm-logs`` identifies that it was produced by a Junos device and assigns
+the error tag ``BGP_PREFIX_LIMIT_EXCEEDED`` and then will try to map the
+information into the OpenConfig model ``openconfig_bgp``:
+
+.. code-block:: json
+
+	{
+	  "yang_message": {
+		"bgp": {
+		  "neighbors": {
+			"neighbor": {
+			  "192.168.140.254": {
+				"state": {
+				  "peer_as": "65001"
+				},
+				"afi_safis": {
+				  "afi_safi": {
+					"inet4": {
+					  "state": {
+						"prefixes": {
+						  "received": "141"
+						}
+					  },
+					  "ipv4_unicast": {
+						"prefix_limit": {
+						  "state": {
+							"max_prefixes": "140"
+						  }
+						}
+					  }
+					}
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  },
+	  "message_details": {
+		"processId": "2902",
+		"hostPrefix": null,
+		"pri": "149",
+		"processName": "rpd",
+		"host": "vmx01",
+		"tag": "BGP_PREFIX_THRESH_EXCEEDED",
+		"time": "14:03:12",
+		"date": "Jun 21",
+		"message": "192.168.140.254 (External AS 65001): Configured maximum prefix-limit threshold(140) exceeded for inet4-unicast nlri: 141 (instance master)"
+	  },
+	  "timestamp": 1498050192,
+	  "facility": 18,
+	  "ip": "127.0.0.1",
+	  "host": "vmx01",
+	  "yang_model": "openconfig_bgp",
+	  "error": "BGP_PREFIX_THRESH_EXCEEDED",
+	  "os": "junos",
+	  "severity": 5
+	}
+
+Under this section, we present the possible error tags, together with their
+corresponding YANG model and examples.
+
+.. toctree::
+   :maxdepth: 1
+
+   RAW
+   UNKNOWN
+   {% for error_name in error_list -%}
+   {{ error_name }}
+   {% endfor -%}

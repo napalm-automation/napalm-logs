@@ -19,8 +19,15 @@
 import os
 import sys
 import json
+import logging
+
+# Import third party libs
+import jinja2
+
+from napalm_logs.base import NapalmLogs
 # sys.path.insert(0, os.path.abspath('.'))
 
+log = logging.getLogger(__name__)
 
 # -- General configuration ------------------------------------------------
 
@@ -196,13 +203,78 @@ epub_exclude_files = ['search.html']
 
 
 def gen_messages_rst():
-    with open('../report.json', 'r') as report_fh:
+    report_rel_path = '../report.json'
+    if not os.path.isfile(report_rel_path):
+        raise IOError('No report.json generated.')
+    with open(report_rel_path, 'r') as report_fh:
         report_dict = json.loads(report_fh.read())
     passed_tests = False
     for data in report_dict['data']:
         if data['type'] == 'report':
             passed_tests = data['attributes']['summary'].get('failed', 0) == 0
     if passed_tests:
-        raise Exception('Didnt pass the tests, not generating doc')
+        raise AssertionError('Didnt pass the tests, not generating doc')
+    # Start building the docs.
+    # Firstly load the messages config, by creating an instance
+    #   of the base NapalmLogs class, without starting the engine.
+    nl_ = NapalmLogs()
+    defined_errors = {}
+    for os_name, os_cfg in nl_.config_dict.items():
+        for message in os_cfg['messages']:
+            error_name = message['error']
+            if error_name not in defined_errors:
+                defined_errors[error_name] = {
+                    'doc': '',
+                    'os': [],
+                    'model': ''
+                }
+            if not defined_errors[error_name]['doc'] or\
+               len(defined_errors[error_name]['doc']) < len(message['__doc__']):
+                defined_errors[error_name]['doc'] = message['__doc__']
+            if not defined_errors[error_name]['model']:
+                defined_errors[error_name]['model'] = message['model']
+            defined_errors[error_name]['os'].append(os_name)
+    # The collect the mock data from the tests:
+    cwd = os.path.dirname(__file__)
+    test_root_path = os.path.join(cwd, '..', 'tests', 'config')
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader('.'))
+    for error_name, error_details in defined_errors.items():
+        os_name = error_details['os'][0]  # Picking up the first OS in the list.
+        error_path = os.path.join(test_root_path, os_name, error_name)
+        test_cases = [name for name in os.listdir(error_path) if os.path.isdir(os.path.join(error_path, name))]
+        test_case_name = 'default' if 'default' in test_cases else test_cases[0]  # Picking up a test case.
+        test_case_path = os.path.join(error_path, test_case_name)
+        raw_message_filepath = os.path.join(test_case_path, 'syslog.msg')
+        log.debug('Looking for %s', raw_message_filepath)
+        assert os.path.isfile(raw_message_filepath)
+        with open(raw_message_filepath, 'r') as raw_message_fh:
+            raw_message = raw_message_fh.read()
+        log.debug('Read raw message:')
+        log.debug(raw_message)
+        yang_message_filepath = os.path.join(test_case_path, 'yang.json')
+        log.debug('Looking for %s', yang_message_filepath)
+        assert os.path.isfile(yang_message_filepath)
+        with open(yang_message_filepath, 'r') as yang_message_fh:
+            yang_message = yang_message_fh.read()
+        log.debug('Read YANG text:')
+        log.debug(yang_message)
+        struct_yang_message = json.loads(yang_message)
+        indented_yang_message = json.dumps(struct_yang_message, indent=4, sort_keys=True)
+        log.debug('Struct YANG message:')
+        log.debug(struct_yang_message)
+        msg_template = env.get_template('message_template.jinja')
+        rendered_template = msg_template.render(error_name=error_name,
+                                                error_doc=error_details['doc'],
+                                                error_yang=error_details['model'],
+                                                error_os_list=error_details['os'],
+                                                error_txt_example=raw_message.strip(),
+                                                error_json_example=indented_yang_message)
+        message_rst_path = 'messages/{error_name}.rst'.format(error_name=error_name)
+        with open(message_rst_path, 'w') as rst_fh:
+            rst_fh.write(rendered_template)
+    index_tpl_file = env.get_template('messages_index_template.jinja')
+    rendered_template = index_tpl_file.render(error_list=list(defined_errors.keys()))
+    with open('messages/index.rst', 'w') as index_fh:
+        index_fh.write(rendered_template)
 
 gen_messages_rst()
