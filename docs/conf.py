@@ -17,14 +17,15 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import sys
 import json
 import logging
 
 # Import third party libs
 import jinja2
 
+sys.path.insert(0, os.path.abspath('../'))
 from napalm_logs.base import NapalmLogs
-# sys.path.insert(0, os.path.abspath('.'))
 
 log = logging.getLogger(__name__)
 
