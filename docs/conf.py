@@ -271,14 +271,17 @@ def gen_messages_rst():
         rendered_template = msg_template.render(error_name=error_name,
                                                 error_doc=error_details['doc'],
                                                 error_yang=error_details['model'],
-                                                error_os_list=error_details['os'],
+                                                error_os_list=list(set(error_details['os'])),
                                                 error_txt_example=raw_message.strip(),
                                                 error_json_example=indented_yang_message.replace('\n}', '\n  }'))
         message_rst_path = 'messages/{error_name}.rst'.format(error_name=error_name)
         with open(message_rst_path, 'w') as rst_fh:
             rst_fh.write(rendered_template)
     index_tpl_file = env.get_template('messages_index_template.jinja')
-    rendered_template = index_tpl_file.render(error_list=list(defined_errors.keys()))
+    messages_list = list(defined_errors.keys())
+    messages_list.extend(['RAW', 'UNKNOWN'])
+    messages_list.sort()
+    rendered_template = index_tpl_file.render(error_list=messages_list)
     with open('messages/index.rst', 'w') as index_fh:
         index_fh.write(rendered_template)
 

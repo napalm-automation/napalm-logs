@@ -1,4 +1,5 @@
 jinja2
+-e ../
 sphinx
 sphinx-rtd-theme
 sphinxcontrib-napoleon
