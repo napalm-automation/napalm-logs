@@ -25,6 +25,7 @@ import logging
 import jinja2
 
 sys.path.insert(0, os.path.abspath('../'))
+import napalm_logs
 from napalm_logs.base import NapalmLogs
 
 log = logging.getLogger(__name__)
