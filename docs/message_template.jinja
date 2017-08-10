@@ -1,12 +1,17 @@
-.. _{{ error_name }}
+.. _{{ error_name }}:
 
-================
+{{ '=' * (error_name|length) }}
 {{ error_name }}
-================
+{{ '=' * (error_name|length) }}
 
 {{ error_doc }}
 
+{% if error_yang == 'NO_MODEL' -%}
+There is no YANG model available yet to map this class of messages.
+Please check the :ref:`{{ error_name }}-json` section to see the structure.
+{% else -%}
 Maps to the ``{{ error_yang }}`` YANG model.
+{% endif %}
 
 .. _{{ error_name }}-os-list:
 
