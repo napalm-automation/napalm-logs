@@ -135,6 +135,27 @@ class NapalmLogs:
                 hasattr(self.device_blacklist, '__iter__') and
                 os_name in self.device_blacklist)
 
+    @staticmethod
+    def _extract_yaml_docstring(stream):
+        '''
+        Extract the comments at the top of the YAML file,
+        from the stream handler.
+        Return the extracted comment as string.
+        '''
+        comment_lines = []
+        lines = stream.read().splitlines()
+        for line in lines:
+            line_strip = line.strip()
+            if not line_strip:
+                continue
+            if line_strip.startswith('#'):
+                comment_lines.append(
+                    line_strip.replace('#', '', 1).strip()
+                )
+            else:
+                break
+        return ' '.join(comment_lines)
+
     def _load_config(self, path):
         '''
         Read the configuration under a specific path
@@ -187,11 +208,20 @@ class NapalmLogs:
                 file_name, file_extension = os.path.splitext(file_)
                 file_extension = file_extension.replace('.', '')
                 filepath = os.path.join(os_dir, file_)
+                comment = ''
                 if file_extension in ('yml', 'yaml'):
                     try:
                         log.debug('Loading %s as YAML', file_)
                         with open(filepath, 'r') as fstream:
                             cfg = yaml.load(fstream)
+                            # Reposition at the top and read the comments.
+                            if file_name not in CONFIG.OS_INIT_FILENAMES:
+                                # If the file name is not a profile init.
+                                fstream.seek(0)
+                                comment = self._extract_yaml_docstring(fstream)
+                                if 'messages' in cfg:
+                                    for message in cfg['messages']:
+                                        message['__doc__'] = comment
                             napalm_logs.utils.dictupdate(config[os_name], cfg)
                     except yaml.YAMLError as yamlexc:
                         log.error('Invalid YAML file: %s', filepath, exc_info=True)
@@ -258,6 +288,7 @@ class NapalmLogs:
                                 'tag': mod_tag,
                                 'error': mod_err,
                                 'match_on': err_match,
+                                '__doc__': mod.__doc__,
                                 '__python_fun__': getattr(mod, CONFIG.CONFIG_RUN_FUN),
                                 '__python_mod__': filepath,  # Will be used for debugging
                                 'line': '',
