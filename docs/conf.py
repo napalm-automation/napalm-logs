@@ -278,7 +278,10 @@ def gen_messages_rst():
         with open(message_rst_path, 'w') as rst_fh:
             rst_fh.write(rendered_template)
     index_tpl_file = env.get_template('messages_index_template.jinja')
-    rendered_template = index_tpl_file.render(error_list=list(defined_errors.keys()))
+    messages_list = list(defined_errors.keys())
+    messages_list.extend(['RAW', 'UNKNOWN'])
+    messages_list.sort()
+    rendered_template = index_tpl_file.render(error_list=messages_list)
     with open('messages/index.rst', 'w') as index_fh:
         index_fh.write(rendered_template)
 
