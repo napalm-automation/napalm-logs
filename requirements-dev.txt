@@ -1,6 +1,7 @@
 -r requirements.txt
 pytest
 pylama
+jinja2
 coveralls
 pytest-cov
 pytest-json

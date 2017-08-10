@@ -1,3 +1,5 @@
+.. _messages:
+
 ===================
 Structured Messages
 ===================
@@ -10,7 +12,9 @@ For example, the following syslog message:
 
 	<28>Jul  4 13:40:55 vmx2 rpd[2942]: BGP_PREFIX_LIMIT_EXCEEDED: 10.0.0.31 (Internal AS 65001): Configured maximum prefix-limit(1) exceeded for inet-unicast nlri: 7 (instance master)
 
-``napalm-logs`` identifies that it was produced by a Junos device and assigns the error tag ``BGP_PREFIX_LIMIT_EXCEEDED`` and then will try to map the information into the OpenConfig model ``openconfig_bgp``:
+``napalm-logs`` identifies that it was produced by a Junos device and assigns
+the error tag ``BGP_PREFIX_LIMIT_EXCEEDED`` and then will try to map the
+information into the OpenConfig model ``openconfig_bgp``:
 
 .. code-block:: json
 
@@ -67,15 +71,15 @@ For example, the following syslog message:
 	  "severity": 5
 	}
 
-Under this section, we present the possible error tags, together with their corresponding YANG model and examples.
+Under this section, we present the possible error tags, together with their
+corresponding YANG model and examples.
 
 .. toctree::
    :maxdepth: 1
 
-   BGP_MD5_INCORRECT
-   BGP_PREFIX_THRESH_EXCEEDED
-   BGP_PREFIX_LIMIT_EXCEEDED
-   BGP_PEER_NOT_CONFIGURED
    RAW
-   SYSTEM_ALARM
    UNKNOWN
+   {% for error_name in error_list -%}
+   {{ error_name }}
+   {% endfor -%}
+
