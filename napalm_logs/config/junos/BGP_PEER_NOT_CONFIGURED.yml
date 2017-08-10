@@ -1,3 +1,6 @@
+# This error tag corresponds to syslog messages notifying that the configured
+# peer sent a BGP notification code 6 subcode 5, which idicates that the peer
+# does not have the session configured.
 messages:
   # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
   # This may change if we are able to find a more well defined naming system.
