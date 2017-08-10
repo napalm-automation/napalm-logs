@@ -32,7 +32,7 @@ Directory tree structure example:
 
 The user can select to extend the capabilities of the public library,
 by defining profiles under a directory, specifying the path using the
-:ref:`extension-config-path` option.
+:ref:`configuration-options-extension-config-path` option.
 
 Custom directory tree example:
 

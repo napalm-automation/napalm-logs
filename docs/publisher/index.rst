@@ -1,4 +1,4 @@
-.. _publisher
+.. _publisher:
 
 =========
 Publisher
