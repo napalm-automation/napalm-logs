@@ -65,9 +65,10 @@ class KafkaListener(ListenerBase):
             raise ListenerException(error)
         log_source = msg.key
         try:
-            decoded = json.loads(msg.value)
+            decoded = json.loads(msg.value.decode('utf-8'))
         except ValueError:
-            log.error('Not in json format: %s', msg.value)
+            log.error('Not in json format: %s', msg.value.decode('utf-8'))
+            return '', ''
         log_message = decoded.get('message')
         log.debug('[%s] Received %s from %s', log_message, log_source, time.time())
         return log_message, log_source
