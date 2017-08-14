@@ -117,6 +117,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     'mapping': mapping
                 }
             )
+        log.debug('Compiled messages:')
+        log.debug(self.compiled_messages)
 
     def _parse(self, msg_dict):
         '''
@@ -124,9 +126,16 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         be generated.
         '''
         error_present = False
+        # log.debug('Matching the message:')
+        # log.debug(msg_dict)
         for message in self.compiled_messages:
+            # log.debug('Matching using:')
+            # log.debug(message)
             match_on = message['match_on']
-            if message[match_on] != msg_dict[match_on]:
+            if match_on not in msg_dict:
+                # log.debug('%s is not a valid key in the partially parsed dict', match_on)
+                continue
+            if message['tag'] != msg_dict[match_on]:
                 continue
             if '__python_fun__' in message:
                 return {
