@@ -105,10 +105,11 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 self.compiled_prefixes[dev_os].append({
                     'prefix': re.compile(escaped.format(**values)),
                     'prefix_positions': sorted_position,
+                    'raw_prefix': escaped.format(**values),
                     'values': values
                 })
-        log.debug('Compiled prefixes')
-        log.debug(self.compiled_prefixes)
+        # log.debug('Compiled prefixes')
+        # log.debug(self.compiled_prefixes)
 
     def _identify_os(self, msg):
         '''
@@ -134,9 +135,11 @@ class NapalmLogsServerProc(NapalmLogsProc):
                         log.error('Exception while parsing %s with the %s python profiler',
                                   msg, prefix['__python_mod__'], exc_info=True)
                 else:
-                    log.debug('Matching using YAML-defined profiler')
+                    log.debug('Matching using YAML-defined profiler:')
+                    log.debug(prefix['raw_prefix'])
                     match = prefix['prefix'].search(msg)
                 if not match:
+                    log.debug('Match not found')
                     continue
                 if '__python_fun__' in prefix:
                     log.debug('%s matched using the custom python profiler %s', msg, prefix['__python_mod__'])

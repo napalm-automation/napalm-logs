@@ -1,0 +1,40 @@
+{
+  "ip": "127.0.0.1",
+  "host": "edge01.bjm01",
+  "yang_message": {
+    "system": {
+      "ntp": {
+        "servers": {
+          "server": {
+            "1.2.3.4": {
+              "state": {
+                "stratum": 16
+              },
+              "config": {
+                "association-type": "SERVER"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "processId": "16015",
+    "host": "edge01.bjm01",
+    "date": "Jul 13",
+    "tag": "xntpd",
+    "facility": 18,
+    "hostPrefix": "re0.",
+    "message": "NTP Server 1.2.3.4 is Unreachable",
+    "time": "22:53:14",
+    "pri": "149",
+    "severity": 5
+  },
+  "error": "NTP_SERVER_UNREACHABLE",
+  "timestamp": 1499986394,
+  "facility": 18,
+  "os": "junos",
+  "yang_model": "openconfig-system",
+  "severity": 5
+}

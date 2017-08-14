@@ -15,3 +15,13 @@ prefixes:
       processId: \[?(\d+)?\]?
       tag: ([\w\s]+)
     line: '{date} {time} {hostPrefix}{host} {processName}{processId}: {tag}:'
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\w+\s+\d+)
+      time: (\d\d:\d\d:\d\d)
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      tag: (\w+)
+      # Most log lines have a process ID, however some do not
+      processId: (\d+)
+    line: '{date} {time} {hostPrefix}{host} {tag}[{processId}]:'
