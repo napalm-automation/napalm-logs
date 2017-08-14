@@ -1,0 +1,20 @@
+# This message is sent when the synchronization is lost
+# with an NTP server. According to the ``openconfig-system``
+# YANG model, the distinction between NTP peers and servers
+# is made via the ``association-type`` field from the ``config``
+# container.
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: NTP_SERVER_UNREACHABLE
+    tag: xntpd
+    values:
+      peerType|upper: (\w+)
+      peerAddr: (\d+\.\d+\.\d+\.\d+)
+    line: 'NTP {peerType} {peerAddr} is Unreachable'
+    model: openconfig-system
+    mapping:
+      variables:
+        system//ntp//servers//server//{peerAddr}//config//association-type: peerType
+      static:
+        system//ntp//servers//server//{peerAddr}//state//stratum: 16
