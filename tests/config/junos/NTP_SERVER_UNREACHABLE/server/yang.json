@@ -24,17 +24,17 @@
     "host": "edge01.bjm01",
     "date": "Jul 13",
     "tag": "xntpd",
-    "facility": 18,
+    "facility": 12,
     "hostPrefix": "re0.",
     "message": "NTP Server 1.2.3.4 is Unreachable",
     "time": "22:53:14",
-    "pri": "149",
-    "severity": 5
+    "pri": "99",
+    "severity": 3
   },
   "error": "NTP_SERVER_UNREACHABLE",
   "timestamp": 1499986394,
-  "facility": 18,
+  "facility": 12,
   "os": "junos",
   "yang_model": "openconfig-system",
-  "severity": 5
+  "severity": 3
 }
