@@ -1,0 +1,13 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: NTP_SERVER_UNREACHABLE
+    tag: IP-IP_NTP-5-SYNC_LOSS
+    values:
+      peerAddr: (\d+\.\d+\.\d+\.\d+)
+    line: 'Synchronization lost : {peerAddr} : The association was removed'
+    model: openconfig-system
+    mapping:
+      variables: {}
+      static:
+        system//ntp//servers//server//{peerAddr}//state//stratum: 16
