@@ -29,13 +29,13 @@ Will produce the following object:
 					"inet4": {
 					  "state": {
 						"prefixes": {
-						  "received": "141"
+						  "received": 141
 						}
 					  },
 					  "ipv4_unicast": {
 						"prefix_limit": {
 						  "state": {
-							"max_prefixes": "140"
+							"max_prefixes": 140
 						  }
 						}
 					  }
@@ -49,6 +49,8 @@ Will produce the following object:
 	  },
 	  "message_details": {
 		"processId": "2902",
+		"severity": 5,
+		"facility": 18,
 		"hostPrefix": null,
 		"pri": "149",
 		"processName": "rpd",
@@ -62,19 +64,23 @@ Will produce the following object:
 	  "facility": 18,
 	  "ip": "127.0.0.1",
 	  "host": "vmx01",
-	  "yang_model": "openconfig_bgp",
+	  "yang_model": "openconfig-bgp",
 	  "error": "BGP_PREFIX_THRESH_EXCEEDED",
 	  "os": "junos",
 	  "severity": 5
 	}
   }
 
-
-Thie library is provided with a command line program which acts as a daemon, running in background and listening to syslog messages continuously, then publishing them over secured channels, where multiple clients can subscribe.
+The library is comes with a command line program which acts as a daemon, running in background and listening to syslog messages continuously, then publishing them over secured channels, where multiple clients can subscribe.
 
 It is flexible to listen to the syslog messages via UDP or TCP, but also from brokers such as Apache Kafka. Similarly, the output objects can be published via various channels such as ZeroMQ, Kafka, or remote server logging. It is also pluggable enough to extend these capabilities and listen or publish to other services, depending on the needs.
 
 The messages are published over a secured channel, encrypted and signed. Although the security can be disabled, this is highly discouraged.
+
+Documentation
+--------------
+    
+Please check `the official documentation <http://napalm-logs.readthedocs.io/en/latest/>`_ for more detailed information.
 
 Install
 -------
