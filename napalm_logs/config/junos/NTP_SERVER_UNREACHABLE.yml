@@ -15,6 +15,6 @@ messages:
     model: openconfig-system
     mapping:
       variables:
-        system//ntp//servers//server//{peerAddr}//config//association-type: peerType
+        system//ntp//servers//server//{peerAddr}//state//association-type: peerType
       static:
         system//ntp//servers//server//{peerAddr}//state//stratum: 16
