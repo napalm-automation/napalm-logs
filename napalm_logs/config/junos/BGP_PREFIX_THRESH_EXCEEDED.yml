@@ -14,7 +14,7 @@ messages:
       type: (\w+)
       peeringType: (\w+)
     line: '{peer} ({peeringType} AS {asn}): Configured maximum prefix-limit threshold({limit}) exceeded for {table}-{type} nlri: {current} (instance master)'
-    model: openconfig_bgp
+    model: openconfig-bgp
     mapping:
       variables:
         bgp//neighbors//neighbor//{peer}//state//peer_as: asn
@@ -32,7 +32,7 @@ messages:
       type: (\w+)
       peeringType: (\w+)
     line: '{peer} ({peeringType} AS {asn}): Configured maximum prefix-limit threshold({limit}) exceeded for {table}-{type} nlri: {current} (instance master)'
-    model: openconfig_bgp
+    model: openconfig-bgp
     mapping:
       variables:
         bgp//neighbors//neighbor//{peer}//state//peer_as: asn

@@ -11,7 +11,7 @@ messages:
       operStatusValue: (\d)
       interface: ([\w\-\/]+)
     line: 'ifIndex {snmpID}, ifAdminStatus {adminStatusString}({adminStatusValue}), ifOperStatus {operStatusString}({operStatusValue}), ifName {interface}'
-    model: openconfig_interfaces
+    model: openconfig-interfaces
     mapping:
       variables:
         interfaces//interface//{interface}//state//admin_status: adminStatusString
