@@ -8,9 +8,7 @@
           "server": {
             "1.2.3.4": {
               "state": {
-                "stratum": 16
-              },
-              "config": {
+                "stratum": 16,
                 "association-type": "SERVER"
               }
             }
