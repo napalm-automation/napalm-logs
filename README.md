@@ -63,7 +63,7 @@ Output object example
   "message_details": {
     "processId": "2902",
     "facility": 18,
-    "severity": 5
+    "severity": 5,
     "hostPrefix": null,
     "pri": "149",
     "processName": "rpd",
