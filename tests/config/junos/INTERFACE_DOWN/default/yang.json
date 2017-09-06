@@ -28,7 +28,7 @@
   "facility": 3,
   "ip": "127.0.0.1",
   "host": "vmx01",
-  "yang_model": "openconfig_interfaces",
+  "yang_model": "openconfig-interfaces",
   "error": "INTERFACE_DOWN",
   "os": "junos",
   "severity": 4

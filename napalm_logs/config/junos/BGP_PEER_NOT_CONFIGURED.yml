@@ -11,7 +11,7 @@ messages:
       asn: (\d+)
       number: (\d+)
     line: '{number}: NOTIFICATION received from {peer} (External AS {asn}): code 6 (Cease) subcode 5 (Connection Rejected)'
-    model: openconfig_bgp
+    model: openconfig-bgp
     mapping:
       variables:
         bgp//neighbors//neighbor//{peer}//state//peer_as: asn

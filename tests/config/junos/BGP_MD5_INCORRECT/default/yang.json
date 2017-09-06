@@ -29,7 +29,7 @@
   "facility": 0,
   "ip": "127.0.0.1",
   "host": "vmx01",
-  "yang_model": "openconfig_bgp",
+  "yang_model": "openconfig-bgp",
   "error": "BGP_MD5_INCORRECT",
   "os": "junos",
   "severity": 4

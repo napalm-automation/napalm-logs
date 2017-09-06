@@ -28,7 +28,7 @@
   "facility": 18,
   "ip": "127.0.0.1",
   "host": "edge01",
-  "yang_model": "openconfig_bgp",
+  "yang_model": "openconfig-bgp",
   "error": "BGP_PREFIX_LIMIT_EXCEEDED",
   "os": "eos",
   "severity": 5

@@ -8,7 +8,7 @@ messages:
       current|int: (\d+)
       limit|int: (\d+)
     line: 'No. of IPv4 Unicast prefixes received from {peer} has reached {current}, max {limit}'
-    model: openconfig_bgp
+    model: openconfig-bgp
     mapping:
       variables:
         bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet//ipv4_unicast//prefix_limit//state//max_prefixes: limit
@@ -21,7 +21,7 @@ messages:
       current|int: (\d+)
       limit|int: (\d+)
     line: 'No. of IPv6 Unicast prefixes received from {peer} has reached {current}, max {limit}'
-    model: openconfig_bgp
+    model: openconfig-bgp
     mapping:
       variables:
         bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet6//ipv6_unicast//prefix_limit//state//max_prefixes: limit

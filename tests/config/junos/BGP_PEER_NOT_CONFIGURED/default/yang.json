@@ -30,7 +30,7 @@
   "facility": 10,
   "ip": "127.0.0.1",
   "host": "vmx01",
-  "yang_model": "openconfig_bgp",
+  "yang_model": "openconfig-bgp",
   "error": "BGP_PEER_NOT_CONFIGURED",
   "os": "junos",
   "severity": 7
