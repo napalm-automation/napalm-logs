@@ -209,17 +209,17 @@ e.g.: the CLI option ``auth-address`` becomes ``auth_address`` in the
 
 .. code-block:: yaml
 
-	address: 172.17.17.1
-	port: 5514
-	publish_address: 172.17.17.2
-	publish_port: 49017
-	transport: zmq
-	listener:
-    kafka:
-  	  bootstrap_servers:
-  	    - 10.10.10.1
-  	    - 10.10.10.2
-  	    - 10.10.10.3
+    address: 172.17.17.1
+    port: 5514
+    publish_address: 172.17.17.2
+    publish_port: 49017
+    transport: zmq
+    listener:
+      kafka:
+        bootstrap_servers:
+          - 10.10.10.1
+          - 10.10.10.2
+          - 10.10.10.3
 
 The configuration above listens to the syslog messages from the Kafka bootstrap
 servers ``10.10.10.1``, ``10.10.10.2`` and ``10.10.10.3`` then publishes the
