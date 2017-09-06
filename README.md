@@ -4,7 +4,6 @@ napalm-logs is a Python library that listens to syslog messages from network
 devices and returns strucuted data following the [OpenConfig](http://www.openconfig.net/)
 or [IETF](https://github.com/YangModels/yang/tree/master/standard/ietf) YANG models.
 
-
 <img src="logo.png" data-canonical-src="logo.png" width="300" />
 
 The outgoing objects are published via ZeroMQ, Kafka, or other usual transport
@@ -25,13 +24,6 @@ Requirements
 - PyNaCl
 - u-msgpack-python
 
-Installation
-------------
-
-```
-pip install napalm-logs
-```
-
 Output object example
 ---------------------
 
@@ -50,13 +42,13 @@ Output object example
                 "inet4": {
                   "state": {
                     "prefixes": {
-                      "received": "141"
+                      "received": 141
                     }
                   },
                   "ipv4_unicast": {
                     "prefix_limit": {
                       "state": {
-                        "max_prefixes": "140"
+                        "max_prefixes": 140
                       }
                     }
                   }
@@ -70,6 +62,8 @@ Output object example
   },
   "message_details": {
     "processId": "2902",
+    "facility": 18,
+    "severity": 5
     "hostPrefix": null,
     "pri": "149",
     "processName": "rpd",
@@ -83,9 +77,21 @@ Output object example
   "facility": 18,
   "ip": "127.0.0.1",
   "host": "vmx01",
-  "yang_model": "openconfig_bgp",
+  "yang_model": "openconfig-bgp",
   "error": "BGP_PREFIX_THRESH_EXCEEDED",
   "os": "junos",
   "severity": 5
 }
+```
+
+Documentation
+-------------
+
+Please check [the official documentation](http://napalm-logs.readthedocs.io/en/latest/) for more detailed information.
+
+Installation
+------------
+
+```
+pip install napalm-logs
 ```
