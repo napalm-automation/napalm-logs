@@ -11,7 +11,7 @@ For example, the following syslog message from a Juniper device:
 
 .. code-block:: text
 
-	Mar 30 12:45:19 re0.edge01.bjm01 rpd[15852]: BGP_PREFIX_THRESH_EXCEEDED 1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)
+	<149>Jun 21 14:03:12  vmx01 rpd[2902]: BGP_PREFIX_THRESH_EXCEEDED: 192.168.140.254 (External AS 4230): Configured maximum prefix-limit threshold(140) exceeded for inet4-unicast nlri: 141 (instance master) 
 
 Will produce the following object:
 
@@ -24,7 +24,7 @@ Will produce the following object:
             "neighbor": {
               "192.168.140.254": {
                 "state": {
-                  "peer_as": "65001"
+                  "peer_as": "4230"
                 },
                 "afi_safis": {
                   "afi_safi": {
@@ -60,9 +60,9 @@ Will produce the following object:
         "tag": "BGP_PREFIX_THRESH_EXCEEDED",
         "time": "14:03:12",
         "date": "Jun 21",
-        "message": "192.168.140.254 (External AS 65001): Configured maximum prefix-limit threshold(140) exceeded for inet4-unicast nlri: 141 (instance master)"
+        "message": "192.168.140.254 (External AS 4230): Configured maximum prefix-limit threshold(140) exceeded for inet4-unicast nlri: 141 (instance master)"
       },
-      "timestamp": 1498050192,
+      "timestamp": 1498053792,
       "facility": 18,
       "ip": "127.0.0.1",
       "host": "vmx01",
