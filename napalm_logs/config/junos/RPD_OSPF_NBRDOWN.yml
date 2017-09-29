@@ -1,0 +1,36 @@
+# This error tag corresponds to syslog messages notifying that the configured
+# ospf neighbor has changed state from Full
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: OSPF_NEIGHBOR_DOWN
+    tag: RPD_OSPF_NBRDOWN
+    values:
+      neighbor: ([\w\d:\.]+)
+      interface: ([\w\-\/\.\d]+)
+      area: (\d+\.\d+\.\d+\.\d+)
+      reason_message: ([\w ]+)
+    line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Full to Down due to KillNbr (event reason: {reason_message})'
+    model: openconfig-network-instance
+    mapping:
+      variables:
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reason_message
+      static:
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state: DOWN
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason: KILL_NEIGHBOR
+
+  - error: OSPF_NEIGHBOR_DOWN
+    tag: RPD_OSPF_NBRDOWN
+    values:
+      neighbor: ([\w\d:\.]+)
+      interface: ([\w\-\/\.\d]+)
+      area: (\d+\.\d+\.\d+\.\d+)
+      reason_message: ([\w ]+)
+    line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Full to Down due to InActiveTimer (event reason: {reason_message})'
+    model: openconfig-network-instance
+    mapping:
+      variables:
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reason_message
+      static:
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state: DOWN
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason: INACTIVE_TIMER

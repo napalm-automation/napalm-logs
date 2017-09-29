@@ -1,0 +1,36 @@
+{
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "ge-1/0/23.0": {
+          "ethernet": {
+            "state": {
+              "learned-mac-addresses": "3"
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "date": "Jun 21",
+    "time": "14:03:12",
+    "hostPrefix": null,
+    "host": "vmx01",
+    "processName": "l2ald",
+    "processId": "2902",
+    "tag": "L2ALD_MAC_LIMIT_REACHED_IF",
+    "pri": "149",
+    "message": "Limit on learned MAC addresses reached for ge-1/0/23.0; current count is 3",
+    "facility": 18,
+    "severity": 5
+  },
+  "yang_model": "openconfig-interface",
+  "os": "junos",
+  "facility": 18,
+  "severity": 5,
+  "error": "INTERFACE_MAC_LIMIT_REACHED",
+  "host": "vmx01",
+  "ip": "127.0.0.1",
+  "timestamp": 1498053792
+}

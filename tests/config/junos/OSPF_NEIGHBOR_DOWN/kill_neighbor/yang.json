@@ -1,0 +1,62 @@
+{
+  "yang_message": {
+    "network-instances": {
+      "network-instance": {
+        "global": {
+          "protocols": {
+            "protocol": {
+              "ospf": {
+                "ospfv2": {
+                  "areas": {
+                    "area": {
+                      "0.0.0.0": {
+                        "interfaces": {
+                          "interface": {
+                            "ge-0/0/0.0": {
+                              "neighbors": {
+                                "neighbor": {
+                                  "1.1.1.1": {
+                                    "state": {
+                                      "adjacency-state-change-reason-message": "neighbor down",
+                                      "adjacency-state": "DOWN",
+                                      "adjacency-state-change-reason": "KILL_NEIGHBOR"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "date": "Jun 21",
+    "time": "14:03:12",
+    "hostPrefix": null,
+    "host": "vmx01",
+    "processName": "rpd",
+    "processId": "2902",
+    "tag": "RPD_OSPF_NBRDOWN",
+    "pri": "149",
+    "message": "OSPF neighbor 1.1.1.1 (realm ospf-v2 ge-0/0/0.0 area 0.0.0.0) state changed from Full to Down due to KillNbr (event reason: neighbor down)",
+    "facility": 18,
+    "severity": 5
+  },
+  "yang_model": "openconfig-network-instance",
+  "os": "junos",
+  "facility": 18,
+  "severity": 5,
+  "error": "OSPF_NEIGHBOR_DOWN",
+  "host": "vmx01",
+  "ip": "127.0.0.1",
+  "timestamp": 1498053792
+}

@@ -1,0 +1,35 @@
+{
+  "yang_message": {
+    "users": {
+      "user": {
+        "luke": {
+          "action": {
+            "requested_commit": true,
+            "comment": "hello"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "processId": "7729",
+    "severity": 5,
+    "facility": 23,
+    "hostPrefix": null,
+    "pri": "189",
+    "processName": "mgd",
+    "host": "vmx01",
+    "tag": "UI_COMMIT",
+    "time": "21:44:00",
+    "date": "Jul 20",
+    "message": "User 'luke' requested 'commit' operation (comment: hello)"
+  },
+  "timestamp": 1500587040,
+  "facility": 23,
+  "ip": "127.0.0.1",
+  "host": "vmx01",
+  "yang_model": "NO_MODEL",
+  "error": "CONFIGURATION_COMMIT_REQUESTED",
+  "os": "junos",
+  "severity": 5
+}

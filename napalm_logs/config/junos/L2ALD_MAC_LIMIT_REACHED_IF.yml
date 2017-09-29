@@ -1,0 +1,16 @@
+# This error tag corresponds to syslog messages notifying that the configured
+# interface mac learning limit has been reached
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: INTERFACE_MAC_LIMIT_REACHED
+    tag: L2ALD_MAC_LIMIT_REACHED_IF
+    values:
+      interface: ([\w\-\/\.\d]+)
+      count: (\d+)
+    line: 'Limit on learned MAC addresses reached for {interface}; current count is {count}'
+    model: openconfig-interface
+    mapping:
+      variables:
+        interfaces//interface//{interface}//ethernet//state//learned-mac-addresses: count
+      static: {}

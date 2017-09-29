@@ -1,0 +1,17 @@
+# This error tag corresponds to syslog messages notifying that the a
+# user has requested a configuration commit
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: CONFIGURATION_COMMIT_REQUESTED
+    tag: UI_COMMIT
+    values:
+      user: (\w+)
+      comment: (\w+)
+    line: "User '{user}' requested 'commit' operation (comment: {comment})"
+    model: NO_MODEL
+    mapping:
+      variables:
+        users//user//{user}//action//comment: comment
+      static:
+        users//user//{user}//action//requested_commit: True
