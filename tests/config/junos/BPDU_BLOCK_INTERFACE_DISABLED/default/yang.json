@@ -18,16 +18,16 @@
     "processName": "eswd",
     "processId": "2902",
     "tag": "ESWD_BPDU_BLOCK_ERROR_DISABLED",
-    "pri": "149",
+    "pri": "25",
     "message": "ge-0/0/17.0: bpdu-block disabled port",
-    "facility": 18,
-    "severity": 5
+    "facility": 3,
+    "severity": 1
   },
   "yang_model": "openconfig-interface",
   "os": "junos",
-  "facility": 18,
-  "severity": 5,
-  "error": "BPDU_BLOCK_INTERFACE_DISSABLED",
+  "facility": 3,
+  "severity": 1,
+  "error": "BPDU_BLOCK_INTERFACE_DISABLED",
   "host": "vmx01",
   "ip": "127.0.0.1",
   "timestamp": 1498053792

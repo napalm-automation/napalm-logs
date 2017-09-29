@@ -11,10 +11,10 @@
   },
   "message_details": {
     "processId": "7729",
-    "severity": 5,
+    "severity": 3,
     "facility": 23,
     "hostPrefix": null,
-    "pri": "189",
+    "pri": "187",
     "processName": "mgd",
     "host": "vmx01",
     "tag": "UI_CONFIGURATION_ERROR",
@@ -29,5 +29,5 @@
   "yang_model": "NO_MODEL",
   "error": "CONFIGURATION_ERROR",
   "os": "junos",
-  "severity": 5
+  "severity": 3
 }

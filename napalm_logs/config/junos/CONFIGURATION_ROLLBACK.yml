@@ -13,3 +13,16 @@ messages:
       variables: {}
       static:
         users//user//{user}//action//configuration_rollback: True
+
+  - error: CONFIGURATION_ROLLBACK
+    tag: UI_LOAD_EVENT
+    values:
+      user: (\w+)
+      number: (\d+)
+    line: "User '{user}' is performing a 'rollback {number}'"
+    model: NO_MODEL
+    mapping:
+      variables:
+        users//user//{user}//action//configuration_rollback_number: number
+      static:
+        users//user//{user}//action//configuration_rollback: True

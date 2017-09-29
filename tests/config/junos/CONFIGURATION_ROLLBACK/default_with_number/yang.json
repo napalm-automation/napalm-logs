@@ -1,0 +1,35 @@
+{
+  "yang_message": {
+    "users": {
+      "user": {
+        "luke": {
+          "action": {
+            "configuration_rollback": true,
+            "configuration_rollback_number": "3"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "date": "Jul 20",
+    "time": "21:44:00",
+    "hostPrefix": null,
+    "host": "vmx01",
+    "processName": "mgd",
+    "processId": "7729",
+    "tag": "UI_LOAD_EVENT",
+    "pri": "189",
+    "message": "User 'luke' is performing a 'rollback 3'",
+    "facility": 23,
+    "severity": 5
+  },
+  "yang_model": "NO_MODEL",
+  "os": "junos",
+  "facility": 23,
+  "severity": 5,
+  "error": "CONFIGURATION_ROLLBACK",
+  "host": "vmx01",
+  "ip": "127.0.0.1",
+  "timestamp": 1500587040
+}

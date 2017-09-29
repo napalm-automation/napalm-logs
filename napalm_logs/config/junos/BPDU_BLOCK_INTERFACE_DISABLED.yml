@@ -1,9 +1,9 @@
 # This error tag corresponds to syslog messages notifying that the configured
-# interface has been dissabled due to a bpdu block
+# interface has been disabled due to a bpdu block
 messages:
   # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
   # This may change if we are able to find a more well defined naming system.
-  - error: BPDU_BLOCK_INTERFACE_DISSABLED
+  - error: BPDU_BLOCK_INTERFACE_DISABLED
     tag: ESWD_BPDU_BLOCK_ERROR_DISABLED
     values:
       interface: ([\w\-\/\.\d]+)
