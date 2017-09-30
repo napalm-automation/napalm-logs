@@ -51,7 +51,7 @@
     "facility": 3,
     "severity": 5
   },
-  "yang_model": "openconfig-network-instance",
+  "yang_model": "openconfig-ospf",
   "os": "junos",
   "facility": 3,
   "severity": 5,

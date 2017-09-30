@@ -11,7 +11,7 @@ messages:
       area: (\d+\.\d+\.\d+\.\d+)
       reason_message: ([\w ]+)
     line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Full to Down due to KillNbr (event reason: {reason_message})'
-    model: openconfig-network-instance
+    model: openconfig-ospf
     mapping:
       variables:
         network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reason_message
@@ -27,7 +27,7 @@ messages:
       area: (\d+\.\d+\.\d+\.\d+)
       reason_message: ([\w ]+)
     line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Full to Down due to InActiveTimer (event reason: {reason_message})'
-    model: openconfig-network-instance
+    model: openconfig-ospf
     mapping:
       variables:
         network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reason_message

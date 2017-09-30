@@ -6,7 +6,7 @@
           "1.1.1.1": {
             "state": {
               "peer_as": "2222",
-              "session-state-change-event": "AnEvent",
+              "session-state-change-event": "RecvKeepAlive",
               "session-state": "ESTABLISHED",
               "session-state-old": "OPEN_CONFIRM"
             }
@@ -24,7 +24,7 @@
     "processId": "2902",
     "tag": "RPD_BGP_NEIGHBOR_STATE_CHANGED",
     "pri": "28",
-    "message": "BGP peer 1.1.1.1 (External AS 2222) changed state from OpenConfirm to Established (event AnEvent) (instance master)",
+    "message": "BGP peer 1.1.1.1 (External AS 2222) changed state from OpenConfirm to Established (event RecvKeepAlive) (instance master)",
     "facility": 3,
     "severity": 4
   },

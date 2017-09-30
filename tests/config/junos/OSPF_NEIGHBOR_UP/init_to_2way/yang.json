@@ -17,7 +17,7 @@
                                 "neighbor": {
                                   "1.1.1.1": {
                                     "state": {
-                                      "adjacency-state-change-reason-message": "ExStart",
+                                      "adjacency-state-change-reason-message": "two way received",
                                       "adjacency-state": "TWO_WAY",
                                       "adjacency-state-change-reason": "TWO_WAY_RECEIVED"
                                     }
@@ -47,11 +47,11 @@
     "processId": "2902",
     "tag": "RPD_OSPF_NBRUP",
     "pri": "29",
-    "message": "OSPF neighbor 1.1.1.1 (realm ospf-v2 ge-0/0/0.0 area 0.0.0.0) state changed from Init to 2Way due to 2WayRcvd (event reason: ExStart)",
+    "message": "OSPF neighbor 1.1.1.1 (realm ospf-v2 ge-0/0/0.0 area 0.0.0.0) state changed from Init to 2Way due to 2WayRcvd (event reason: two way received)",
     "facility": 3,
     "severity": 5
   },
-  "yang_model": "openconfig-network-instance",
+  "yang_model": "openconfig-ospf",
   "os": "junos",
   "facility": 3,
   "severity": 5,

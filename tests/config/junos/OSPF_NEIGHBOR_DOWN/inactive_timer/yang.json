@@ -17,7 +17,7 @@
                                 "neighbor": {
                                   "1.1.1.1": {
                                     "state": {
-                                      "adjacency-state-change-reason-message": "dead timer",
+                                      "adjacency-state-change-reason-message": "BFD session timed out and neighbor was declared dead",
                                       "adjacency-state": "DOWN",
                                       "adjacency-state-change-reason": "INACTIVE_TIMER"
                                     }
@@ -47,11 +47,11 @@
     "processId": "2902",
     "tag": "RPD_OSPF_NBRDOWN",
     "pri": "29",
-    "message": "OSPF neighbor 1.1.1.1 (realm ospf-v2 ge-0/0/0.0 area 0.0.0.0) state changed from Full to Down due to InActiveTimer (event reason: dead timer)",
+    "message": "OSPF neighbor 1.1.1.1 (realm ospf-v2 ge-0/0/0.0 area 0.0.0.0) state changed from Full to Down due to InActiveTimer (event reason: BFD session timed out and neighbor was declared dead)",
     "facility": 3,
     "severity": 5
   },
-  "yang_model": "openconfig-network-instance",
+  "yang_model": "openconfig-ospf",
   "os": "junos",
   "facility": 3,
   "severity": 5,
