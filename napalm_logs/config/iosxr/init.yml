@@ -1,4 +1,4 @@
-# You should not use special characture in the value keys
+# You should not use special characters in the value keys
 #
 # A single whitespace in `line` will match any number of whitespaces. You should be explicit when
 # Matching white space in `values`
