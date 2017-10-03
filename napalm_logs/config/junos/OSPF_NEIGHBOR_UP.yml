@@ -9,12 +9,12 @@ messages:
       neighbor: ([\w\d:\.]+)
       interface: ([\w\-\/\.\d]+)
       area: (\d+\.\d+\.\d+\.\d+)
-      reason_message: ([\w ]+)
-    line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Init to ExStart due to 2WayRcvd (event reason: {reason_message})'
+      reasonMessage: ([\w ]+)
+    line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Init to ExStart due to 2WayRcvd (event reason: {reasonMessage})'
     model: openconfig-ospf
     mapping:
       variables:
-        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reason_message
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reasonMessage
       static:
         network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state: EXCHANGE_START
         network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason: TWO_WAY_RECEIVED
@@ -25,12 +25,12 @@ messages:
       neighbor: ([\w\d:\.]+)
       interface: ([\w\-\/\.\d]+)
       area: (\d+\.\d+\.\d+\.\d+)
-      reason_message: ([\w ]+)
-    line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Init to 2Way due to 2WayRcvd (event reason: {reason_message})'
+      reasonMessage: ([\w ]+)
+    line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Init to 2Way due to 2WayRcvd (event reason: {reasonMessage})'
     model: openconfig-ospf
     mapping:
       variables:
-        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reason_message
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reasonMessage
       static:
         network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state: TWO_WAY
         network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason: TWO_WAY_RECEIVED
@@ -41,12 +41,12 @@ messages:
       neighbor: ([\w\d:\.]+)
       interface: ([\w\-\/\.\d]+)
       area: (\d+\.\d+\.\d+\.\d+)
-      reason_message: ([\w ]+)
-    line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Exchange to Full due to ExchangeDone (event reason: {reason_message})'
+      reasonMessage: ([\w ]+)
+    line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Exchange to Full due to ExchangeDone (event reason: {reasonMessage})'
     model: openconfig-ospf
     mapping:
       variables:
-        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reason_message
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reasonMessage
       static:
         network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state: FULL
         network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason: EXCHANGE_DONE
@@ -57,12 +57,12 @@ messages:
       neighbor: ([\w\d:\.]+)
       interface: ([\w\-\/\.\d]+)
       area: (\d+\.\d+\.\d+\.\d+)
-      reason_message: ([\w ]+)
-    line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Loading to Full due to LoadDone (event reason: {reason_message})'
+      reasonMessage: ([\w ]+)
+    line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Loading to Full due to LoadDone (event reason: {reasonMessage})'
     model: openconfig-ospf
     mapping:
       variables:
-        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reason_message
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason-message: reasonMessage
       static:
         network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state: FULL
         network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//{area}//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state-change-reason: LOAD_DONE
