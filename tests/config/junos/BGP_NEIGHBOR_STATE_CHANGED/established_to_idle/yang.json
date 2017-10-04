@@ -1,0 +1,39 @@
+{
+  "yang_message": {
+    "bgp": {
+      "neighbors": {
+        "neighbor": {
+          "1.1.1.1": {
+            "state": {
+              "peer_as": "2222",
+              "session-state-change-event": "HoldTime",
+              "session-state": "IDLE",
+              "session-state-old": "ESTABLISHED"
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "date": "Jun 21",
+    "time": "14:03:12",
+    "hostPrefix": null,
+    "host": "vmx01",
+    "processName": "rpd",
+    "processId": "2902",
+    "tag": "RPD_BGP_NEIGHBOR_STATE_CHANGED",
+    "pri": "28",
+    "message": "BGP peer 1.1.1.1 (External AS 2222) changed state from Established to Idle (event HoldTime) (instance master)",
+    "facility": 3,
+    "severity": 4
+  },
+  "yang_model": "openconfig-bgp",
+  "os": "junos",
+  "facility": 3,
+  "severity": 4,
+  "error": "BGP_NEIGHBOR_STATE_CHANGED",
+  "host": "vmx01",
+  "ip": "127.0.0.1",
+  "timestamp": 1498053792
+}

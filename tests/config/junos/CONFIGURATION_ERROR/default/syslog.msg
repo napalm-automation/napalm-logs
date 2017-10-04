@@ -1,0 +1,1 @@
+<187>Jul 20 21:44:00 vmx01 mgd[7729]: UI_CONFIGURATION_ERROR: Process: mgd, path: [edit vlans VLANTEST l3-interface], statement: l3-interface vlan.666, Interface must already be defined under [edit interfaces]

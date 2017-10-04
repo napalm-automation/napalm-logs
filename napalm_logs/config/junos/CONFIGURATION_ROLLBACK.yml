@@ -1,0 +1,28 @@
+# This error tag corresponds to syslog messages notifying that the a
+# user has requested a configuration rollback
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: CONFIGURATION_ROLLBACK
+    tag: UI_LOAD_EVENT
+    values:
+      user: (\w+)
+    line: "User '{user}' is performing a 'rollback'"
+    model: NO_MODEL
+    mapping:
+      variables: {}
+      static:
+        users//user//{user}//action//configuration_rollback: True
+
+  - error: CONFIGURATION_ROLLBACK
+    tag: UI_LOAD_EVENT
+    values:
+      user: (\w+)
+      number: (\d+)
+    line: "User '{user}' is performing a 'rollback {number}'"
+    model: NO_MODEL
+    mapping:
+      variables:
+        users//user//{user}//action//configuration_rollback_number: number
+      static:
+        users//user//{user}//action//configuration_rollback: True

@@ -1,0 +1,20 @@
+# This error tag corresponds to syslog messages notifying that there
+# is an error in the configuration
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: CONFIGURATION_ERROR
+    tag: UI_CONFIGURATION_ERROR
+    values:
+      path: ([\[\]+\w\-\.\d_ ]+)
+      statement: ([\[\]+\w\-\.\d\"\'_ ]+)
+      message: ([\[\]+\w\-\.\d\"\'_ ]+)
+    line: "Process: mgd, path: {path}, statement: {statement}, {message}"
+    model: NO_MODEL
+    mapping:
+      variables:
+        system//configuration//path: path
+        system//configuration//statement: statement
+        system//configuration//message: message
+      static:
+        system//configuration//error: True
