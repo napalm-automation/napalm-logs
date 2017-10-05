@@ -11,7 +11,7 @@ prefixes:
       # only provide the node-id which, e.g RP/0/RSP0/CPU0. To include the
       # hostname you can add a hostname prefix, however as this is not always
       # present the host field can be empty.
-      host: ([^ ]+ )?
+      host: ([^ ]+)?
       nodeId: ([^ ]+)
       date: (\w+ +\d+)
       time: (\d\d:\d\d:\d\d)
@@ -20,5 +20,5 @@ prefixes:
       processName: (\w+)
       processId: (\d+)
       tag: ([\w-]+)
-    line: '{messageId}: {host}{nodeId}:{date} {time}{milliseconds}{timeZone}: {processName}[{processId}]: %{tag}'
+    line: '{messageId}: {host} {nodeId}:{date} {time}{milliseconds}{timeZone}: {processName}[{processId}]: %{tag} : '
 
