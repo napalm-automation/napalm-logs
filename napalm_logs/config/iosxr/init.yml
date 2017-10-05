@@ -11,7 +11,7 @@ prefixes:
       # only provide the node-id which, e.g RP/0/RSP0/CPU0. To include the
       # hostname you can add a hostname prefix, however as this is not always
       # present the host field can be empty.
-      host: ([^ ]+)?
+      host: ([^ ]+)
       nodeId: ([^ ]+)
       date: (\w+ +\d+)
       time: (\d\d:\d\d:\d\d)
@@ -21,4 +21,19 @@ prefixes:
       processId: (\d+)
       tag: ([\w-]+)
     line: '{messageId}: {host} {nodeId}:{date} {time}{milliseconds}{timeZone}: {processName}[{processId}]: %{tag} : '
-
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      messageId: (\d+)
+      # On IOS-XR syslog messages do not contain the hostname by default, they
+      # only provide the node-id which, e.g RP/0/RSP0/CPU0. To include the
+      # hostname you can add a hostname prefix, however as this is not always
+      # present the host field can be empty.
+      nodeId: ([^ ]+)
+      date: (\w+ +\d+)
+      time: (\d\d:\d\d:\d\d)
+      milliseconds: (\.\d\d\d)
+      timeZone: \s?(\w\w\w)?
+      processName: (\w+)
+      processId: (\d+)
+      tag: ([\w-]+)
+    line: '{messageId}: {nodeId}:{date} {time}{milliseconds}{timeZone}: {processName}[{processId}]: %{tag} : '
