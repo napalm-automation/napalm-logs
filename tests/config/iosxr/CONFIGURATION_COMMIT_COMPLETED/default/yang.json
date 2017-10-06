@@ -1,0 +1,33 @@
+{
+    "host": "xrv",
+    "yang_message": {
+        "system": {
+            "operations": {
+                "commit_complete": true
+            }
+        }
+    },
+    "message_details": {
+        "processId": "67310",
+        "facility": 23,
+        "time": "22:52:47",
+        "pri": "190",
+        "nodeId": "RP/0/RP0/CPU0",
+        "processName": "cfgmgr_trial_confirm",
+        "host": "xrv",
+        "tag": "MGBL-CONFIG-6-DB_COMMIT",
+        "messageId": "40",
+        "date": "Oct  4",
+        "timeZone": null,
+        "message": "Configuration committed by user 'vagrant'. Use 'show configuration commit changes 1000000093' to view the changes.",
+        "milliseconds": ".441",
+        "severity": 6
+    },
+    "timestamp": 1507157567,
+    "error": "CONFIGURATION_COMMIT_COMPLETED",
+    "ip": "127.0.0.1",
+    "facility": 23,
+    "os": "iosxr",
+    "yang_model": "NO_MODEL",
+    "severity": 6
+}

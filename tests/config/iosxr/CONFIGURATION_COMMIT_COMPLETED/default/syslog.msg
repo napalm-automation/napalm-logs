@@ -1,0 +1,1 @@
+<190>40: xrv RP/0/RP0/CPU0:Oct  4 22:52:47.441 : cfgmgr_trial_confirm[67310]: %MGBL-CONFIG-6-DB_COMMIT : Configuration committed by user 'vagrant'. Use 'show configuration commit changes 1000000093' to view the changes.
