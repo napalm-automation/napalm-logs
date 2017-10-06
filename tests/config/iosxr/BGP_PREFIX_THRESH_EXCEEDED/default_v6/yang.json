@@ -46,7 +46,7 @@
   "timestamp": 1490713710,
   "facility": 18,
   "ip": "127.0.0.1",
-  "host": "vmx01 ",
+  "host": "vmx01",
   "yang_model": "openconfig-bgp",
   "error": "BGP_PREFIX_THRESH_EXCEEDED",
   "os": "iosxr",
