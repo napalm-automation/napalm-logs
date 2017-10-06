@@ -36,6 +36,6 @@
   },
   "yang_model": "openconfig-system",
   "ip": "127.0.0.1",
-  "host": "device3 ",
+  "host": "device3",
   "facility": 12
 }
