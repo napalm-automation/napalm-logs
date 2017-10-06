@@ -97,24 +97,23 @@ def client(**config):
     #                                     address=config['auth_address'],
     #                                     port=config['auth_port'])
 
-    heat_stop = time.time() + config['heat_time']
-    stop_time = time.time() + config['run_time'] + 2 * config['heat_time']
+    start_time = time.time()
     count = 0
     # while time.time() < heat_stop:
     #     obj = sock.recv()
     #     decrypted = napalm_logs.utils.decrypt(obj, vk, pk)
-    while time.time() < stop_time:
+    while True:
         try:
             obj = sock.recv()
         except zmq.Again:
-            continue
+            break
         log.debug('Received:')
         log.debug(obj)
         decrypted = napalm_logs.utils.unserialize(obj)
         log.debug('Decrypted:')
         log.debug(decrypted)
         count += 1
-    print('Received {0} messages in {1} seconds'.format(count, config['run_time']))
+    print('Received {0} messages in {1} seconds'.format(count, time.time() - start_time))
 
 
 def router_tcp(id, **config):
