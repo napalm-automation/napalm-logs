@@ -91,27 +91,30 @@ def client(**config):
         addr=config['publish_address'],
         port=config['publish_port']))
     sock.setsockopt(zmq.SUBSCRIBE, '')
+    sock.setsockopt(zmq.RCVTIMEO, 1000)
 
-    auth = napalm_logs.utils.ClientAuth(config['certificate'],
-                                        address=config['auth_address'],
-                                        port=config['auth_port'])
+    # auth = napalm_logs.utils.ClientAuth(config['certificate'],
+    #                                     address=config['auth_address'],
+    #                                     port=config['auth_port'])
 
     heat_stop = time.time() + config['heat_time']
-    stop_time = time.time() + config['run_time']
+    stop_time = time.time() + config['run_time'] + 2 * config['heat_time']
     count = 0
     # while time.time() < heat_stop:
     #     obj = sock.recv()
     #     decrypted = napalm_logs.utils.decrypt(obj, vk, pk)
     while time.time() < stop_time:
-        obj = sock.recv()
+        try:
+            obj = sock.recv()
+        except zmq.Again:
+            continue
         log.debug('Received:')
         log.debug(obj)
-        decrypted = auth.decrypt(obj)
+        decrypted = napalm_logs.utils.unserialize(obj)
         log.debug('Decrypted:')
         log.debug(decrypted)
         count += 1
-    print('Received {0} messages in {1} seconds'.format(count,
-                                                        config['run_time']-config['heat_time']))
+    print('Received {0} messages in {1} seconds'.format(count, config['run_time']))
 
 
 def router_tcp(id, **config):
@@ -162,6 +165,10 @@ def main():
     log.addHandler(screen_logger)
     pop = ProfilerOptionParser()
     config = pop.extra_parse(log, screen_logger)
+    if 'auth_port' not in config:
+        config['auth_port'] = 49018
+    if 'auth_address' not in config:
+        config['auth_address'] = '0.0.0.0'
     cproc = Process(target=client, kwargs=config)
     cproc.start()
     for _ in range(config['routers']):
