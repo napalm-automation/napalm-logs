@@ -15,6 +15,7 @@ import threading
 
 # Import third party libs
 import zmq
+import umsgpack
 
 # Import napalm-logs pkgs
 import napalm_logs.ext.six as six
@@ -55,17 +56,18 @@ class NapalmLogsServerProc(NapalmLogsProc):
         Subscript to the listener IPC
         and publish to the device specific IPC.
         '''
-        ctx = zmq.Context()
+        log.debug('Setting up the server IPC puller to receive from the listener')
+        self.ctx = zmq.Context()
         # subscribe to listener
-        self.sub = ctx.socket(zmq.PULL)
-        self.sub.connect(LST_IPC_URL)
+        self.sub = self.ctx.socket(zmq.PULL)
+        self.sub.bind(LST_IPC_URL)
         # device publishers
-        os_types = self.config.keys()
-        for dev_os in os_types:
-            pub = ctx.socket(zmq.PUSH)
-            ipc_url = DEV_IPC_URL_TPL.format(os=dev_os)
-            pub.bind(ipc_url)
-            self.pubs[dev_os] = pub
+        # os_types = self.config.keys()
+        # for dev_os in os_types:
+        #     pub = ctx.socket(zmq.PUSH)
+        #     ipc_url = DEV_IPC_URL_TPL.format(os=dev_os)
+        #     pub.bind(ipc_url)
+        #     self.pubs[dev_os] = pub
 
     def _compile_prefixes(self):
         '''
@@ -186,7 +188,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
         inspect and identify the operating system,
         then queue the message correspondingly.
         '''
-        # self._setup_ipc()
+        self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
@@ -200,7 +202,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
             # bin_obj = self.sub.recv()
             # msg, address = umsgpack.unpackb(bin_obj, use_list=False)
             try:
-                msg, address = self.pipe.recv()
+                bin_obj = self.sub.recv()
+                msg, address = umsgpack.unpackb(bin_obj, use_list=False)
             except IOError as error:
                 if self.__up is False:
                     return
