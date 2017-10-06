@@ -1,0 +1,14 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: CONFIGURATION_COMMIT_COMPLETED
+    tag: 'MGBL-CONFIG-6-DB_COMMIT'
+    values:
+      user: (\w+)
+      commitNumber: (\d+)
+    line: "Configuration committed by user '{user}'. Use 'show configuration commit changes {commitNumber}' to view the changes."
+    model: NO_MODEL
+    mapping:
+      variables: {}
+      static:
+        system//operations//commit_complete: True
