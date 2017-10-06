@@ -5,6 +5,7 @@ Config defaults.
 from __future__ import absolute_import
 
 import os
+import tempfile
 import logging
 import napalm_logs.ext.six as six
 
@@ -101,17 +102,19 @@ DEFAULT_DELIM = '//'
 PROC_DEAD_FLAGS = ('T', 'X', 'Z')
 
 # zmq proxies
-AUTH_IPC_URL = 'ipc:///tmp/napalm-logs-auth'
+TMP_DIR = tempfile.gettempdir()
+AUTH_IPC_URL = 'ipc://{}'.format(os.path.join(TMP_DIR, 'napalm-logs-auth'))
 # the auth proxy is not used yet, TODO
-LST_IPC_URL = 'ipc:///tmp/napalm-logs-lst'
-SRV_IPC_URL = 'ipc:///tmp/napalm-logs-srv'
+LST_IPC_URL = 'ipc://{}'.format(os.path.join(TMP_DIR, 'napalm-logs-lst'))
+SRV_IPC_URL = 'ipc://{}'.format(os.path.join(TMP_DIR, 'napalm-logs-srv'))
 # the publisher IPC is used as proxy
 # the devices send the messages to the proxy
 # and the publisher subscribes to the proxy and
 # publishes them on the desired transport
-DEV_IPC_URL_TPL = 'ipc:///tmp/napalm-logs-dev-{os}'
+DEV_IPC_URL_TPL = 'ipc://{}'.format(os.path.join(TMP_DIR,
+                                                'napalm-logs-dev-{os}'))
 # the server publishes to a separate IPC per device
-PUB_IPC_URL = 'ipc:///tmp/napalm-logs-pub'
+PUB_IPC_URL = 'ipc://{}'.format(os.path.join(TMP_DIR, 'napalm-logs-pub'))
 
 # auth
 AUTH_KEEP_ALIVE = b'KEEPALIVE'
