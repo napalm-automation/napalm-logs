@@ -12,7 +12,6 @@ import threading
 
 # Import third party libs
 import zmq
-import umsgpack
 import nacl.utils
 import nacl.secret
 
