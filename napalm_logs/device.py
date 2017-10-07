@@ -57,7 +57,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         # subscribe to device IPC
         log.debug('Creating the dealer IPC for %s', self._name)
         self.sub = self.ctx.socket(zmq.DEALER)
-        self.sub.setsockopt(zmq.IDENTITY, self._name)
+        self.sub.setsockopt(zmq.IDENTITY, bytes(self._name).encode('utf-8'))
         # subscribe to the corresponding IPC pipe
         self.sub.connect(DEV_IPC_URL)
         # self.sub.setsockopt(zmq.SUBSCRIBE, '')
