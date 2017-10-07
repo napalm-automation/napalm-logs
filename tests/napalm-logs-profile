@@ -91,7 +91,7 @@ def client(**config):
         addr=config['publish_address'],
         port=config['publish_port']))
     sock.setsockopt(zmq.SUBSCRIBE, '')
-    sock.setsockopt(zmq.RCVTIMEO, 1000)
+    sock.setsockopt(zmq.RCVTIMEO, 5000)
 
     # auth = napalm_logs.utils.ClientAuth(config['certificate'],
     #                                     address=config['auth_address'],
