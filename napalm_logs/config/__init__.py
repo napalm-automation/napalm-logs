@@ -111,8 +111,7 @@ SRV_IPC_URL = 'ipc://{}'.format(os.path.join(TMP_DIR, 'napalm-logs-srv'))
 # the devices send the messages to the proxy
 # and the publisher subscribes to the proxy and
 # publishes them on the desired transport
-DEV_IPC_URL_TPL = 'ipc://{}'.format(os.path.join(TMP_DIR,
-                                                'napalm-logs-dev-{os}'))
+DEV_IPC_URL = 'ipc://{}'.format(os.path.join(TMP_DIR, 'napalm-logs-dev'))
 # the server publishes to a separate IPC per device
 PUB_IPC_URL = 'ipc://{}'.format(os.path.join(TMP_DIR, 'napalm-logs-pub'))
 

@@ -61,10 +61,10 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         and publish the messages
         on the right transport.
         '''
-        ctx = zmq.Context()
-        self.sub = ctx.socket(zmq.SUB)
+        self.ctx = zmq.Context()
+        log.debug('Setting up the publisher puller')
+        self.sub = self.ctx.socket(zmq.PULL)
         self.sub.bind(PUB_IPC_URL)
-        self.sub.setsockopt(zmq.SUBSCRIBE, '')
 
     def _setup_transport(self):
         '''
@@ -75,12 +75,12 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                                          self.port,
                                          **self.publisher_opts)
 
-    def _prepare(self, obj):
+    def _prepare(self, bin_obj):
         '''
         Prepare the object to be sent over the untrusted channel.
         '''
         # serialize the object
-        bin_obj = umsgpack.packb(obj)
+        # bin_obj = umsgpack.packb(obj)
         # generating a nonce
         nonce = nacl.utils.random(nacl.secret.SecretBox.NONCE_SIZE)
         # encrypting using the nonce
@@ -93,7 +93,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         Listen to messages and publish them.
         '''
-        # self._setup_ipc()
+        self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
@@ -103,7 +103,8 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         while self.__up:
             # bin_obj = self.sub.recv()  # already serialized
             try:
-                obj = self.pipe.recv()
+                # obj = self.pipe.recv()
+                bin_obj = self.sub.recv()
             except IOError as error:
                 if self.__up is False:
                     return
@@ -113,12 +114,14 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                     raise NapalmLogsExit(msg)
             log.debug('Publishing the OC object (serialised)')
             if not self.disable_security:
-                bin_obj = self._prepare(obj)
-            else:
-                bin_obj = umsgpack.packb(obj)
+                bin_obj = self._prepare(bin_obj)
+            # else:
+            #     bin_obj = umsgpack.packb(obj)
             self.transport.publish(bin_obj)
 
     def stop(self):
         log.info('Stopping publisher process')
         self.__up = False
+        self.sub.close()
+        self.ctx.term()
         self.pipe.close()

@@ -20,7 +20,7 @@ import umsgpack
 # Import napalm-logs pkgs
 import napalm_logs.ext.six as six
 from napalm_logs.config import LST_IPC_URL
-from napalm_logs.config import DEV_IPC_URL_TPL
+from napalm_logs.config import DEV_IPC_URL
 from napalm_logs.config import UNKNOWN_DEVICE_NAME
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.transport import get_transport
@@ -42,7 +42,6 @@ class NapalmLogsServerProc(NapalmLogsProc):
         self.logger_opts = logger_opts
         self.publisher_opts = publisher_opts
         self.__up = False
-        # self.pubs = {}
         self.compiled_prefixes = None
         self._compile_prefixes()
 
@@ -62,12 +61,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
         self.sub = self.ctx.socket(zmq.PULL)
         self.sub.bind(LST_IPC_URL)
         # device publishers
-        # os_types = self.config.keys()
-        # for dev_os in os_types:
-        #     pub = ctx.socket(zmq.PUSH)
-        #     ipc_url = DEV_IPC_URL_TPL.format(os=dev_os)
-        #     pub.bind(ipc_url)
-        #     self.pubs[dev_os] = pub
+        log.debug('Creating the router ICP on the server')
+        self.pub = self.ctx.socket(zmq.ROUTER)
+        self.pub.bind(DEV_IPC_URL)
 
     def _compile_prefixes(self):
         '''
@@ -230,18 +226,25 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 # bin_obj = umsgpack.packb(obj)
                 log.debug('Queueing message to %s', dev_os)
                 # self.pubs[dev_os].send(bin_obj)
-                self.os_pipes[dev_os].send((msg_dict, address))
+                self.pub.send_multipart([dev_os,
+                                         umsgpack.packb((msg_dict, address))])
+                # self.os_pipes[dev_os].send((msg_dict, address))
             elif dev_os and dev_os not in self.os_pipes:
                 # Identified the OS, but the corresponding process does not seem to be started.
                 log.info('Unable to queue the message to %s. Is the sub-process started?', dev_os)
             elif not dev_os and self.publisher_opts.get('send_unknown'):
                 # OS not identified, but the user requested to publish the message as-is
-                self.os_pipes[UNKNOWN_DEVICE_NAME].send(({'message': msg}, address))
+                self.pub.send_multipart([UNKNOWN_DEVICE_NAME,
+                                         umsgpack.packb(({'message': msg}, address))])
+                # self.os_pipes[UNKNOWN_DEVICE_NAME].send(({'message': msg}, address))
             log.info('No action requested. Ignoring.')
 
     def stop(self):
         log.info('Stopping server process')
         self.__up = False
+        self.sub.close()
+        self.pub.close()
+        self.ctx.term()
         self.pipe.close()
         for os_pipe in self.os_pipes.values():
             os_pipe.close()
