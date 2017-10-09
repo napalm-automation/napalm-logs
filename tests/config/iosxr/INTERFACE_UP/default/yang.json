@@ -1,0 +1,37 @@
+{
+    "error": "INTERFACE_UP",
+    "facility": 23,
+    "host": "gw1.dev1",
+    "ip": "127.0.0.1",
+    "message_details": {
+        "date": "Jul  7",
+        "facility": 23,
+        "host": "gw1.dev1",
+        "message": "Interface TenGigE0/2/0/4, changed state to Up",
+        "messageId": "94307",
+        "milliseconds": ".834",
+        "nodeId": "LC/0/2/CPU0",
+        "pri": "187",
+        "processId": "214",
+        "processName": "ifmgr",
+        "severity": 3,
+        "tag": "PKT_INFRA-LINK-3-UPDOWN",
+        "time": "20:16:14",
+        "timeZone": null
+    },
+    "os": "iosxr",
+    "severity": 3,
+    "timestamp": 1499458574,
+    "yang_message": {
+        "interfaces": {
+            "interface": {
+                "TenGigE0/2/0/4": {
+                    "state": {
+                        "oper_status": "UP"
+                    }
+                }
+            }
+        }
+    },
+    "yang_model": "openconfig-interfaces"
+}
