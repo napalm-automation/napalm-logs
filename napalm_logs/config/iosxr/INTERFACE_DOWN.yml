@@ -1,0 +1,13 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: INTERFACE_DOWN
+    tag: PKT_INFRA-LINK-3-UPDOWN
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+    line: 'Interface {interface}, changed state to Down'
+    model: openconfig-interfaces
+    mapping:
+      variables: {}
+      static:
+        interfaces//interface//{interface}//state//oper_status: DOWN
