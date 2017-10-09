@@ -7,7 +7,7 @@
         "date": "Jul  7",
         "facility": 23,
         "host": "gw1.dev1",
-        "message": "Interface TenGigE0/2/0/4, changed state to Down",
+        "message": "Interface TenGigE0/2/0/4, changed state to Up",
         "messageId": "94307",
         "milliseconds": ".834",
         "nodeId": "LC/0/2/CPU0",
