@@ -27,7 +27,7 @@
             "interface": {
                 "TenGigE0/2/0/4": {
                     "state": {
-                        "oper_status": "DOWN"
+                        "oper_status": "UP"
                     }
                 }
             }
