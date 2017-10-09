@@ -1,5 +1,5 @@
 {
-    "error": "INTERFACE_DOWN",
+    "error": "INTERFACE_UP",
     "facility": 23,
     "host": "gw1.dev1",
     "ip": "127.0.0.1",
