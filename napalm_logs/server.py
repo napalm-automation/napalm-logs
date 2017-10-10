@@ -35,6 +35,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
     Server sub-process class.
     '''
     def __init__(self,
+                 opts,
                  config,
                  started_os_proc,
                  # pipe,
@@ -42,6 +43,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                  logger,
                  logger_opts,
                  publisher_opts):
+        self.opts = opts
         self.config = config
         self.started_os_proc = started_os_proc
         # self.pipe = pipe
@@ -68,10 +70,22 @@ class NapalmLogsServerProc(NapalmLogsProc):
         # subscribe to listener
         self.sub = self.ctx.socket(zmq.PULL)
         self.sub.bind(LST_IPC_URL)
+        try:
+            self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
+            # zmq 2
+        except AttributeError:
+            # zmq 3
+            self.sub.setsockopt(zmq.RCVHWM, self.opts['hwm'])
         # device publishers
         log.debug('Creating the router ICP on the server')
         self.pub = self.ctx.socket(zmq.ROUTER)
         self.pub.bind(DEV_IPC_URL)
+        try:
+            self.pub.setsockopt(zmq.HWM, self.opts['hwm'])
+            # zmq 2
+        except AttributeError:
+            # zmq 3
+            self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
 
     def _compile_prefixes(self):
         '''
@@ -208,13 +222,13 @@ class NapalmLogsServerProc(NapalmLogsProc):
             try:
                 bin_obj = self.sub.recv()
                 msg, address = umsgpack.unpackb(bin_obj, use_list=False)
-            except IOError as error:
+            except zmq.ZMQError as error:
                 if self.__up is False:
+                    log.info('Exiting on process shutdown')
                     return
                 else:
-                    msg = 'Received IOError from server pipe: {}'.format(error)
-                    log.error(msg, exc_info=True)
-                    raise NapalmLogsExit(msg)
+                    log.error(error, exc_info=True)
+                    raise NapalmLogsExit(error)
             if six.PY3:
                 msg = str(msg, 'utf-8')
             else:

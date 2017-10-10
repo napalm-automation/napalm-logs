@@ -61,7 +61,8 @@ class NapalmLogs:
                  logger_opts={},
                  publisher_opts={},
                  device_blacklist=[],
-                 device_whitelist=[]):
+                 device_whitelist=[],
+                 hwm=None):
         '''
         Init the napalm-logs engine.
 
@@ -95,6 +96,8 @@ class NapalmLogs:
         self.publisher_opts = publisher_opts
         self.device_whitelist = device_whitelist
         self.device_blacklist = device_blacklist
+        self.opts = {}
+        self.opts['hwm'] = CONFIG.ZMQ_INTERNAL_HWM if hwm is None else hwm
         # Setup the environment
         self._setup_log()
         self._build_config()
@@ -450,7 +453,8 @@ class NapalmLogs:
         verify_key = self.__signing_key.verify_key
         sgn_verify_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
         log.debug('Starting the authenticator subprocess')
-        auth = NapalmLogsAuthProc(self.certificate,
+        auth = NapalmLogsAuthProc(self.opts,
+                                  self.certificate,
                                   self.keyfile,
                                   self.__priv_key,
                                   sgn_verify_hex,
@@ -468,7 +472,8 @@ class NapalmLogs:
         '''
         log.debug('Starting the listener process')
         # Get the correct listener class
-        listener = NapalmLogsListenerProc(self.address,
+        listener = NapalmLogsListenerProc(self.opts,
+                                          self.address,
                                           self.port,
                                           self.listener_type,
                                           # pipe,
@@ -486,7 +491,8 @@ class NapalmLogs:
         Start the server process.
         '''
         log.debug('Starting the server process')
-        server = NapalmLogsServerProc(self.config_dict,
+        server = NapalmLogsServerProc(self.opts,
+                                      self.config_dict,
                                       started_os_proc,
                                       # pipe,
                                       # os_pipes,
@@ -504,7 +510,8 @@ class NapalmLogs:
         Start the publisher process.
         '''
         log.info('Starting the publisher process')
-        publisher = NapalmLogsPublisherProc(self.publish_address,
+        publisher = NapalmLogsPublisherProc(self.opts,
+                                            self.publish_address,
                                             self.publish_port,
                                             self.transport,
                                             # pub_pipe,
@@ -528,6 +535,7 @@ class NapalmLogs:
         # TODO remove the pipe overhead when migrating to zmq IPC
         log.info('Starting the child process for %s', device_os)
         dos = NapalmLogsDeviceProc(device_os,
+                                   self.opts,
                                    device_config,
                                    # device_pipe,
                                    # dev_pub_pipe,

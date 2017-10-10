@@ -29,12 +29,14 @@ class NapalmLogsListenerProc(NapalmLogsProc):
     publisher sub-process class.
     '''
     def __init__(self,
+                 opts,
                  address,
                  port,
                  listener_type,
                  # pipe,
                  listener_opts=None):
         self.__up = False
+        self.opts = opts
         self.address = address
         self.port = port
         # self.pipe = pipe
@@ -62,6 +64,13 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         self.ctx = zmq.Context()
         self.pub = self.ctx.socket(zmq.PUSH)
         self.pub.connect(LST_IPC_URL)
+        log.debug('Setting HWM for the listener: %d', self.opts['hwm'])
+        try:
+            self.pub.setsockopt(zmq.HWM, self.opts['hwm'])
+            # zmq 2
+        except AttributeError:
+            # zmq 3
+            self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
 
     def start(self):
         '''
@@ -80,8 +89,12 @@ class NapalmLogsListenerProc(NapalmLogsProc):
             try:
                 log_message, log_source = self.listener.receive()
             except ListenerException as lerr:
-                # Exit on listener exception.
-                raise NapalmLogsExit(lerr)
+                if self.__up is False:
+                    log.info('Exiting on process shutdown')
+                    return
+                else:
+                    log.error(lerr, exc_info=True)
+                    raise NapalmLogsExit(lerr)
             log.debug('Received %s from %s. Queueing to the server.', log_message, log_source)
             if not log_message:
                 log.info('Empty message received from %s. Not queueing to the server.', log_source)

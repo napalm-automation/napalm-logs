@@ -55,12 +55,14 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         | <------------ ACK ----------- |
     '''
     def __init__(self,
+                 opts,
                  certificate,
                  keyfile,
                  private_key,
                  signature_hex,
                  auth_address=AUTH_ADDRESS,
                  auth_port=AUTH_PORT):
+        self.opts = opts
         self.certificate = certificate
         self.keyfile = keyfile
         self.__key = private_key

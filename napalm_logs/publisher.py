@@ -30,6 +30,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
     publisher sub-process class.
     '''
     def __init__(self,
+                 opts,
                  address,
                  port,
                  transport_type,
@@ -39,6 +40,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                  publisher_opts,
                  disable_security=False):
         self.__up = False
+        self.opts = opts
         self.address = address
         self.port = port
         # self.pipe = pipe
@@ -64,6 +66,12 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         log.debug('Setting up the publisher puller')
         self.sub = self.ctx.socket(zmq.PULL)
         self.sub.bind(PUB_IPC_URL)
+        try:
+            self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
+            # zmq 2
+        except AttributeError:
+            # zmq 3
+            self.sub.setsockopt(zmq.RCVHWM, self.opts['hwm'])
 
     def _setup_transport(self):
         '''
@@ -104,13 +112,13 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
             try:
                 # obj = self.pipe.recv()
                 bin_obj = self.sub.recv()
-            except IOError as error:
+            except zmq.ZMQError as error:
                 if self.__up is False:
+                    log.info('Exiting on process shutdown')
                     return
                 else:
-                    msg = 'Received IOError on publisher pipe: {}'.format(error)
-                    log.error(msg, exc_info=True)
-                    raise NapalmLogsExit(msg)
+                    log.error(error, exc_info=True)
+                    raise NapalmLogsExit(error)
             log.debug('Publishing the OC object (serialised)')
             if not self.disable_security:
                 bin_obj = self._prepare(bin_obj)

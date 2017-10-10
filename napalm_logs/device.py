@@ -35,12 +35,14 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
     '''
     def __init__(self,
                  name,
+                 opts,
                  config,
                  # pipe,
                  # pub_pipe,
                  publisher_opts):
         self._name = name
         self._config = config
+        self.opts = opts
         # self.pipe = pipe
         # self.pub_pipe = pub_pipe
         self.publisher_opts = publisher_opts
@@ -63,12 +65,24 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         log.debug('Creating the dealer IPC for %s', self._name)
         self.sub = self.ctx.socket(zmq.DEALER)
         self.sub.setsockopt(zmq.IDENTITY, bytes(self._name).encode('utf-8'))
+        try:
+            self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
+            # zmq 2
+        except AttributeError:
+            # zmq 3
+            self.sub.setsockopt(zmq.RCVHWM, self.opts['hwm'])
         # subscribe to the corresponding IPC pipe
         self.sub.connect(DEV_IPC_URL)
         # self.sub.setsockopt(zmq.SUBSCRIBE, '')
         # publish to the publisher IPC
         self.pub = self.ctx.socket(zmq.PUSH)
         self.pub.connect(PUB_IPC_URL)
+        try:
+            self.pub.setsockopt(zmq.HWM, self.opts['hwm'])
+            # zmq 2
+        except AttributeError:
+            # zmq 3
+            self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
 
     def _compile_messages(self):
         '''
@@ -224,13 +238,12 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             try:
                 bin_obj = self.sub.recv()
                 msg_dict, address = umsgpack.unpackb(bin_obj, use_list=False)
-            except IOError as error:
+            except zmq.ZMQError as error:
                 if self.__up is False:
+                    log.info('Exiting on process shutdown [%s]', self._name)
                     return
                 else:
-                    msg = 'Received IOError on {} device pipe: {}'.format(self._name, error)
-                    log.error(msg, exc_info=True)
-                    raise NapalmLogsExit(msg)
+                    raise NapalmLogsExit(error)
             log.debug('%s: dequeued %s, received from %s', self._name, msg_dict, address)
             if self._name == UNKNOWN_DEVICE_NAME:
                 # If running in the sub-process publishing messages for unknown OSs.
@@ -325,4 +338,4 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         self.pub.close()
         self.ctx.term()
         # self.pipe.close()
-        self.pub_pipe.close()
+        # self.pub_pipe.close()
