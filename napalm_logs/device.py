@@ -19,6 +19,7 @@ import umsgpack
 
 # Import napalm-logs pkgs
 import napalm_logs.utils
+import napalm_logs.ext.six as six
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import PUB_IPC_URL
 from napalm_logs.config import DEV_IPC_URL
@@ -64,7 +65,10 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         # subscribe to device IPC
         log.debug('Creating the dealer IPC for %s', self._name)
         self.sub = self.ctx.socket(zmq.DEALER)
-        self.sub.setsockopt(zmq.IDENTITY, bytes(self._name).encode('utf-8'))
+        if six.PY2:
+            self.sub.setsockopt(zmq.IDENTITY, self._name)
+        elif six.PY3:
+            self.sub.setsockopt(zmq.IDENTITY, bytes(self._name, 'utf-8'))
         try:
             self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
             # zmq 2

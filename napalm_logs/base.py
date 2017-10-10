@@ -535,7 +535,6 @@ class NapalmLogs:
         '''
         Start the device worker process.
         '''
-        # TODO remove the pipe overhead when migrating to zmq IPC
         log.info('Starting the child process for %s', device_os)
         dos = NapalmLogsDeviceProc(device_os,
                                    self.opts,

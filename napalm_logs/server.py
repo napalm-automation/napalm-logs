@@ -248,6 +248,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 # bin_obj = umsgpack.packb(obj)
                 log.debug('Queueing message to %s', dev_os)
                 # self.pubs[dev_os].send(bin_obj)
+                if six.PY3:
+                    dev_os = bytes(dev_os, 'utf-8')
                 self.pub.send_multipart([dev_os,
                                          umsgpack.packb((msg_dict, address))])
                 # self.os_pipes[dev_os].send((msg_dict, address))
@@ -257,7 +259,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
             elif not dev_os and self.publisher_opts.get('send_unknown'):
                 # OS not identified, but the user requested to publish the message as-is
                 log.debug('Publishing message, although not identified, as requested')
-                self.pub.send_multipart([UNKNOWN_DEVICE_NAME,
+                if six.PY3:
+                    dev_os = bytes(UNKNOWN_DEVICE_NAME, 'utf-8')
+                self.pub.send_multipart([dev_os,
                                          umsgpack.packb(({'message': msg}, address))])
                 # self.os_pipes[UNKNOWN_DEVICE_NAME].send(({'message': msg}, address))
             log.info('No action requested. Ignoring.')
