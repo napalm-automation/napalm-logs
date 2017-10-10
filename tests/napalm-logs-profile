@@ -92,16 +92,12 @@ def client(**config):
         port=config['publish_port']))
     sock.setsockopt(zmq.SUBSCRIBE, '')
     sock.setsockopt(zmq.RCVTIMEO, 5000)
-
-    # auth = napalm_logs.utils.ClientAuth(config['certificate'],
-    #                                     address=config['auth_address'],
-    #                                     port=config['auth_port'])
-
+    if not config['disable_security']:
+        auth = napalm_logs.utils.ClientAuth(config['certificate'],
+                                            address=config['auth_address'],
+                                            port=config['auth_port'])
     start_time = time.time()
     count = 0
-    # while time.time() < heat_stop:
-    #     obj = sock.recv()
-    #     decrypted = napalm_logs.utils.decrypt(obj, vk, pk)
     while True:
         try:
             obj = sock.recv()
@@ -109,7 +105,10 @@ def client(**config):
             break
         log.debug('Received:')
         log.debug(obj)
-        decrypted = napalm_logs.utils.unserialize(obj)
+        if config['disable_security']:
+            decrypted = napalm_logs.utils.unserialize(obj)
+        else:
+            decrypted = auth.decrypt(obj)
         log.debug('Decrypted:')
         log.debug(decrypted)
         count += 1
@@ -164,10 +163,6 @@ def main():
     log.addHandler(screen_logger)
     pop = ProfilerOptionParser()
     config = pop.extra_parse(log, screen_logger)
-    if 'auth_port' not in config:
-        config['auth_port'] = 49018
-    if 'auth_address' not in config:
-        config['auth_address'] = '0.0.0.0'
     cproc = Process(target=client, kwargs=config)
     cproc.start()
     for _ in range(config['routers']):
