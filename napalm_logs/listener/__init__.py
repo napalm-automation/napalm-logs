@@ -14,8 +14,8 @@ from napalm_logs.exceptions import InvalidListenerException
 # Listener classes
 from napalm_logs.listener.tcp import TCPListener
 from napalm_logs.listener.udp import UDPListener
-from napalm_logs.listener.zmq import HAS_ZMQ
-from napalm_logs.listener.zmq import ZMQListener
+from napalm_logs.listener.zeromq import HAS_ZMQ
+from napalm_logs.listener.zeromq import ZMQListener
 from napalm_logs.listener.kafka import HAS_KAFKA
 from napalm_logs.listener.kafka import KafkaListener
 
