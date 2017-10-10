@@ -6,6 +6,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # Import stdlib
+import time
 import logging
 
 # Import third party libs
@@ -49,8 +50,8 @@ class ZMQListener(ListenerBase):
                        protocol=self.protocol,
                        address=self.address,
                        port=self.port
-                   ) if self.port else \
-                   '{protocol}://{address}'.format(
+                   ) if self.port else\
+                   '{protocol}://{address}'.format(  # noqa
                        protocol=self.protocol,
                        address=self.address
                    )
