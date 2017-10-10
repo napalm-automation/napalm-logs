@@ -461,6 +461,7 @@ class NapalmLogs:
                                   self.auth_port)
         proc = Process(target=auth.start)
         proc.start()
+        proc.description = 'Auth process'
         log.debug('Started auth process as %s with PID %s', proc._name, proc.pid)
         return proc
 
@@ -479,6 +480,7 @@ class NapalmLogs:
                                           listener_opts=self.listener_opts)
         proc = Process(target=listener.start)
         proc.start()
+        proc.description = 'Listener process'
         log.debug('Started listener process as %s with PID %s', proc._name, proc.pid)
         return proc
 
@@ -500,6 +502,7 @@ class NapalmLogs:
                                       self.publisher_opts)
         proc = Process(target=server.start)
         proc.start()
+        proc.description = 'Server process'
         log.debug('Started server process as %s with PID %s', proc._name, proc.pid)
         return proc
 
@@ -520,6 +523,7 @@ class NapalmLogs:
                                             disable_security=self.disable_security)
         proc = Process(target=publisher.start)
         proc.start()
+        proc.description = 'Publisher process'
         log.debug('Started publisher process as %s with PID %s', proc._name, proc.pid)
         return proc
 
@@ -541,6 +545,7 @@ class NapalmLogs:
                                    self.publisher_opts)
         os_proc = Process(target=dos.start)
         os_proc.start()
+        os_proc.description = '%s device process' % device_os
         log.debug('Started process %s for %s, having PID %s', os_proc._name, device_os, os_proc.pid)
         return os_proc
 
@@ -599,6 +604,7 @@ class NapalmLogs:
             for process in self._processes:
                 if process.is_alive() is True:
                     continue
+                log.debug('%s is dead. Stopping the napalm-logs engine.', process.description)
                 self.stop_engine()
 
     def stop_engine(self):
