@@ -32,7 +32,7 @@ class NapalmLogsListenerProc(NapalmLogsProc):
                  address,
                  port,
                  listener_type,
-                 pipe,
+                 # pipe,
                  listener_opts=None):
         self.__up = False
         self.address = address
@@ -93,4 +93,5 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         self.__up = False
         self.pub.close()
         self.ctx.term()
+        # self.pipe.close()
         self.listener.stop()

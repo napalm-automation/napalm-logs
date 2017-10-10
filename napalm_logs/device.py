@@ -33,11 +33,16 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
     '''
     Device sub-process class.
     '''
-    def __init__(self, name, config, pipe, pub_pipe, publisher_opts):
+    def __init__(self,
+                 name,
+                 config,
+                 # pipe,
+                 # pub_pipe,
+                 publisher_opts):
         self._name = name
-        self.pipe = pipe
         self._config = config
-        self.pub_pipe = pub_pipe
+        # self.pipe = pipe
+        # self.pub_pipe = pub_pipe
         self.publisher_opts = publisher_opts
         self.__up = False
         self.compiled_messages = None
@@ -319,5 +324,5 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         self.sub.close()
         self.pub.close()
         self.ctx.term()
-        self.pipe.close()
+        # self.pipe.close()
         self.pub_pipe.close()

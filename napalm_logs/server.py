@@ -34,10 +34,18 @@ class NapalmLogsServerProc(NapalmLogsProc):
     '''
     Server sub-process class.
     '''
-    def __init__(self, config, pipe, os_pipes, logger, logger_opts, publisher_opts):
+    def __init__(self,
+                 config,
+                 started_os_proc,
+                 # pipe,
+                 # os_pipes,
+                 logger,
+                 logger_opts,
+                 publisher_opts):
         self.config = config
-        self.pipe = pipe
-        self.os_pipes = os_pipes
+        self.started_os_proc = started_os_proc
+        # self.pipe = pipe
+        # self.os_pipes = os_pipes
         self.logger = logger
         self.logger_opts = logger_opts
         self.publisher_opts = publisher_opts
@@ -219,7 +227,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     self._send_log_syslog(dev_os, msg_dict)
                 elif self.logger_opts.get('send_unknown') and not dev_os:
                     self._send_log_syslog(UNKNOWN_DEVICE_NAME, {'message': msg})
-            if dev_os and dev_os in self.os_pipes:
+            if dev_os and dev_os in self.started_os_proc:
                 # Identified the OS and the corresponding process is started.
                 # Then send the message in the right queue
                 # obj = (msg_dict, address)
@@ -229,11 +237,12 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 self.pub.send_multipart([dev_os,
                                          umsgpack.packb((msg_dict, address))])
                 # self.os_pipes[dev_os].send((msg_dict, address))
-            elif dev_os and dev_os not in self.os_pipes:
+            elif dev_os and dev_os not in self.started_os_proc:
                 # Identified the OS, but the corresponding process does not seem to be started.
                 log.info('Unable to queue the message to %s. Is the sub-process started?', dev_os)
             elif not dev_os and self.publisher_opts.get('send_unknown'):
                 # OS not identified, but the user requested to publish the message as-is
+                log.debug('Publishing message, although not identified, as requested')
                 self.pub.send_multipart([UNKNOWN_DEVICE_NAME,
                                          umsgpack.packb(({'message': msg}, address))])
                 # self.os_pipes[UNKNOWN_DEVICE_NAME].send(({'message': msg}, address))
@@ -245,8 +254,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
         self.sub.close()
         self.pub.close()
         self.ctx.term()
-        self.pipe.close()
-        for os_pipe in self.os_pipes.values():
-            os_pipe.close()
+        # self.pipe.close()
+        # for os_pipe in self.os_pipes.values():
+        #     os_pipe.close()
         if self.logger:
             self._log_syslog_transport.stop()

@@ -33,7 +33,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                  address,
                  port,
                  transport_type,
-                 pipe,
+                 # pipe,
                  private_key,
                  signing_key,
                  publisher_opts,
@@ -41,7 +41,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.__up = False
         self.address = address
         self.port = port
-        self.pipe = pipe
+        # self.pipe = pipe
         self.disable_security = disable_security
         self._transport_type = transport_type
         self.publisher_opts = publisher_opts
@@ -123,4 +123,4 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.__up = False
         self.sub.close()
         self.ctx.term()
-        self.pipe.close()
+        # self.pipe.close()

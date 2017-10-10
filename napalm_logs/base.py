@@ -461,7 +461,8 @@ class NapalmLogs:
         log.debug('Started auth process as %s with PID %s', proc._name, proc.pid)
         return proc
 
-    def _start_lst_proc(self, pipe):
+    def _start_lst_proc(self):
+                        # pipe):
         '''
         Start the listener process.
         '''
@@ -470,21 +471,25 @@ class NapalmLogs:
         listener = NapalmLogsListenerProc(self.address,
                                           self.port,
                                           self.listener_type,
-                                          pipe,
+                                          # pipe,
                                           listener_opts=self.listener_opts)
         proc = Process(target=listener.start)
         proc.start()
         log.debug('Started listener process as %s with PID %s', proc._name, proc.pid)
         return proc
 
-    def _start_srv_proc(self, pipe, os_pipes):
+    def _start_srv_proc(self,
+                        started_os_proc):
+                        # pipe,
+                        # os_pipes):
         '''
         Start the server process.
         '''
         log.debug('Starting the server process')
         server = NapalmLogsServerProc(self.config_dict,
-                                      pipe,
-                                      os_pipes,
+                                      started_os_proc,
+                                      # pipe,
+                                      # os_pipes,
                                       self.logger,
                                       self.logger_opts,
                                       self.publisher_opts)
@@ -493,7 +498,8 @@ class NapalmLogs:
         log.debug('Started server process as %s with PID %s', proc._name, proc.pid)
         return proc
 
-    def _start_pub_proc(self, pub_pipe):
+    def _start_pub_proc(self):
+                        # pub_pipe):
         '''
         Start the publisher process.
         '''
@@ -501,7 +507,7 @@ class NapalmLogs:
         publisher = NapalmLogsPublisherProc(self.publish_address,
                                             self.publish_port,
                                             self.transport,
-                                            pub_pipe,
+                                            # pub_pipe,
                                             self.__priv_key,
                                             self.__signing_key,
                                             self.publisher_opts,
@@ -513,9 +519,9 @@ class NapalmLogs:
 
     def _start_dev_proc(self,
                         device_os,
-                        device_config,
-                        device_pipe,
-                        dev_pub_pipe):
+                        device_config):
+                        # device_pipe,
+                        # dev_pub_pipe):
         '''
         Start the device worker process.
         '''
@@ -523,8 +529,8 @@ class NapalmLogs:
         log.info('Starting the child process for %s', device_os)
         dos = NapalmLogsDeviceProc(device_os,
                                    device_config,
-                                   device_pipe,
-                                   dev_pub_pipe,
+                                   # device_pipe,
+                                   # dev_pub_pipe,
                                    self.publisher_opts)
         os_proc = Process(target=dos.start)
         os_proc.start()
@@ -545,15 +551,16 @@ class NapalmLogs:
             # start the keepalive thread for the auth sub-process
             self._processes.append(self._start_auth_proc())
         # publisher process start
-        pub_pipe, dev_pub_pipe = Pipe(duplex=False)
+        # pub_pipe, dev_pub_pipe = Pipe(duplex=False)
         self._processes.append(self._start_pub_proc(pub_pipe))
         # device process start
         log.info('Starting child processes for each device type')
-        os_pipes = {}
+        # os_pipes = {}
         if self.publisher_opts.get('send_unknown'):
             # Explicitly requested to send messages from unidentified devices.
             log.info('Starting an additional process to publish messages from identified operating systems.')
             self.config_dict[CONFIG.UNKNOWN_DEVICE_NAME] = {}
+        started_os_proc = []
         for device_os, device_config in self.config_dict.items():
             if self._whitelist_blacklist(device_os):
                 log.debug('Not starting process for %s (whitelist-blacklist logic)', device_os)
@@ -561,17 +568,18 @@ class NapalmLogs:
                 #   or those operating systems that are on the blacklist.
                 # This way we can prevent starting unwanted sub-processes.
                 continue
-            device_pipe, srv_pipe = Pipe(duplex=False)
+            # device_pipe, srv_pipe = Pipe(duplex=False)
             self._processes.append(self._start_dev_proc(device_os,
-                                   device_config,
-                                   device_pipe,
-                                   dev_pub_pipe))
-            os_pipes[device_os] = srv_pipe
+                                   device_config))
+                                   # device_pipe,
+                                   # dev_pub_pipe))
+            started_os_proc.append(device_os)
+            # os_pipes[device_os] = srv_pipe
         # start server process
-        srv_pipe, lst_pipe = Pipe(duplex=False)
-        self._processes.append(self._start_srv_proc(srv_pipe, os_pipes))
+        # srv_pipe, lst_pipe = Pipe(duplex=False)
+        self._processes.append(self._start_srv_proc(started_os_proc))
         # start listener process
-        self._processes.append(self._start_lst_proc(lst_pipe))
+        self._processes.append(self._start_lst_proc())
         thread = threading.Thread(target=self._check_children)
         thread.start()
 
