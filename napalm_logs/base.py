@@ -453,8 +453,7 @@ class NapalmLogs:
         verify_key = self.__signing_key.verify_key
         sgn_verify_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
         log.debug('Starting the authenticator subprocess')
-        auth = NapalmLogsAuthProc(self.opts,
-                                  self.certificate,
+        auth = NapalmLogsAuthProc(self.certificate,
                                   self.keyfile,
                                   self.__priv_key,
                                   sgn_verify_hex,
