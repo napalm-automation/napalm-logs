@@ -34,9 +34,9 @@ class ZMQListener(ListenerBase):
         self.address = address
         self.port = port
         self.hwm = kwargs.get('hwm')
-        self.keepalive = kwargs.get('keepalive')
-        self.keepalive_idle = kwargs.get('keepalive_idle')
-        self.keepalive_interval = kwargs.get('keepalive_interval')
+        self.keepalive = kwargs.get('keepalive', 1)
+        self.keepalive_idle = kwargs.get('keepalive_idle', 300)
+        self.keepalive_interval = kwargs.get('keepalive_interval', -1)
         self.recvtimeout = kwargs.get('timeout')
         self.protocol = kwargs.get('protocol', 'tcp')
         self.type = kwargs.get('socket_type', 'PULL')
