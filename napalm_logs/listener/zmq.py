@@ -62,21 +62,21 @@ class ZMQListener(ListenerBase):
             skt_type = zmq.PULL
         self.sub = self.ctx.socket(skt_type)
         self.sub.connect(zmq_uri)
-        if self.hwm:
+        if self.hwm is not None:
             try:
                 self.sub.setsockopt(zmq.SNDHWM, self.hwm)
             except AttributeError:
                 self.sub.setsockopt(zmq.RCVHWM, self.hwm)
-        if self.recvtimeout:
+        if self.recvtimeout is not None:
             log.debug('Setting RCVTIMEO to %d', self.recvtimeout)
             self.sub.setsockopt(zmq.RCVTIMEO, self.recvtimeout)
-        if self.keepalive:
+        if self.keepalive is not None:
             log.debug('Setting TCP_KEEPALIVE to %d', self.keepalive)
             self.sub.setsockopt(zmq.TCP_KEEPALIVE, self.keepalive)
-        if self.keepalive_idle:
+        if self.keepalive_idle is not None:
             log.debug('Setting TCP_KEEPALIVE_IDLE to %d', self.keepalive_idle)
             self.sub.setsockopt(zmq.TCP_KEEPALIVE_IDLE, self.keepalive_idle)
-        if self.keepalive_interval:
+        if self.keepalive_interval is not None:
             log.debug('Setting TCP_KEEPALIVE_INTVL to %d', self.keepalive_interval)
             self.sub.setsockopt(zmq.TCP_KEEPALIVE_INTVL, self.keepalive_interval)
 
