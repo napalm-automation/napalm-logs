@@ -50,3 +50,4 @@ Available listeners and their options
    udp
    tcp
    kafka
+   zmq
