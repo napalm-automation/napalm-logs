@@ -10,7 +10,7 @@ While this listener can be used without any extensive knowledge, we recommend
 reading `the ZeroMQ guide`_ for advanced tunning, especially when the messages
 are transported over networks with misbehaving firewalls.
 
-_`the ZeroMQ guide`: http://zguide.zeromq.org/page:all
+.. _`the ZeroMQ guide`: http://zguide.zeromq.org/page:all
 
 Available options:
 
