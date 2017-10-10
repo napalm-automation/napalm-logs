@@ -552,7 +552,7 @@ class NapalmLogs:
             self._processes.append(self._start_auth_proc())
         # publisher process start
         # pub_pipe, dev_pub_pipe = Pipe(duplex=False)
-        self._processes.append(self._start_pub_proc(pub_pipe))
+        self._processes.append(self._start_pub_proc())
         # device process start
         log.info('Starting child processes for each device type')
         # os_pipes = {}
