@@ -13,7 +13,7 @@ import time
 import yaml
 import logging
 import threading
-from multiprocessing import Process, Pipe
+from multiprocessing import Process
 
 # Import third party libs
 # crypto
@@ -577,9 +577,9 @@ class NapalmLogs:
                 continue
             # device_pipe, srv_pipe = Pipe(duplex=False)
             self._processes.append(self._start_dev_proc(device_os,
-                                   device_config))
-                                   # device_pipe,
-                                   # dev_pub_pipe))
+                                                        device_config))
+                                                        # device_pipe,    # noqa
+                                                        # dev_pub_pipe))  # noqa
             started_os_proc.append(device_os)
             # os_pipes[device_os] = srv_pipe
         # start server process
