@@ -44,7 +44,7 @@ class ZMQListener(ListenerBase):
 
     def start(self):
         '''
-        Startup the kafka consumer.
+        Startup the zmq consumer.
         '''
         zmq_uri = '{protocol}://{address}:{port}'.format(
                        protocol=self.protocol,
@@ -65,7 +65,7 @@ class ZMQListener(ListenerBase):
         self.sub.connect(zmq_uri)
         if self.hwm is not None:
             try:
-                self.sub.setsockopt(zmq.SNDHWM, self.hwm)
+                self.sub.setsockopt(zmq.HWM, self.hwm)
             except AttributeError:
                 self.sub.setsockopt(zmq.RCVHWM, self.hwm)
         if self.recvtimeout is not None:
