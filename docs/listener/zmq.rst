@@ -7,10 +7,9 @@ ZeroMQ
 Receive unstructured syslog messages via ZeroMQ.
 
 While this listener can be used without any extensive knowledge, we recommend
-reading `the ZeroMQ guide`_ for advanced tunning, especially when the messages
-are transported over networks with misbehaving firewalls.
-
-.. _`the ZeroMQ guide`: http://zguide.zeromq.org/page:all
+reading `the ZeroMQ guide <http://zguide.zeromq.org/page:all>`_ for advanced
+tunning, especially when the messages are transported over networks with
+misbehaving firewalls.
 
 Available options:
 
@@ -19,7 +18,7 @@ Available options:
 
 Set the high water mark for inbound messages. This option will configure the
 ZeroMQ option ``ZMQ_RCVHWM``. This option controls the message queue size.
-Read `this <http://api.zeromq.org/4-1:zmq-setsockopt>` document for more details.
+Read `this document <http://api.zeromq.org/4-1:zmq-setsockopt>`_ for more details.
 
 Example:
 
