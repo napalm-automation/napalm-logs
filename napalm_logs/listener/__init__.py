@@ -12,10 +12,13 @@ import logging
 # Exceptions
 from napalm_logs.exceptions import InvalidListenerException
 # Listener classes
-from napalm_logs.listener.kafka import KafkaListener
 from napalm_logs.listener.tcp import TCPListener
 from napalm_logs.listener.udp import UDPListener
+from napalm_logs.listener.zeromq import HAS_ZMQ
+from napalm_logs.listener.zeromq import ZMQListener
 from napalm_logs.listener.kafka import HAS_KAFKA
+from napalm_logs.listener.kafka import KafkaListener
+
 
 log = logging.getLogger(__file__)
 
@@ -28,6 +31,11 @@ LISTENER_LOOKUP = {
 if HAS_KAFKA:
     log.info('Kafka dependency seems to be installed, making kafka listener available.')
     LISTENER_LOOKUP['kafka'] = KafkaListener
+
+if HAS_ZMQ:
+    log.info('Adding ZMQ listener')
+    LISTENER_LOOKUP['zmq'] = ZMQListener
+    LISTENER_LOOKUP['zeromq'] = ZMQListener
 
 
 def get_listener(name):
