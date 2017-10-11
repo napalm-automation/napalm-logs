@@ -7,13 +7,14 @@ Architecture
 Besides speed, there were a couple of considerations we had in mind when we
 designed napalm-logs:
 
-- Lighweight
+- Size
 - Security
 - Flexibility
 - Reliability
 
 The core achitecture can be represented in the diagram below; for simplicity,
-we will analyse the Security later:
+we will analyse the security in the :ref:`Authenticator <arch-authenticator>`
+paragraph:
 
 .. image:: ../_static/architecture.png
    :height: 720px
@@ -25,13 +26,15 @@ we will analyse the Security later:
 The napalm-logs prgram starts a couple of processes to handle and manipulate the
 syslog messages. We called them:
 
-- Listener
-- Server
-- A worker per platform
-- Publisher
+- :ref:`Listener <arch-listener>`
+- :ref:`Server <arch-server>`
+- :ref:`Device (one per platform) <arch-device>`
+- :ref:`Publisher <arch-publisher>`
 
 The processes communicate between them using
 `ZeroMQ IPC <http://api.zeromq.org/2-1:zmq-ipc>`_.
+
+.. _arch-listener:
 
 Listener
 ++++++++
@@ -49,6 +52,8 @@ The Listener is a pluggable interface, check :ref:`listener` for more details.
 
 The communication between the Listener and the Server is a straight PUSH-PULL
 socket.
+
+.. _arch-server:
 
 Server
 ++++++
@@ -71,20 +76,24 @@ However, the user can activate the messages to be published using the
 Note that the Logger interface has a similar option,
 :ref:`logger-opts-send-unknown`.
 
-Platform Worker
-+++++++++++++++
+.. _arch-device:
 
-There is one worker started per platform. Each worker receives the partially
-processed messages from the Server, then extracts the data and mapps it to the
-OpenConfig or IETF YANG model, as configured in the :ref:`device-profiles`.
-When a message does not have a corresponding profile mapping, it is discarded.
-To receive however these messages, the user can choose to publish them
-using the :ref:`publisher-opts-send-raw` option.
+Device
+++++++
+
+There is one device worker started per platform. Each worker receives the
+partially processed messages from the Server, then extracts the data and mapps
+it to the OpenConfig or IETF YANG model, as configured in the
+:ref:`device-profiles`. When a message does not have a corresponding profile
+mapping, it is discarded. To receive however these messages, the user can choose
+to publish them using the :ref:`publisher-opts-send-raw` option.
 
 The messages are then sent to the Publisher IPC socket using ``PUSH``.
 
 You can avoid unwanted workers using the :ref:`configuration-options-device-blacklist`
 and :ref:`configuration-options-device-whitelist` options.
+
+.. _arch-publisher:
 
 Publisher
 +++++++++
@@ -99,6 +108,8 @@ or not, the messages are anyway binary serialised using
 
 The Publisher is another pluggable interface, check :ref:`publisher` for more
 further information.
+
+.. _arch-authenticator:
 
 Authenticator
 +++++++++++++

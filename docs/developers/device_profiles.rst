@@ -343,3 +343,4 @@ acomplish recurrent tasks:
     {'foo': {'bar': {'baz': 'value'}}}
 
 - ``napalm_logs.utils.traverse``: Traverse a dict or list using a slash delimiter target string. The target ``'foo//bar//0'`` will return ``data['foo']['bar'][0]`` if this value exists, otherwise will return empty dict. Return ``None`` when not found. This can be used to verify if a certain key exists under dictionary hierarchy.
+
