@@ -1,4 +1,4 @@
-.. _publisher-kafka
+.. _publisher-kafka:
 
 =====
 Kafka

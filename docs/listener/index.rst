@@ -4,21 +4,21 @@
 Listener
 ========
 
-The listener subsystem is a pluggable interface for inbound unstructured syslog
+The Listener subsystem is a pluggable interface for inbound unstructured syslog
 messages. The messages can be received directly from the network devices, via
 UDP or TCP, or from other third parties, such as brokers, e.g. ZeroMQ, Kafka,
 etc., depending on the architecture of the network. The default listener is UDP.
 
-From the command line, the listener can be selected using the ``--listener``
+From the command line, the Listener can be selected using the ``--listener``
 option, e.g.:
 
 .. code-block:: bash
 
   $ napalm-logs --listener tcp
 
-From the configuration file, the listener can be specified using the ``listener``
+From the configuration file, the Listener can be specified using the ``listener``
 option, eventually with several options. The options depend on the
-nature of the listener.
+nature of the Listener.
 
 Example: listener configuration using the default configuration
 
@@ -37,7 +37,7 @@ Example: listener configuration using custom options
 
 .. note::
 
-  The IP Address / port for the listener be specified using the
+  The IP Address / port for the Listener be specified using the
   :ref:`configuration-options-address` and :ref:`configuration-options-port`
   configuration options.
 

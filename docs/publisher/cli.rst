@@ -1,4 +1,4 @@
-.. _publisher-cli
+.. _publisher-cli:
 
 ===
 CLI

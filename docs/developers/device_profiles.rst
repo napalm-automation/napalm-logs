@@ -328,10 +328,10 @@ consider being:
     Message parsers are usually defined under a Python file having the name of
     the error ID they produce. However, this is not absolutely mandatory.
 
-Useful function
-^^^^^^^^^^^^^^^
+Useful functions
+^^^^^^^^^^^^^^^^
 
-At times, the developer may find very useful several function, in order to
+At times, the developer may find very useful several functions, in order to
 acomplish recurrent tasks:
 
 - ``napalm_logs.utils.extract``: Extracts the fields from a unstructured text, given a field-regex mapping. Please check the previous paragraph for an usage example.
