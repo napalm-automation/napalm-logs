@@ -58,10 +58,10 @@ socket.
 Server
 ++++++
 
-The Server is the process deals with the triage: using the :ref:`device-profiles`,
-it identifies the platform it comes from. Using this information, the messages
-will be queued to the corresponding worker (see next section). The pattern in
-this case is a
+The Server is the process that deals with the triage: using the
+:ref:`device-profiles`, it identifies the platform it comes from. Using this
+information, the messages will be queued to the corresponding worker (see next
+section). The pattern in this case is a
 `Ventiallator Sink <http://zguide.zeromq.org/py:all#Divide-and-Conquer>`_,
 more specifically implemented using
 `ROUTER and DEALER <http://zeromq.org/tutorials:dealer-and-router>`_
@@ -82,10 +82,10 @@ Device
 ++++++
 
 There is one device worker started per platform. Each worker receives the
-partially processed messages from the Server, then extracts the data and mapps
+partially processed messages from the Server, then extracts the data and maps
 it to the OpenConfig or IETF YANG model, as configured in the
 :ref:`device-profiles`. When a message does not have a corresponding profile
-mapping, it is discarded. To receive however these messages, the user can choose
+mapping, it is discarded. To receive these messages, the user can choose
 to publish them using the :ref:`publisher-opts-send-raw` option.
 
 The messages are then sent to the Publisher IPC socket using ``PUSH``.
@@ -99,11 +99,11 @@ Publisher
 +++++++++
 
 The Publisher process retrieves the messages from the IPC socket using ``PULL``
-operations, then forward them over the :ref:`publisher` interfaces. When the
+operations, then forwards them over the :ref:`publisher` interfaces. When the
 messages encryption is not turned off (see
-:ref:`configuration-options-disable-security`), the Publisher has also the role
-to encrypt and sign before publishing. Regardless if the security is disabled
-or not, the messages are anyway binary serialised using
+:ref:`configuration-options-disable-security`), the Publisher also has the role
+of encrypting and signing before publishing. Regardless of the security being
+disabled or not, the messages are binary serialised using
 `MessagePack <http://msgpack.org/>`_.
 
 The Publisher is another pluggable interface, check :ref:`publisher` for more
@@ -133,7 +133,7 @@ the Publisher to encrypt and sign the binary serialised messages.
 The clients receive these keys through an exchange via a TCP socket; this socket
 is SSL secured using the :ref:`configuration-options-certificate` and the
 :ref:`configuration-options-keyfile` provided by the user. Each client connection
-is handled in a separate thread, and the Authenticator keeps alive this
-connection for further notifications.
+is handled in a separate thread, and the Authenticator keeps this connection
+alive for further notifications.
 
 Read more about the :ref:`authentication`.
