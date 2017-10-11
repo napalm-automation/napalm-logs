@@ -1,4 +1,4 @@
-.. _listener-kafka
+.. _listener-kafka:
 
 =====
 Kafka

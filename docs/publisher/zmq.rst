@@ -1,4 +1,4 @@
-.. _publisher-zmq
+.. _publisher-zmq:
 
 ======
 ZeroMQ

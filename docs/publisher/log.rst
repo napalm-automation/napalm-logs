@@ -1,4 +1,4 @@
-.. _publisher-log
+.. _publisher-log:
 
 ===
 Log

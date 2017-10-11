@@ -1,4 +1,4 @@
-.. _listener-zmq
+.. _listener-zmq:
 
 ======
 ZeroMQ
@@ -45,7 +45,7 @@ Example:
 ``keepalive_idle``: 300
 -----------------------
 
-Override ``TCP_KEEPALIVE` socket option (where supported by OS).
+Override ``TCP_KEEPALIVE`` socket option (where supported by OS).
 The value is specified in miliseconds.
 
 Example:

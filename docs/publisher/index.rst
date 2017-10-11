@@ -4,20 +4,20 @@
 Publisher
 =========
 
-The publisher subsystem is a pluggable interface for outbound messages,
+The Publisher subsystem is a pluggable interface for outbound messages,
 structured following the OpenConfig / IETF YANG models.
 The messages can be published over a variety of services -- see
 :ref:`publisher-modules`.
-From the command line, the publisher module can be selected using the
+From the command line, the Publisher module can be selected using the
 ``--publisher`` option, e.g.:
 
 .. code-block:: bash
 
   $ napalm-logs --publisher kafka
 
-From the configuration file, the publisher can be specified using the
+From the configuration file, the Publisher can be specified using the
 ``publisher`` option, eventually with several options. The options depend on the
-nature of the publisher.
+nature of the Publisher.
 
 Example: publisher configuration using the default configuration
 
@@ -35,7 +35,7 @@ Example: publisher configuration using custom options
 
 .. note::
 
-  The IP Address / port for the publisher be specified using the
+  The IP Address / port for the Publisher be specified using the
   :ref:`configuration-options-publish-address` and
   :ref:`configuration-options-publish-port`
   configuration options.
