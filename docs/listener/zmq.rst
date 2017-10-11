@@ -4,6 +4,8 @@
 ZeroMQ
 ======
 
+.. versionadded:: 0.3.0
+
 Receive unstructured syslog messages via ZeroMQ.
 
 While this listener can be used without any extensive knowledge, we recommend
