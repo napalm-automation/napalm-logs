@@ -19,9 +19,10 @@ import umsgpack
 
 # Import napalm-logs pkgs
 import napalm_logs.utils
+import napalm_logs.ext.six as six
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import PUB_IPC_URL
-from napalm_logs.config import DEV_IPC_URL_TPL
+from napalm_logs.config import DEV_IPC_URL
 from napalm_logs.config import UNKNOWN_DEVICE_NAME
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
@@ -33,11 +34,18 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
     '''
     Device sub-process class.
     '''
-    def __init__(self, name, config, pipe, pub_pipe, publisher_opts):
+    def __init__(self,
+                 name,
+                 opts,
+                 config,
+                 # pipe,
+                 # pub_pipe,
+                 publisher_opts):
         self._name = name
-        self.pipe = pipe
         self._config = config
-        self.pub_pipe = pub_pipe
+        self.opts = opts
+        # self.pipe = pipe
+        # self.pub_pipe = pub_pipe
         self.publisher_opts = publisher_opts
         self.__up = False
         self.compiled_messages = None
@@ -53,16 +61,32 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         in the device IPC and publish to the
         publisher proxy.
         '''
-        ctx = zmq.Context()
+        self.ctx = zmq.Context()
         # subscribe to device IPC
-        self.sub = ctx.socket(zmq.PULL)
+        log.debug('Creating the dealer IPC for %s', self._name)
+        self.sub = self.ctx.socket(zmq.DEALER)
+        if six.PY2:
+            self.sub.setsockopt(zmq.IDENTITY, self._name)
+        elif six.PY3:
+            self.sub.setsockopt(zmq.IDENTITY, bytes(self._name, 'utf-8'))
+        try:
+            self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
+            # zmq 2
+        except AttributeError:
+            # zmq 3
+            self.sub.setsockopt(zmq.RCVHWM, self.opts['hwm'])
         # subscribe to the corresponding IPC pipe
-        ipc_url = DEV_IPC_URL_TPL.format(os=self._name)
-        self.sub.connect(ipc_url)
+        self.sub.connect(DEV_IPC_URL)
         # self.sub.setsockopt(zmq.SUBSCRIBE, '')
         # publish to the publisher IPC
-        self.pub = ctx.socket(zmq.PUB)
+        self.pub = self.ctx.socket(zmq.PUSH)
         self.pub.connect(PUB_IPC_URL)
+        try:
+            self.pub.setsockopt(zmq.HWM, self.opts['hwm'])
+            # zmq 2
+        except AttributeError:
+            # zmq 3
+            self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
 
     def _compile_messages(self):
         '''
@@ -206,7 +230,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         '''
         Start the worker process.
         '''
-        # self._setup_ipc()
+        self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
@@ -216,14 +240,14 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             # bin_obj = self.sub.recv()
             # msg_dict, address = umsgpack.unpackb(bin_obj, use_list=False)
             try:
-                msg_dict, address = self.pipe.recv()
-            except IOError as error:
+                bin_obj = self.sub.recv()
+                msg_dict, address = umsgpack.unpackb(bin_obj, use_list=False)
+            except zmq.ZMQError as error:
                 if self.__up is False:
+                    log.info('Exiting on process shutdown [%s]', self._name)
                     return
                 else:
-                    msg = 'Received IOError on {} device pipe: {}'.format(self._name, error)
-                    log.error(msg, exc_info=True)
-                    raise NapalmLogsExit(msg)
+                    raise NapalmLogsExit(error)
             log.debug('%s: dequeued %s, received from %s', self._name, msg_dict, address)
             if self._name == UNKNOWN_DEVICE_NAME:
                 # If running in the sub-process publishing messages for unknown OSs.
@@ -240,7 +264,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 }
                 log.debug('Queueing to be published:')
                 log.debug(to_publish)
-                self.pub_pipe.send(to_publish)
+                # self.pub_pipe.send(to_publish)
+                self.pub.send(umsgpack.packb(to_publish))
                 continue
             # From here on, we're running in a regular OS sub-process.
             host = msg_dict.get('host')
@@ -273,7 +298,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     }
                     log.debug('Queueing to be published:')
                     log.debug(to_publish)
-                    self.pub_pipe.send(to_publish)
+                    # self.pub_pipe.send(to_publish)
+                    self.pub.send(umsgpack.packb(to_publish))
                 continue
             try:
                 if '__python_fun__' in kwargs:
@@ -302,7 +328,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             }
             log.debug('Queueing to be published:')
             log.debug(to_publish)
-            self.pub_pipe.send(to_publish)
+            # self.pub_pipe.send(to_publish)
+            self.pub.send(umsgpack.packb(to_publish))
             # self._publish(to_publish)
 
     def stop(self):
@@ -311,5 +338,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         '''
         log.info('Stopping %s device process', self._name)
         self.__up = False
-        self.pipe.close()
-        self.pub_pipe.close()
+        self.sub.close()
+        self.pub.close()
+        self.ctx.term()
+        # self.pipe.close()
+        # self.pub_pipe.close()

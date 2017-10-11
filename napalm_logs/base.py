@@ -13,7 +13,7 @@ import time
 import yaml
 import logging
 import threading
-from multiprocessing import Process, Pipe
+from multiprocessing import Process
 
 # Import third party libs
 # crypto
@@ -61,7 +61,8 @@ class NapalmLogs:
                  logger_opts={},
                  publisher_opts={},
                  device_blacklist=[],
-                 device_whitelist=[]):
+                 device_whitelist=[],
+                 hwm=None):
         '''
         Init the napalm-logs engine.
 
@@ -95,6 +96,8 @@ class NapalmLogs:
         self.publisher_opts = publisher_opts
         self.device_whitelist = device_whitelist
         self.device_blacklist = device_blacklist
+        self.opts = {}
+        self.opts['hwm'] = CONFIG.ZMQ_INTERNAL_HWM if hwm is None else hwm
         # Setup the environment
         self._setup_log()
         self._build_config()
@@ -458,76 +461,90 @@ class NapalmLogs:
                                   self.auth_port)
         proc = Process(target=auth.start)
         proc.start()
+        proc.description = 'Auth process'
         log.debug('Started auth process as %s with PID %s', proc._name, proc.pid)
         return proc
 
-    def _start_lst_proc(self, pipe):
+    def _start_lst_proc(self):
+                        # pipe):
         '''
         Start the listener process.
         '''
         log.debug('Starting the listener process')
         # Get the correct listener class
-        listener = NapalmLogsListenerProc(self.address,
+        listener = NapalmLogsListenerProc(self.opts,
+                                          self.address,
                                           self.port,
                                           self.listener_type,
-                                          pipe,
+                                          # pipe,
                                           listener_opts=self.listener_opts)
         proc = Process(target=listener.start)
         proc.start()
+        proc.description = 'Listener process'
         log.debug('Started listener process as %s with PID %s', proc._name, proc.pid)
         return proc
 
-    def _start_srv_proc(self, pipe, os_pipes):
+    def _start_srv_proc(self,
+                        started_os_proc):
+                        # pipe,
+                        # os_pipes):
         '''
         Start the server process.
         '''
         log.debug('Starting the server process')
-        server = NapalmLogsServerProc(self.config_dict,
-                                      pipe,
-                                      os_pipes,
+        server = NapalmLogsServerProc(self.opts,
+                                      self.config_dict,
+                                      started_os_proc,
+                                      # pipe,
+                                      # os_pipes,
                                       self.logger,
                                       self.logger_opts,
                                       self.publisher_opts)
         proc = Process(target=server.start)
         proc.start()
+        proc.description = 'Server process'
         log.debug('Started server process as %s with PID %s', proc._name, proc.pid)
         return proc
 
-    def _start_pub_proc(self, pub_pipe):
+    def _start_pub_proc(self):
+                        # pub_pipe):
         '''
         Start the publisher process.
         '''
         log.info('Starting the publisher process')
-        publisher = NapalmLogsPublisherProc(self.publish_address,
+        publisher = NapalmLogsPublisherProc(self.opts,
+                                            self.publish_address,
                                             self.publish_port,
                                             self.transport,
-                                            pub_pipe,
+                                            # pub_pipe,
                                             self.__priv_key,
                                             self.__signing_key,
                                             self.publisher_opts,
                                             disable_security=self.disable_security)
         proc = Process(target=publisher.start)
         proc.start()
+        proc.description = 'Publisher process'
         log.debug('Started publisher process as %s with PID %s', proc._name, proc.pid)
         return proc
 
     def _start_dev_proc(self,
                         device_os,
-                        device_config,
-                        device_pipe,
-                        dev_pub_pipe):
+                        device_config):
+                        # device_pipe,
+                        # dev_pub_pipe):
         '''
         Start the device worker process.
         '''
-        # TODO remove the pipe overhead when migrating to zmq IPC
         log.info('Starting the child process for %s', device_os)
         dos = NapalmLogsDeviceProc(device_os,
+                                   self.opts,
                                    device_config,
-                                   device_pipe,
-                                   dev_pub_pipe,
+                                   # device_pipe,
+                                   # dev_pub_pipe,
                                    self.publisher_opts)
         os_proc = Process(target=dos.start)
         os_proc.start()
+        os_proc.description = '%s device process' % device_os
         log.debug('Started process %s for %s, having PID %s', os_proc._name, device_os, os_proc.pid)
         return os_proc
 
@@ -545,15 +562,16 @@ class NapalmLogs:
             # start the keepalive thread for the auth sub-process
             self._processes.append(self._start_auth_proc())
         # publisher process start
-        pub_pipe, dev_pub_pipe = Pipe(duplex=False)
-        self._processes.append(self._start_pub_proc(pub_pipe))
+        # pub_pipe, dev_pub_pipe = Pipe(duplex=False)
+        self._processes.append(self._start_pub_proc())
         # device process start
         log.info('Starting child processes for each device type')
-        os_pipes = {}
+        # os_pipes = {}
         if self.publisher_opts.get('send_unknown'):
             # Explicitly requested to send messages from unidentified devices.
             log.info('Starting an additional process to publish messages from identified operating systems.')
             self.config_dict[CONFIG.UNKNOWN_DEVICE_NAME] = {}
+        started_os_proc = []
         for device_os, device_config in self.config_dict.items():
             if self._whitelist_blacklist(device_os):
                 log.debug('Not starting process for %s (whitelist-blacklist logic)', device_os)
@@ -561,17 +579,18 @@ class NapalmLogs:
                 #   or those operating systems that are on the blacklist.
                 # This way we can prevent starting unwanted sub-processes.
                 continue
-            device_pipe, srv_pipe = Pipe(duplex=False)
+            # device_pipe, srv_pipe = Pipe(duplex=False)
             self._processes.append(self._start_dev_proc(device_os,
-                                   device_config,
-                                   device_pipe,
-                                   dev_pub_pipe))
-            os_pipes[device_os] = srv_pipe
+                                                        device_config))
+                                                        # device_pipe,    # noqa
+                                                        # dev_pub_pipe))  # noqa
+            started_os_proc.append(device_os)
+            # os_pipes[device_os] = srv_pipe
         # start server process
-        srv_pipe, lst_pipe = Pipe(duplex=False)
-        self._processes.append(self._start_srv_proc(srv_pipe, os_pipes))
+        # srv_pipe, lst_pipe = Pipe(duplex=False)
+        self._processes.append(self._start_srv_proc(started_os_proc))
         # start listener process
-        self._processes.append(self._start_lst_proc(lst_pipe))
+        self._processes.append(self._start_lst_proc())
         thread = threading.Thread(target=self._check_children)
         thread.start()
 
@@ -584,6 +603,7 @@ class NapalmLogs:
             for process in self._processes:
                 if process.is_alive() is True:
                     continue
+                log.debug('%s is dead. Stopping the napalm-logs engine.', process.description)
                 self.stop_engine()
 
     def stop_engine(self):

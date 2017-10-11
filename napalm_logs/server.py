@@ -15,11 +15,12 @@ import threading
 
 # Import third party libs
 import zmq
+import umsgpack
 
 # Import napalm-logs pkgs
 import napalm_logs.ext.six as six
 from napalm_logs.config import LST_IPC_URL
-from napalm_logs.config import DEV_IPC_URL_TPL
+from napalm_logs.config import DEV_IPC_URL
 from napalm_logs.config import UNKNOWN_DEVICE_NAME
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.transport import get_transport
@@ -33,15 +34,24 @@ class NapalmLogsServerProc(NapalmLogsProc):
     '''
     Server sub-process class.
     '''
-    def __init__(self, config, pipe, os_pipes, logger, logger_opts, publisher_opts):
+    def __init__(self,
+                 opts,
+                 config,
+                 started_os_proc,
+                 # pipe,
+                 # os_pipes,
+                 logger,
+                 logger_opts,
+                 publisher_opts):
+        self.opts = opts
         self.config = config
-        self.pipe = pipe
-        self.os_pipes = os_pipes
+        self.started_os_proc = started_os_proc
+        # self.pipe = pipe
+        # self.os_pipes = os_pipes
         self.logger = logger
         self.logger_opts = logger_opts
         self.publisher_opts = publisher_opts
         self.__up = False
-        # self.pubs = {}
         self.compiled_prefixes = None
         self._compile_prefixes()
 
@@ -55,17 +65,27 @@ class NapalmLogsServerProc(NapalmLogsProc):
         Subscript to the listener IPC
         and publish to the device specific IPC.
         '''
-        ctx = zmq.Context()
+        log.debug('Setting up the server IPC puller to receive from the listener')
+        self.ctx = zmq.Context()
         # subscribe to listener
-        self.sub = ctx.socket(zmq.PULL)
-        self.sub.connect(LST_IPC_URL)
+        self.sub = self.ctx.socket(zmq.PULL)
+        self.sub.bind(LST_IPC_URL)
+        try:
+            self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
+            # zmq 2
+        except AttributeError:
+            # zmq 3
+            self.sub.setsockopt(zmq.RCVHWM, self.opts['hwm'])
         # device publishers
-        os_types = self.config.keys()
-        for dev_os in os_types:
-            pub = ctx.socket(zmq.PUSH)
-            ipc_url = DEV_IPC_URL_TPL.format(os=dev_os)
-            pub.bind(ipc_url)
-            self.pubs[dev_os] = pub
+        log.debug('Creating the router ICP on the server')
+        self.pub = self.ctx.socket(zmq.ROUTER)
+        self.pub.bind(DEV_IPC_URL)
+        try:
+            self.pub.setsockopt(zmq.HWM, self.opts['hwm'])
+            # zmq 2
+        except AttributeError:
+            # zmq 3
+            self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
 
     def _compile_prefixes(self):
         '''
@@ -186,7 +206,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
         inspect and identify the operating system,
         then queue the message correspondingly.
         '''
-        # self._setup_ipc()
+        self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
@@ -200,14 +220,15 @@ class NapalmLogsServerProc(NapalmLogsProc):
             # bin_obj = self.sub.recv()
             # msg, address = umsgpack.unpackb(bin_obj, use_list=False)
             try:
-                msg, address = self.pipe.recv()
-            except IOError as error:
+                bin_obj = self.sub.recv()
+                msg, address = umsgpack.unpackb(bin_obj, use_list=False)
+            except zmq.ZMQError as error:
                 if self.__up is False:
+                    log.info('Exiting on process shutdown')
                     return
                 else:
-                    msg = 'Received IOError from server pipe: {}'.format(error)
-                    log.error(msg, exc_info=True)
-                    raise NapalmLogsExit(msg)
+                    log.error(error, exc_info=True)
+                    raise NapalmLogsExit(error)
             if six.PY3:
                 msg = str(msg, 'utf-8')
             else:
@@ -220,27 +241,39 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     self._send_log_syslog(dev_os, msg_dict)
                 elif self.logger_opts.get('send_unknown') and not dev_os:
                     self._send_log_syslog(UNKNOWN_DEVICE_NAME, {'message': msg})
-            if dev_os and dev_os in self.os_pipes:
+            if dev_os and dev_os in self.started_os_proc:
                 # Identified the OS and the corresponding process is started.
                 # Then send the message in the right queue
                 # obj = (msg_dict, address)
                 # bin_obj = umsgpack.packb(obj)
                 log.debug('Queueing message to %s', dev_os)
                 # self.pubs[dev_os].send(bin_obj)
-                self.os_pipes[dev_os].send((msg_dict, address))
-            elif dev_os and dev_os not in self.os_pipes:
+                if six.PY3:
+                    dev_os = bytes(dev_os, 'utf-8')
+                self.pub.send_multipart([dev_os,
+                                         umsgpack.packb((msg_dict, address))])
+                # self.os_pipes[dev_os].send((msg_dict, address))
+            elif dev_os and dev_os not in self.started_os_proc:
                 # Identified the OS, but the corresponding process does not seem to be started.
                 log.info('Unable to queue the message to %s. Is the sub-process started?', dev_os)
             elif not dev_os and self.publisher_opts.get('send_unknown'):
                 # OS not identified, but the user requested to publish the message as-is
-                self.os_pipes[UNKNOWN_DEVICE_NAME].send(({'message': msg}, address))
+                log.debug('Publishing message, although not identified, as requested')
+                if six.PY3:
+                    dev_os = bytes(UNKNOWN_DEVICE_NAME, 'utf-8')
+                self.pub.send_multipart([dev_os,
+                                         umsgpack.packb(({'message': msg}, address))])
+                # self.os_pipes[UNKNOWN_DEVICE_NAME].send(({'message': msg}, address))
             log.info('No action requested. Ignoring.')
 
     def stop(self):
         log.info('Stopping server process')
         self.__up = False
-        self.pipe.close()
-        for os_pipe in self.os_pipes.values():
-            os_pipe.close()
+        self.sub.close()
+        self.pub.close()
+        self.ctx.term()
+        # self.pipe.close()
+        # for os_pipe in self.os_pipes.values():
+        #     os_pipe.close()
         if self.logger:
             self._log_syslog_transport.stop()

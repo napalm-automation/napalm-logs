@@ -91,27 +91,28 @@ def client(**config):
         addr=config['publish_address'],
         port=config['publish_port']))
     sock.setsockopt(zmq.SUBSCRIBE, '')
-
-    auth = napalm_logs.utils.ClientAuth(config['certificate'],
-                                        address=config['auth_address'],
-                                        port=config['auth_port'])
-
-    heat_stop = time.time() + config['heat_time']
-    stop_time = time.time() + config['run_time']
+    sock.setsockopt(zmq.RCVTIMEO, 5000)
+    if not config['disable_security']:
+        auth = napalm_logs.utils.ClientAuth(config['certificate'],
+                                            address=config['auth_address'],
+                                            port=config['auth_port'])
+    start_time = time.time()
     count = 0
-    # while time.time() < heat_stop:
-    #     obj = sock.recv()
-    #     decrypted = napalm_logs.utils.decrypt(obj, vk, pk)
-    while time.time() < stop_time:
-        obj = sock.recv()
+    while True:
+        try:
+            obj = sock.recv()
+        except zmq.Again:
+            break
         log.debug('Received:')
         log.debug(obj)
-        decrypted = auth.decrypt(obj)
+        if config['disable_security']:
+            decrypted = napalm_logs.utils.unserialize(obj)
+        else:
+            decrypted = auth.decrypt(obj)
         log.debug('Decrypted:')
         log.debug(decrypted)
         count += 1
-    print('Received {0} messages in {1} seconds'.format(count,
-                                                        config['run_time']-config['heat_time']))
+    print('Received {0} messages in {1} seconds'.format(count, time.time() - start_time))
 
 
 def router_tcp(id, **config):

@@ -33,8 +33,13 @@ class OptionParser(optparse.OptionParser, object):
 
     VERSION = napalm_logs.__version__
     usage = 'napalm-logs [options]'
-    epilog = 'Full documentation coming soon.'
-    description = 'napalm-logs CLI script.'
+    epilog = 'Documentation at: http://napalm-logs.readthedocs.io/en/latest/'
+    description = (
+        'Process listening to syslog messages from network device'
+        'from various sources, and publishing JSON serializable Python objects, '
+        'in a vendor agnostic shape. The output objects are structured following'
+        'the OpenConfig or IETF YANG models.'
+    )
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('version', '%prog {0}'.format(self.VERSION))
@@ -175,6 +180,18 @@ class NLOptionParser(OptionParser, object):
             dest='log_format',
             help=('Logging format. Default: {0}'.format(defaults.LOG_FORMAT))
         )
+        self.add_option(
+            '--hwm',
+            dest='hwm',
+            type=int,
+            help=(
+                'Internal ZeroMQ high water mark. '
+                'This option controls the length of the internal message queue,'
+                'and it tunes the capacity of the napalm-logs engine. '
+                'For high performance, this number can be increased, but implies'
+                'higher memory consumption. '
+                'Default: {0}'.format(defaults.ZMQ_INTERNAL_HWM))
+        )
 
     def convert_env_dict(self, d):
         for k, v in d.items():
@@ -307,6 +324,12 @@ class NLOptionParser(OptionParser, object):
             elif isinstance(publisher_cfg, six.string_type):
                 publisher = publisher_cfg
 
+        hwm = defaults.ZMQ_INTERNAL_HWM
+        if self.options.hwm is not None:
+            hwm = self.options.hwm
+        elif file_cfg.get('hwm') is not None:
+            hwm = file_cfg['hwm']
+
         cfg = {
             'address': self.options.address or file_cfg.get('address') or defaults.ADDRESS,
             'port': self.options.port or file_cfg.get('port') or defaults.PORT,
@@ -332,7 +355,8 @@ class NLOptionParser(OptionParser, object):
             'logger_opts': logger_opts,
             'publisher_opts': publisher_opts,
             'device_whitelist': device_whitelist,
-            'device_blacklist': device_blacklist
+            'device_blacklist': device_blacklist,
+            'hwm': hwm
         }
         return cfg
 

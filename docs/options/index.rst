@@ -174,6 +174,36 @@ Configuration file example:
 
   extension_config_path: /home/admin/napalm-logs/
 
+.. _configuration-hwm:
+
+``hwm``: 1000
+-------------
+
+.. versionadded:: 0.3.0
+
+This option controls the ZeroMQ high water mark (the hard limit on the maximum
+number of outstanding messages ZeromMQ shall queue in memory).
+If this limit has been reached the internal sockets enter an exceptional state,
+and ZeroMQ blocks the reception of further messages.
+This option can be used to tune the performances of the napalm-logs, in terms of
+total messages processed. While the default limit should be generally
+enough, in environments with extremely high density of syslog messages to be
+processed, it is recommended to increase this value. Keep in mind that a higher
+queue implies higher memory consumption.
+For maximum capacity, this option can be set to ``0``, i.e., inifinite queue.
+
+CLI usage example:
+
+.. code-block:: bash
+
+  $ napalm-logs --hwm 0
+
+Configuration file example:
+
+.. code-block:: yaml
+
+  hwm: 0
+
 .. _configuration-options-keyfile:
 
 ``keyfile``
