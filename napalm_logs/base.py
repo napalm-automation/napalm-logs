@@ -62,7 +62,8 @@ class NapalmLogs:
                  publisher_opts={},
                  device_blacklist=[],
                  device_whitelist=[],
-                 hwm=None):
+                 hwm=None,
+                 device_worker_processes=1):
         '''
         Init the napalm-logs engine.
 
@@ -96,6 +97,7 @@ class NapalmLogs:
         self.publisher_opts = publisher_opts
         self.device_whitelist = device_whitelist
         self.device_blacklist = device_blacklist
+        self.device_worker_processes = device_worker_processes
         self.opts = {}
         self.opts['hwm'] = CONFIG.ZMQ_INTERNAL_HWM if hwm is None else hwm
         # Setup the environment
@@ -580,10 +582,12 @@ class NapalmLogs:
                 # This way we can prevent starting unwanted sub-processes.
                 continue
             # device_pipe, srv_pipe = Pipe(duplex=False)
-            self._processes.append(self._start_dev_proc(device_os,
-                                                        device_config))
-                                                        # device_pipe,    # noqa
-                                                        # dev_pub_pipe))  # noqa
+            log.debug('Will start %d worker processes for %s', self.device_worker_processes, device_os)
+            for proc_index in range(self.device_worker_processes):
+                self._processes.append(self._start_dev_proc(device_os,
+                                                            device_config))
+                                                            # device_pipe,    # noqa
+                                                            # dev_pub_pipe))  # noqa
             started_os_proc.append(device_os)
             # os_pipes[device_os] = srv_pipe
         # start server process
