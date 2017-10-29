@@ -81,6 +81,10 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.transport = transport_class(self.address,
                                          self.port,
                                          **self.publisher_opts)
+        self.__transport_encrypt = True
+        if hasattr(self.transport, 'NO_ENCRYPT') and\
+           getattr(self.transport, 'NO_ENCRYPT') == True:
+            self.__transport_encrypt = False
 
     def _prepare(self, bin_obj):
         '''
@@ -120,10 +124,8 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                     log.error(error, exc_info=True)
                     raise NapalmLogsExit(error)
             log.debug('Publishing the OC object (serialised)')
-            if not self.disable_security:
+            if not self.disable_security and self.__transport_encrypt:
                 bin_obj = self._prepare(bin_obj)
-            # else:
-            #     bin_obj = umsgpack.packb(obj)
             self.transport.publish(bin_obj)
 
     def stop(self):
