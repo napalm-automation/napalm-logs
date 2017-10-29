@@ -12,13 +12,17 @@ import logging
 # Exceptions
 from napalm_logs.exceptions import InvalidTransportException
 # Transport classes
-from napalm_logs.transport.zeromq import ZMQTransport
 from napalm_logs.transport.cli import CLITransport
 from napalm_logs.transport.log import LogTransport
+from napalm_logs.transport.zeromq import ZMQTransport
 # extras: require additional underlying libraries
+# ~~~ Kafka ~~~
 from napalm_logs.transport.kafka import HAS_KAFKA
 from napalm_logs.transport.kafka import KafkaTransport
-# from napalm_logs.transport.kafka import KafkaTransport
+# ~~~ HTTP ~~~
+from napalm_logs.transport.http import HAS_TORNADO
+from napalm_logs.transport.http import HAS_REQUESTS
+from napalm_logs.transport.http import HTTPTransport
 # from napalm_logs.transport.rabbitmq import RabbitMQTransport
 
 log = logging.getLogger(__file__)
@@ -38,6 +42,9 @@ TRANSPORT_LOOKUP = {
 if HAS_KAFKA:
     log.info('Kafka dependency seems to be installed, making kafka transport available.')
     TRANSPORT_LOOKUP['kafka'] = KafkaTransport
+
+if HAS_REQUESTS or HAS_TORNADO:
+    TRANSPORT_LOOKUP['http'] = HTTPTransport
 
 
 def get_transport(name):
