@@ -39,7 +39,7 @@ class HTTPTransport(TransportBase):
     '''
     HTTP transport class.
     '''
-    NO_ENCRYPT = True 
+    NO_ENCRYPT = True
     # This tells the publisher to not encrypt the messages
     #   published over this channel.
 

@@ -83,7 +83,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                                          **self.publisher_opts)
         self.__transport_encrypt = True
         if hasattr(self.transport, 'NO_ENCRYPT') and\
-           getattr(self.transport, 'NO_ENCRYPT') == True:
+           getattr(self.transport, 'NO_ENCRYPT') is True:
             self.__transport_encrypt = False
 
     def _prepare(self, bin_obj):
