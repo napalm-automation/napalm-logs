@@ -192,6 +192,13 @@ class NLOptionParser(OptionParser, object):
                 'higher memory consumption. '
                 'Default: {0}'.format(defaults.ZMQ_INTERNAL_HWM))
         )
+        self.add_option(
+            '-w', '--device-worker-processes',
+            dest='device_worker_processes',
+            type=int,
+            help='Number of wroker processes per device.',
+            default=1
+        )
 
     def convert_env_dict(self, d):
         for k, v in d.items():
@@ -356,7 +363,9 @@ class NLOptionParser(OptionParser, object):
             'publisher_opts': publisher_opts,
             'device_whitelist': device_whitelist,
             'device_blacklist': device_blacklist,
-            'hwm': hwm
+            'hwm': hwm,
+            'device_worker_processes': self.options.device_worker_processes or\
+                                       file_cfg.get('device_worker_processes') or 1
         }
         return cfg
 

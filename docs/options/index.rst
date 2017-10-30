@@ -131,6 +131,27 @@ Configuration file example:
 
   config_path: /home/admin/napalm-logs/
 
+.. _configuration-options-device-worker-processes:
+
+``device-worker-processes``: ``1``
+----------------------------------
+
+.. versionadded:: 0.3.0
+
+This option configures the number of worker processes to be started for each
+platform class. For better performances and higher capacity, it is recommended
+to increase this number, which defaults to 1, i.e., by default there will be
+started a single process per platform.
+
+.. note::
+
+    Increasing the number of processes, will imply higher memory consumption.
+
+    For fine-tunning, consider increasing this number, and at the same time
+    exclude (or include) the appropriate platforms, using the following options:
+    :ref:`configuration-options-device-blacklist` and
+    :ref:`configuration-options-device-whitelist`.
+
 .. _configuration-options-disable-security:
 
 ``disable-security``

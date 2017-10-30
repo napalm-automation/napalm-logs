@@ -141,15 +141,19 @@ def router_udp(id, **config):
     Multiple instances of this have to be started,
     sending messages to the same.
     '''
-    skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    context = zmq.Context()
+    skt = context.socket(zmq.PUSH)
+    skt.bind('tcp://{addr}:{port}'.format(
+        addr=config['address'],
+        port=config['port']))
     stop_time = time.time() + config['run_time']
     count = 0
     while time.time() < stop_time:
         log.debug('Sending sample syslog to {0}:{1} via udp'.format(config['address'], config['port']))
         # config['syslog_sample'] = '{timestamp} {id}'
-        skt.sendto(config['syslog_sample'].format(id=str(id*10)+str(count),
-                                                  timestamp=time.time()),
-                   (config['address'], config['port']))
+        skt.send(config['syslog_sample'].format(id=str(id*10)+str(count),
+                                                  timestamp=time.time()))
         count += 1
         time.sleep(1.0/config['pace'])
     print('Sent {0} messages in {1} seconds'.format(count, config['run_time']))
