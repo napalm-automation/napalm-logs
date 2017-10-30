@@ -49,6 +49,7 @@ Available publishers and their options
    :maxdepth: 1
 
    cli
+   http
    kafka
    log
    zmq
