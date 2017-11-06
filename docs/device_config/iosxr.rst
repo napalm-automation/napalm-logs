@@ -8,14 +8,14 @@ The following will configure IOS-XR to send the syslog messages, over UDP, to th
 IP Address ``10.10.10.1``, port 10101:
 
 
-.. code-block::
+.. code-block:: text
 
     logging 10.10.10.1 port 10101
 
 To correctly send the hostname information, is is also recommended to explicitly
 configure the following:
 
-.. code-block::
+.. code-block:: text
 
     logging hostnameprefix <hostname of the device>
 

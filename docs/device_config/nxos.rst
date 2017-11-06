@@ -7,6 +7,6 @@ Cisco NX-OS
 The following will configure NX-OS to send the syslog messages, over UDP, to the
 IP Address ``10.10.10.1``, port 10101:
 
-.. code-block::
+.. code-block:: text
 
     logging server 10.10.10.1 port 10101
