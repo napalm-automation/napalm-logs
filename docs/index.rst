@@ -311,4 +311,5 @@ daemon):
    listener/index
    publisher/index
    logger/index
+   syslog/index
    developers/index
