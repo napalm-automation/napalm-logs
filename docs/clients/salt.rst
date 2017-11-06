@@ -25,6 +25,9 @@ and :ref:`configuration-options-auth-port`,
   side with ``address`` and ``port`` napalm-syslog Salt Engine fields: they are
   *not* the same!
 
+For more configuration options and usage examples of the napalm-syslog Salt
+Egine, please check the `documentation <https://docs.saltstack.com/en/latest/ref/engines/all/salt.engines.napalm_syslog.html>`_.
+
 Configuration example:
 
 When the napalm-logs engine is started usign the command line ``$ napalm-logs -a 1.2.3.4 -p 1234 --publish-address 5.6.7.8 --publish-port 5678 --disable-security``,
