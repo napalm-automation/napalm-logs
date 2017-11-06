@@ -305,6 +305,7 @@ daemon):
    :maxdepth: 2
 
    installation/index
+   device_config/index
    options/index
    messages/index
    authentication/index
