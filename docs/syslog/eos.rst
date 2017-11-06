@@ -15,7 +15,7 @@ PRI
 HEADER
 ------
 
-.. syslog-eos-msg:
+.. _syslog-eos-msg:
 
 MSG
 ---

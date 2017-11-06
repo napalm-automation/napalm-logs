@@ -15,7 +15,7 @@ PRI
 HEADER
 ------
 
-.. syslog-nxos-msg:
+.. _syslog-nxos-msg:
 
 MSG
 ---

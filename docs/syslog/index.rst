@@ -41,7 +41,7 @@ HEADER
 
 The syslog messages from network devices do not respect the `standard HEADER <https://www.balabit.com/documents/syslog-ng-ose-latest-guides/en/syslog-ng-ose-guide-admin/html/ietfsyslog-header.html>`_.
 
-.. syslog-msg:
+.. _syslog-msg:
 
 MSG
 ---

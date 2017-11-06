@@ -15,7 +15,7 @@ PRI
 HEADER
 ------
 
-.. syslog-iosxr-msg:
+.. _syslog-iosxr-msg:
 
 MSG
 ---

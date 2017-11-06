@@ -15,7 +15,7 @@ PRI
 HEADER
 ------
 
-.. syslog-junos-msg:
+.. _syslog-junos-msg:
 
 MSG
 ---
