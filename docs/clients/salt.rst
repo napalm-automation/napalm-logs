@@ -39,6 +39,7 @@ or using the configuration file:
     port: 1234
     publish_address: 5.6.7.8
     publish_port: 5678
+    disable_security: true
 
 The napalm-syslog engine is configured under the Salt Master or Minion:
 
