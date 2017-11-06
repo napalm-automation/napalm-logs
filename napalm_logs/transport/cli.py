@@ -8,6 +8,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 # Import napalm-logs pkgs
+import napalm_logs.utils
 from napalm_logs.transport.base import TransportBase
 
 
@@ -15,5 +16,10 @@ class CLITransport(TransportBase):
     '''
     CLI transport class.
     '''
+    NO_ENCRYPT = True
+    # This tells the publisher to not encrypt the messages
+    #   published over this channel.
+
     def publish(self, obj):
-        print(obj)
+        data = napalm_logs.utils.unserialize(obj)
+        print(data)
