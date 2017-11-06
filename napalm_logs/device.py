@@ -42,6 +42,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                  # pub_pipe,
                  publisher_opts):
         self._name = name
+        log.debug('Starting process for %s', self._name)
         self._config = config
         self.opts = opts
         # self.pipe = pipe

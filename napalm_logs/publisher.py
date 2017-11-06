@@ -123,7 +123,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                 else:
                     log.error(error, exc_info=True)
                     raise NapalmLogsExit(error)
-            log.debug('Publishing the OC object (serialised)')
+            log.debug('Publishing the OC object')
             if not self.disable_security and self.__transport_encrypt:
                 bin_obj = self._prepare(bin_obj)
             self.transport.publish(bin_obj)
