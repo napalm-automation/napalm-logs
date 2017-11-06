@@ -302,7 +302,7 @@ daemon):
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    installation/index
    options/index
