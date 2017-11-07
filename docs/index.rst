@@ -302,7 +302,7 @@ daemon):
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    installation/index
    clients/index
@@ -312,4 +312,5 @@ daemon):
    listener/index
    publisher/index
    logger/index
+   syslog/index
    developers/index
