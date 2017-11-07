@@ -261,6 +261,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 log.debug('Publishing message, although not identified, as requested')
                 if six.PY3:
                     dev_os = bytes(UNKNOWN_DEVICE_NAME, 'utf-8')
+                else:
+                    dev_os = UNKNOWN_DEVICE_NAME
                 self.pub.send_multipart([dev_os,
                                          umsgpack.packb(({'message': msg}, address))])
                 # self.os_pipes[UNKNOWN_DEVICE_NAME].send(({'message': msg}, address))

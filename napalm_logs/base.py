@@ -571,7 +571,7 @@ class NapalmLogs:
         # os_pipes = {}
         if self.publisher_opts.get('send_unknown'):
             # Explicitly requested to send messages from unidentified devices.
-            log.info('Starting an additional process to publish messages from identified operating systems.')
+            log.info('Starting an additional process to publish messages from unknown operating systems.')
             self.config_dict[CONFIG.UNKNOWN_DEVICE_NAME] = {}
         started_os_proc = []
         for device_os, device_config in self.config_dict.items():
@@ -582,7 +582,7 @@ class NapalmLogs:
                 # This way we can prevent starting unwanted sub-processes.
                 continue
             # device_pipe, srv_pipe = Pipe(duplex=False)
-            log.debug('Will start %d worker processes for %s', self.device_worker_processes, device_os)
+            log.debug('Will start %d worker process(es) for %s', self.device_worker_processes, device_os)
             for proc_index in range(self.device_worker_processes):
                 self._processes.append(self._start_dev_proc(device_os,
                                                             device_config))
