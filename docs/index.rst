@@ -307,6 +307,7 @@ daemon):
    installation/index
    device_config/index
    options/index
+   clients/index
    messages/index
    authentication/index
    listener/index
