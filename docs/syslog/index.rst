@@ -31,8 +31,44 @@ in the following documents, individually:
 PRI
 ---
 
+The Priority value is calculated by first multiplying the Facility number by 8
+and then adding the numerical value of the Severity. For example, a kernel
+message (Facility=0) with a Severity of Emergency (Severity=0) would have a
+Priority value of 0.
+
 In addition to the `standard PRI <https://www.balabit.com/documents/syslog-ng-ose-latest-guides/en/syslog-ng-ose-guide-admin/html/ietfsyslog-pri.html>`_ classification, each platform defines additional
-values for Facility and Severity which may differ from a platform to another.
+values for Facility which may differ from a platform to another.
+
+The Severity however usually respects the standard:
+
++----------------+------------------+------------------------------------------+
+| Numerical code | Severity level   | Description                              |
++================+==================+==========================================+
+| 0              | emergency        | System panic or other condition that     |
+|                |                  | causes the router to stop functioning    |
++----------------+------------------+------------------------------------------+
+| 1              | alert            | Conditions that require immediate        |
+|                |                  | correction, such as a corrupted          |
+|                |                  | system database                          |
++----------------+------------------+------------------------------------------+
+| 2              | critical         | Critical conditions, such as hard errors |
++----------------+------------------+------------------------------------------+
+| 3              | error            | Error conditions that generally have less|
+|                |                  | serious consequences than errors in the  |
+|                |                  | emergency, alert, and critical levels    |
++----------------+------------------+------------------------------------------+
+| 4              | warning          | Conditions that warrant monitoring       |
++----------------+------------------+------------------------------------------+
+| 5              | notice           | Conditions that are not errors but       |
+|                |                  | might warrant special handling           |
++----------------+------------------+------------------------------------------+
+| 6              | info             | Events or nonerror conditions of interest|
++----------------+------------------+------------------------------------------+
+| 7              | debug            | Software debugging messages (these appear|
+|                |                  | only if a technical support              |
+|                |                  | representative has instructed you to     |
+|                |                  | configute this severity level            |
++----------------+------------------+------------------------------------------+
 
 .. _syslog-header:
 
