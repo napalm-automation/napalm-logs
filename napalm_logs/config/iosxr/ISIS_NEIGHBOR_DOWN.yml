@@ -1,0 +1,19 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: ISIS_NEIGHBOR_DOWN
+    tag: ROUTING-ISIS-5-ADJCHANGE
+    values:
+      neighbor: ([^ ]+)
+      interface: ([^ ]+)
+      level: (L\d)
+      downReason: (.*)
+    line: 'Adjacency to {neighbor} ({interface}) ({level}) Down, {downReason}'
+    model: NOMODEL
+    mapping:
+      variables:
+        isis/neighbor: neighbor
+        isis/interface: interface
+        isis/level: level
+        isis/downReason: downReason
+      static: {}
