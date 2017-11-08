@@ -23,10 +23,40 @@
     "severity": 6,
     "timestamp": 1509534684,
     "yang_message": {
-        "isis/downReason": "Interface state down",
-        "isis/interface": "TenGigE1/2/0/8.92",
-        "isis/level": "L2",
-        "isis/neighbor": "gw1.nyc1"
+        "network-instances": {
+            "network-instance": {
+                "global": {
+                    "protocols": {
+                        "protocol": {
+                            "isis": {
+                                "interfaces": {
+                                    "interface": {
+                                        "TenGigE1/2/0/8.92": {
+                                            "levels": {
+                                                "level": {
+                                                    "L2": {
+                                                        "adjacencies": {
+                                                            "adjacency": {
+                                                                "gw1.nyc1": {
+                                                                    "state": {
+                                                                        "adjacency-state": "DOWN",
+                                                                        "adjacency-state-change-reason-message": "Interface state down"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     },
-    "yang_model": "NOMODEL"
+    "yang_model": "openconfig-isis"
 }

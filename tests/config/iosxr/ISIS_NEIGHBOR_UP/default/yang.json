@@ -23,10 +23,40 @@
     "severity": 6,
     "timestamp": 1509499044,
     "yang_message": {
-        "isis/interface": "TenGigE0/2/0/8.995",
-        "isis/level": "L2",
-        "isis/neighbor": "gw3.lax1",
-        "isis/upReason": "New adjacency"
+        "network-instances": {
+            "network-instance": {
+                "global": {
+                    "protocols": {
+                        "protocol": {
+                            "isis": {
+                                "interfaces": {
+                                    "interface": {
+                                        "TenGigE0/2/0/8.995": {
+                                            "levels": {
+                                                "level": {
+                                                    "L2": {
+                                                        "adjacencies": {
+                                                            "adjacency": {
+                                                                "gw3.lax1": {
+                                                                    "state": {
+                                                                        "adjacency-state": "UP",
+                                                                        "adjacency-state-change-reason-message": "New adjacency"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     },
-    "yang_model": "NOMODEL"
+    "yang_model": "openconfig-isis"
 }

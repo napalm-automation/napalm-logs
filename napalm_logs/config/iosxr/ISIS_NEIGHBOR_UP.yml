@@ -1,6 +1,4 @@
 messages:
-  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
-  # This may change if we are able to find a more well defined naming system.
   - error: ISIS_NEIGHBOR_UP
     tag: ROUTING-ISIS-5-ADJCHANGE
     values:
@@ -9,11 +7,9 @@ messages:
       level: (L\d)
       upReason: (.*)
     line: 'Adjacency to {neighbor} ({interface}) ({level}) Up, {upReason}'
-    model: NOMODEL
+    model: openconfig-isis
     mapping:
       variables:
-        isis/neighbor: neighbor
-        isis/interface: interface
-        isis/level: level
-        isis/upReason: upReason
-      static: {}
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state-change-reason-message: upReason
+      static:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state: UP
