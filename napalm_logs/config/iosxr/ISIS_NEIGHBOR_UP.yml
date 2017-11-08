@@ -1,0 +1,15 @@
+messages:
+  - error: ISIS_NEIGHBOR_UP
+    tag: ROUTING-ISIS-5-ADJCHANGE
+    values:
+      neighbor: ([^ ]+)
+      interface: ([^ ]+)
+      level: (L\d)
+      upReason: (.*)
+    line: 'Adjacency to {neighbor} ({interface}) ({level}) Up, {upReason}'
+    model: openconfig-isis
+    mapping:
+      variables:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state-change-reason-message: upReason
+      static:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state: UP

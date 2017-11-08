@@ -1,0 +1,15 @@
+messages:
+  - error: ISIS_NEIGHBOR_DOWN
+    tag: ROUTING-ISIS-5-ADJCHANGE
+    values:
+      neighbor: ([^ ]+)
+      interface: ([^ ]+)
+      level: (L\d)
+      downReason: (.*)
+    line: 'Adjacency to {neighbor} ({interface}) ({level}) Down, {downReason}'
+    model: openconfig-isis
+    mapping:
+      variables:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state-change-reason-message: downReason
+      static:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state: DOWN
