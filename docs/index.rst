@@ -315,3 +315,4 @@ daemon):
    logger/index
    syslog/index
    developers/index
+   releases/index

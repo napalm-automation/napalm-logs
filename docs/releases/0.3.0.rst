@@ -1,0 +1,59 @@
+.. _release-0.3.0:
+
+================================
+Release 0.3.0 - Codename Backsaw
+================================
+
+The third major release comes with several core improvements and messages, as
+well as more modules for the pluggable interfaces.
+
+Core changes
+^^^^^^^^^^^^
+
+The internal pipeline for the internal communication between the napalm-logs
+processes has been improved, now being based on ZeroMQ. The architecture
+from the first release (see :ref:`release-0.1.0-architecture`) wasn't changed,
+but rather improved following a standard
+`Ventiallator Sink <http://zguide.zeromq.org/py:all#Divide-and-Conquer>`_
+topology, where the Server is the ``ROUTER``, and each Device process is the
+``DEALER``. This allows a better control and optimisation, as the user can start
+more than one single Device process per platform class, using the new
+:ref:`configuration-options-device-worker-processes` configuration option.
+Increasing the number of Device processes will increase the processing speed.
+
+Additionally, the memory consumption and can be better controlled using the
+:ref:`configuration-hwm` configuration option, by adjusting the maximum buffer
+size. For maximum capacity, this value can be set as ``0``, which means infinite
+queue, so there won't be any messages dropped.
+
+.. _release-0.3.0-modules:
+
+New Modules
+^^^^^^^^^^^
+
+The following modules have been added in this release:
+
+.. _release-0.3.0-modules-listener:
+
+Listener
+--------
+
+- :ref:`listener-zmq`
+
+.. _release-0.3.0-modules-publisher:
+
+Publisher
+---------
+
+- :ref:`publisher-http`
+
+New Structured Messages
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- :ref:`INTERFACE_UP`
+
+The following messages were already defined, now extending the list of supported
+platforms thanks to `Andrew Dampf <https://github.com/wasabi222>`_:
+
+- :ref:`INTERFACE_DOWN` added to ``iosxr``
+- :ref:`CONFIGURATION_COMMIT_COMPLETED` added to ``iosxr``
