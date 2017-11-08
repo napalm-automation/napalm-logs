@@ -1,0 +1,18 @@
+.. _release-0.2.0:
+
+============================
+Release 0.2.0 - Codename Axe
+============================
+
+This release extended the list of :ref:`messages`, thanks to
+`John Anderson <https://github.com/lampwins>`_:
+
+- :ref:`BGP_NEIGHBOR_STATE_CHANGED`
+- :ref:`BPDU_BLOCK_INTERFACE_DISABLED`
+- :ref:`CONFIGURATION_COMMIT_COMPLETED`
+- :ref:`CONFIGURATION_COMMIT_REQUESTED`
+- :ref:`CONFIGURATION_ERROR`
+- :ref:`CONFIGURATION_ROLLBACK`
+- :ref:`INTERFACE_MAC_LIMIT_REACHED`
+- :ref:`OSPF_NEIGHBOR_DOWN`
+- :ref:`OSPF_NEIGHBOR_UP`

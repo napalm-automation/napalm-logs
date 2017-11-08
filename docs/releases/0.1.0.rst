@@ -1,0 +1,94 @@
+.. _release-0.1.0:
+
+=============================
+Release 0.1.0 - Codename Adze
+=============================
+
+This is the very first napalm-logs public release.
+
+The main goal of this project is to provide a uniform, vendor-agnostic structure
+based on the raw syslog messages from the network devices. The documents produced
+by napalm-logs follow the hierarcy standardised in the OpenConfig and IETF YANG
+models. There are however corner cases where a YANG model is not available yet,
+or the information cannot be mapped, at least, at the time being. In this case
+we still provide a cross-platform structure, even though not using an industry
+standard.
+
+The syslog messages can be received over a pluggable interface named :ref:`listener`
+(see :ref:`the available Listener modules in this release <release-0.1.0-modules-listener>`).
+The napalm-logs daemon extracts the information from the syslog snippets and
+maps it into structures defined in the OpenConfig or IETF YANG models. The
+messages are then published on various channels through the :ref:`publisher`
+interface, which is also pluggable.
+
+Messages comming from platforms that could not be identified, or the message
+mapping is not yet defined (i.e., missing :ref:`device-profiles`) are by default
+dropped. Using the :ref:`logger` interface, the user can externalise these
+partially-parsed messages to various systems for logging purpose.
+
+.. _release-0.1.0-architecture:
+
+Architecture
+^^^^^^^^^^^^
+
+The napalm-logs daemon starts a list of processes:
+
+- :ref:`listener`
+- Server
+- A separate process per platform class
+- :ref:`publisher`
+- :ref:`authentication`
+
+The messages are received on the :ref:`listener` interface vie one of the
+pluggable modules available (see :ref:`release-0.1.0-modules-listener`), and
+queued to the Server. The Server is the separate process that identifies
+the platform name based on the structure of the syslog message, then triages
+them into separate queues, one per platform. For each platform there is a
+dedicated process started, that reads the messages from the appropriate queue
+and generates the structured object based on the standard YANG hierarchy. After
+the object is generated, it is passed to the :ref:`publisher` which binary
+serialises the document, encrypts and publishes it on the selected channel.
+
+The internal communitcation between the napalm-logs processes is realised
+using unidirectional multiprocessing Pipes.
+
+.. _release-0.1.0-modules:
+
+Available Modules
+^^^^^^^^^^^^^^^^^
+
+This release provides few modules for the pluggable interfaces: 
+
+.. _release-0.1.0-modules-listener:
+
+Listener
+--------
+
+- :ref:`listener-udp`
+- :ref:`listener-tcp`
+- :ref:`listener-kafka`
+
+.. _release-0.1.0-modules-publisher:
+
+Publisher
+---------
+
+- :ref:`publisher-cli`
+- :ref:`publisher-log`
+- :ref:`publisher-zmq`
+- :ref:`publisher-kafka`
+
+Available structured messages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- :ref:`RAW`
+- :ref:`UNKNOWN`
+- :ref:`BGP_MD5_INCORRECT`
+- :ref:`BGP_PEER_NOT_CONFIGURED`
+- :ref:`BGP_PREFIX_LIMIT_EXCEEDED`
+- :ref:`BGP_PREFIX_THRESH_EXCEEDED`
+- :ref:`INTERFACE_DOWN`
+- :ref:`NTP_SERVER_UNREACHABLE`
+- :ref:`SYSTEM_ALARM`
+- :ref:`USER_ENTER_CONFIG_MODE`
+- :ref:`USER_LOGIN`
