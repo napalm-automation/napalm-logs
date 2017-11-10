@@ -83,13 +83,6 @@ class NLOptionParser(OptionParser, object):
             dest='config_file',
             help=('Config file absolute path. Default: {0}'.format(defaults.CONFIG_FILE))
         )
-        # self.add_option(
-        #     '-d', '--daemon',
-        #     default=True,
-        #     dest='daemon',
-        #     action='store_true',
-        #     help='Run the {0} as a daemon. Default: %default'.format(self.get_prog_name())
-        # )
         self.add_option(
             '-a', '--address',
             dest='address',
@@ -117,9 +110,9 @@ class NLOptionParser(OptionParser, object):
             help=('Listener type. Default: {0}'.format(defaults.LISTENER))
         )
         self.add_option(
-            '-t', '--transport',
-            dest='transport',
-            help=('Publish transport. Default: {0}'.format(defaults.PUBLISHER))
+            '-s', '--serializer',
+            dest='serializer',
+            help=('Serializer type. Default: {0}'.format(defaults.SERIALIZER))
         )
         self.add_option(
             '--publisher',
@@ -276,60 +269,43 @@ class NLOptionParser(OptionParser, object):
         device_whitelist = file_cfg.get('device_whitelist', [])
         device_blacklist = file_cfg.get('device_blacklist', [])
 
-        listener = defaults.LISTENER
+        listener = []
         if self.options.listener:
-            listener = self.options.listener
-        elif file_cfg.get('listener'):
-            listener_cfg = file_cfg.get('listener')
+            listener = [{self.options.listener: {}}]
+        if 'listener' in file_cfg:
+            listener_cfg = file_cfg['listener']
             if isinstance(listener_cfg, dict):
-                listener = list(listener_cfg.keys())[0]
-                log.debug('Using the %s listener from the config file', listener)
-                # TODO later we could allow the possibility to start multiple listeners
-                listener_opts_cfg = file_cfg.get('listener_opts', {})
-                # Merging the listener opts under the listener
-                #   with the general opts under the listener_opts key
-                listener_opts = napalm_logs.utils.dictupdate(listener_cfg[listener],
-                                                             listener_opts_cfg)
-                log.debug('Listener opts from the config file:')
-                log.debug(listener_opts)
+                for listener_name, listener_opts in listener_cfg.items():
+                    listener.append({listener_name: listener_opts})
             elif isinstance(listener_cfg, six.string_type):
-                listener = listener_cfg
+                listener = [{listener_cfg: {}}]
+            elif isinstance(listener_cfg, list):
+                for lst_cfg in listener_cfg:
+                    if isinstance(lst_cfg, six.string_type):
+                        listener.append({lst_cfg: {}})
+                    elif isinstance(lst_cfg, dict):
+                        listener.append(lst_cfg)
+        if not listener:
+            listener = [{defaults.LISTENER: {}}]
 
-        logger = defaults.LOGGER
-        if file_cfg.get('logger'):
-            logger_cfg = file_cfg.get('logger')
-            if isinstance(logger_cfg, dict):
-                logger = list(logger_cfg.keys())[0]
-                log.debug('Using the %s logger from the config file', logger)
-                # TODO later we could allow the possibility to start multiple loggers
-                logger_opts_cfg = file_cfg.get('logger_opts', {})
-                # Merging the logger opts under the logger
-                #   with the general opts under the logger_opts key
-                logger_opts = napalm_logs.utils.dictupdate(logger_cfg[logger],
-                                                           logger_opts_cfg)
-                log.debug('Logger opts from the config file:')
-                log.debug(logger_opts)
-            elif isinstance(logger_cfg, six.string_type):
-                logger = logger_cfg
-
-        publisher = defaults.PUBLISHER
-        if self.options.publisher or self.options.transport:
-            publisher = self.options.publisher or self.options.transport
-        elif file_cfg.get('publisher') or file_cfg.get('transport'):
-            publisher_cfg = file_cfg.get('publisher') or file_cfg.get('transport')
+        publisher = []
+        if self.options.publisher:
+            publisher = [{self.options.publisher: {}}]
+        if 'publisher' in file_cfg:
+            publisher_cfg = file_cfg['publisher']
             if isinstance(publisher_cfg, dict):
-                publisher = list(publisher_cfg.keys())[0]
-                log.debug('Using the %s publisher from the config file', publisher)
-                # TODO later we could allow the possibility to start multiple publishers
-                publisher_opts_cfg = file_cfg.get('publisher_opts', {})
-                # Merging the publisher opts under the publisher
-                #   with the general opts under the publisher_opts key
-                publisher_opts = napalm_logs.utils.dictupdate(publisher_cfg[publisher],
-                                                              publisher_opts_cfg)
-                log.debug('Publisher opts from the config file:')
-                log.debug(publisher_opts)
+                for publisher_name, publisher_opts in publisher_cfg.items():
+                    publisher.append({publisher_name: publisher_opts})
             elif isinstance(publisher_cfg, six.string_type):
-                publisher = publisher_cfg
+                publisher = [{publisher_cfg: {}}]
+            elif isinstance(publisher_cfg, list):
+                for lst_cfg in publisher_cfg:
+                    if isinstance(lst_cfg, six.string_type):
+                        publisher.append({lst_cfg: {}})
+                    elif isinstance(lst_cfg, dict):
+                        publisher.append(lst_cfg)
+        if not publisher:
+            publisher = [{defaults.PUBLISHER: {}}]
 
         hwm = defaults.ZMQ_INTERNAL_HWM
         if self.options.hwm is not None:
@@ -341,7 +317,7 @@ class NLOptionParser(OptionParser, object):
             'address': self.options.address or file_cfg.get('address') or defaults.ADDRESS,
             'port': self.options.port or file_cfg.get('port') or defaults.PORT,
             'listener': listener,
-            'transport': publisher,
+            'publisher': publisher,
             'publish_address': self.options.publish_address or file_cfg.get('publish_address') or
                                defaults.PUBLISH_ADDRESS,  # noqa
             'publish_port': self.options.publish_port or file_cfg.get('publish_port') or
@@ -357,15 +333,13 @@ class NLOptionParser(OptionParser, object):
             'extension_config_path': self.options.extension_config_path or file_cfg.get('extension_config_path'),
             'log_level': log_lvl,
             'log_format': log_fmt,
-            'listener_opts': listener_opts,
-            'logger': logger,
-            'logger_opts': logger_opts,
-            'publisher_opts': publisher_opts,
             'device_whitelist': device_whitelist,
             'device_blacklist': device_blacklist,
             'hwm': hwm,
             'device_worker_processes': self.options.device_worker_processes or\
-                                       file_cfg.get('device_worker_processes') or 1
+                                       file_cfg.get('device_worker_processes') or 1,
+            'serializer': self.options.serializer or file_cfg.get('serializer') or
+                               defaults.SERIALIZER
         }
         return cfg
 

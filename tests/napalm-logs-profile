@@ -63,7 +63,7 @@ class ProfilerOptionParser(NLOptionParser):
             help=('Total test time. Default: {0}'.format(RUN_TIME))
         )
         self.add_option(
-            '-s', '--syslog-sample',
+            '-k', '--syslog-sample',
             dest='syslog_sample',
             help=('Syslog sample message. Default: {0}'.format(SYSLOG_MSG))
         )

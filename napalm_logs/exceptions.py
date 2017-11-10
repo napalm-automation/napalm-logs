@@ -51,6 +51,20 @@ class InvalidListenerException(ListenerException):
     pass
 
 
+class SerializerException(NapalmLogsException):
+    '''
+    Raised in case of serializer-related errors.
+    '''
+    pass
+
+
+class InvalidSerializerException(SerializerException):
+    '''
+    Raised when the user selects a serializer not available.
+    '''
+    pass
+
+
 class ConfigurationException(NapalmLogsException):
     '''
     Exception thrown when the user configuration is not correct.

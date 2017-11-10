@@ -24,6 +24,7 @@ AUTH_ADDRESS = '0.0.0.0'
 AUTH_PORT = 49018
 AUTH_MAX_TRY = 5
 AUTH_TIMEOUT = 1
+SERIALIZER = 'msgpack'
 LOG_LEVEL = 'warning'
 LOG_FORMAT = '%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s'
 LOG_FILE = os.path.join(ROOT_DIR, 'var', 'log', 'napalm', 'logs')
@@ -44,16 +45,16 @@ INIT_RUN_FUN = 'extract'
 CONFIG_RUN_FUN = 'emit'
 
 UNKNOWN_DEVICE_NAME = 'unknown'
+
 LISTENER_OPTS = {
-    'kafka_topic': 'syslog.net'
 }
+
 LOGGER_OPTS = {
-    'kafka_topic': 'syslog.net.processed',
-    'send_raw': False,  # initially called `syslog`
+    'send_raw': False,
     'send_unknown': False
 }
+
 PUBLISHER_OPTS = {
-    'kafka_topic': 'napalm-logs',
     'send_raw': False,
     'send_unknown': False
 }
@@ -115,6 +116,7 @@ SRV_IPC_URL = 'ipc://{}'.format(os.path.join(TMP_DIR, 'napalm-logs-srv'))
 # publishes them on the desired transport
 DEV_IPC_URL = 'ipc://{}'.format(os.path.join(TMP_DIR, 'napalm-logs-dev'))
 # the server publishes to a separate IPC per device
+PUB_PX_IPC_URL = 'ipc://{}'.format(os.path.join(TMP_DIR, 'napalm-logs-pub-px'))
 PUB_IPC_URL = 'ipc://{}'.format(os.path.join(TMP_DIR, 'napalm-logs-pub'))
 
 # auth
