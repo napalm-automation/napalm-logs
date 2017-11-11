@@ -77,6 +77,13 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         Setup the transport.
         '''
+        publisher_address = self.publisher_opts.get('address')
+        publisher_port = self.publisher_opts.get('port')
+        if publisher_address:
+            self.address = self.publisher_opts.pop('address')
+        if publisher_port:
+            self.port = self.publisher_opts.pop('port')
+
         transport_class = get_transport(self._transport_type)
         self.transport = transport_class(self.address,
                                          self.port,
