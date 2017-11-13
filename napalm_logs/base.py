@@ -527,6 +527,7 @@ class NapalmLogs:
             self.__signing_key = nacl.signing.SigningKey.generate()
             # start the keepalive thread for the auth sub-process
             self._processes.append(self._start_auth_proc())
+        log.debug('Starting the internal proxy')
         proc = self._start_pub_px_proc()
         self._processes.append(proc)
         # publisher process start
@@ -553,6 +554,7 @@ class NapalmLogs:
                 self._processes.append(self._start_dev_proc(device_os,
                                                             device_config))
             started_os_proc.append(device_os)
+        # start the server process
         self._processes.append(self._start_srv_proc(started_os_proc))
         # start listener process
         for lst in self.listener:

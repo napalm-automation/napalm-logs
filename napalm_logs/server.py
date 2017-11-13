@@ -78,7 +78,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
             # zmq 3
             self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
         # Pipe to the publishers
-        self.publisher_pub = self.ctx.socket(zmq.PUSH)
+        self.publisher_pub = self.ctx.socket(zmq.PUB)
         self.publisher_pub.connect(PUB_PX_IPC_URL)
         try:
             self.publisher_pub.setsockopt(zmq.HWM, self.opts['hwm'])

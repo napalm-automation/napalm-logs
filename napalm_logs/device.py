@@ -73,7 +73,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         # subscribe to the corresponding IPC pipe
         self.sub.connect(DEV_IPC_URL)
         # publish to the publisher IPC
-        self.pub = self.ctx.socket(zmq.PUSH)
+        self.pub = self.ctx.socket(zmq.PUB)
         self.pub.connect(PUB_PX_IPC_URL)
         try:
             self.pub.setsockopt(zmq.HWM, self.opts['hwm'])

@@ -48,6 +48,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.pub_id = pub_id
         self.address = publisher_opts.pop('address', None) or address
         self.port = publisher_opts.pop('port', None) or port
+        log.debug('Publishing to %s:%d', self.address, self.port)
         self.serializer = publisher_opts.get('serializer') or serializer
         self.default_serializer = serializer == SERIALIZER
         self.disable_security = disable_security
@@ -71,10 +72,10 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         on the right transport.
         '''
         self.ctx = zmq.Context()
-        log.debug('Setting up the publisher subscriber')
-        self.sub = self.ctx.socket(zmq.PULL)
-        self.sub.bind(PUB_IPC_URL)
-        # self.sub.setsockopt(zmq.SUBSCRIBE, '')
+        log.debug('Setting up the %s publisher subscriber #%d', self._transport_type, self.pub_id)
+        self.sub = self.ctx.socket(zmq.SUB)
+        self.sub.connect(PUB_IPC_URL)
+        self.sub.setsockopt(zmq.SUBSCRIBE, '')
         try:
             self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
             # zmq 2
@@ -142,13 +143,15 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                     log.error(error, exc_info=True)
                     raise NapalmLogsExit(error)
             obj = umsgpack.unpackb(bin_obj)
-            print(obj)
-            print(self.send_unknown)
-            print(self.pub_id)
-            if not(self.send_raw and obj['error'] == 'RAW'):
-                continue
-            if not(self.send_unknown and obj['error'] == 'UNKNOWN'):
-                continue
+            if (self.send_raw or self.send_unknown) and obj['error'] in ('RAW', 'UNKNOWN'):
+                # When send_raw or send_unknown requested
+                #   and the message is one of them,
+                if self.send_raw and obj['error'] != 'RAW' and\
+                   self.send_unknown and obj['error'] != 'UNKNOWN':
+                    # If send_raw requested but no RAW-type message,
+                    #   or send_unknown but no UNKNOWN-type message,
+                    #   then just jump over this message.
+                    continue
             serialized_obj = self._serialize(obj, bin_obj)
             log.debug('Publishing the OC object')
             if not self.disable_security and self.__transport_encrypt:
