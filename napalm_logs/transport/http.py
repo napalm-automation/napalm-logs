@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 # Import stdlib
 import logging
 import threading
+import json
 try:
     import Queue as queue
 except ImportError:
@@ -48,7 +49,7 @@ class HTTPTransport(TransportBase):
             self.address = kwargs['address']
         else:
             self.address = address
-        self.method = kwargs.get('method', 'GET')
+        self.method = kwargs.get('method', 'POST')
         log.debug('Publishing to %s using method %s', self.address, self.method)
         self.auth = kwargs.get('auth')
         self.username = kwargs.get('username')
@@ -138,7 +139,7 @@ class HTTPTransport(TransportBase):
                     self.method,
                     self.address,
                     params=self.params,
-                    data=data
+                    data=json.dumps(data)
                 )
                 if not result.ok:
                     log.error('Unable to publish to %s', self.address)
