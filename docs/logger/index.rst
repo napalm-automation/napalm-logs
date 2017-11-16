@@ -4,6 +4,10 @@
 Logger
 ======
 
+.. warning::
+
+    The Logger interface will be deprecated beginning with release 0.4.0.
+
 The logger subsystem uses the modules from the publisher pluggable subsystem to
 send partially parsed syslog messages. The configuration options are the same
 as for the publisher referenced -- see the :ref:`publisher-modules`. It can be
