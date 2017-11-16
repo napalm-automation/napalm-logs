@@ -123,8 +123,8 @@ Example:
 
 .. _publisher-http-method:
 
-``method``: ``GET``
--------------------
+``method``: ``POST``
+--------------------
 
 HTTP method to use. Choose from: ``GET``, ``POST``, ``PUT``, ``HEAD`` (the
 others probably don't make sense, however they are allowed). For more details
@@ -136,7 +136,7 @@ Example:
 
   publisher:
     http:
-      method: HEAD
+      method: GET
 
 .. _publisher-http-params:
 

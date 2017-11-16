@@ -21,7 +21,7 @@ print(long_description)
 
 setup(
     name='napalm-logs',
-    version='0.2.0',
+    version='0.3.0',
     packages=find_packages(),
     author='Mircea Ulinic',
     author_email='mircea.ulinic@gmail.com',

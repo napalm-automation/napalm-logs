@@ -7,6 +7,7 @@ Release 0.3.0 - Codename Backsaw
 The third major release comes with several core improvements and messages, as
 well as more modules for the pluggable interfaces.
 
+
 Core changes
 ^^^^^^^^^^^^
 
@@ -25,6 +26,17 @@ Additionally, the memory consumption and can be better controlled using the
 :ref:`configuration-hwm` configuration option, by adjusting the maximum buffer
 size. For maximum capacity, this value can be set as ``0``, which means infinite
 queue, so there won't be any messages dropped.
+
+Logger interface deprecation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We aim to provide more core features and improvements in the upcoming releases:
+starting with the upcoming release 0.4.0, you will be able to start multiple
+:ref:`listener` and :ref:`publisher` processes, i.e., the syslog messages can be
+received via multiple channels concomitantly, while the structured messages
+published over several transports. Together with these changes, the :ref:`logger`
+interface will be deprecated, but its features will be leveraged through the
+:ref:`publisher` interface.
 
 .. _release-0.3.0-modules:
 
@@ -51,9 +63,11 @@ New Structured Messages
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 - :ref:`INTERFACE_UP`
+- :ref:`ISIS_NEIGHBOR_DOWN`
+- :ref:`ISIS_NEIGHBOR_UP`
 
 The following messages were already defined, now extending the list of supported
-platforms thanks to `Andrew Dampf <https://github.com/wasabi222>`_:
+platforms:
 
 - :ref:`INTERFACE_DOWN` added to ``iosxr``
 - :ref:`CONFIGURATION_COMMIT_COMPLETED` added to ``iosxr``
