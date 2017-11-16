@@ -63,9 +63,11 @@ New Structured Messages
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 - :ref:`INTERFACE_UP`
+- :ref:`ISIS_NEIGHBOR_DOWN`
+- :ref:`ISIS_NEIGHBOR_UP`
 
 The following messages were already defined, now extending the list of supported
-platforms thanks to `Andrew Dampf <https://github.com/wasabi222>`_:
+platforms:
 
 - :ref:`INTERFACE_DOWN` added to ``iosxr``
 - :ref:`CONFIGURATION_COMMIT_COMPLETED` added to ``iosxr``
