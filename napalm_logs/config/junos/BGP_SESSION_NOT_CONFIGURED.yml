@@ -13,4 +13,4 @@ messages:
     mapping:
       variables: {}
       static:
-        bgp//neighbors//neighbor//{peer}//state//session_state: ACTIVE
+        bgp//neighbors//neighbor//{peer}//state//session_state: IDLE
