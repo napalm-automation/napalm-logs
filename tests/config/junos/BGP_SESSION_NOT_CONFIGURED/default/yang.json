@@ -1,36 +1,36 @@
 {
-    "yang_message": {
-        "bgp": {
-            "neighbors": {
-                "neighbor": {
-                    "2001:e8:124::f1:12:1": {
-                        "state": {
-                            "session_state": "IDLE"
-                        }
-                    }
-                }
+  "yang_message": {
+    "bgp": {
+      "neighbors": {
+        "neighbor": {
+          "2001:e8:124::f1:12:1": {
+            "state": {
+              "session_state": "IDLE"
             }
+          }
         }
-    },
-    "message_details": {
-        "processId": "3167",
-        "severity": 4,
-        "facility": 3,
-        "hostPrefix": "re0-",
-        "pri": "28",
-        "processName": "rpd",
-        "host": "gw2.fin1",
-        "tag": "bgp_listen_accept",
-        "time": "16:58:04",
-        "date": "Nov 20",
-        "message": "4984: NOTIFICATION sent to 2001:e8:124::f1:12:1+51578 (proto): code 6 (Cease) subcode 5 (Connection Rejected), Reason: Connection attempt from unconfigured neighbor: 2001:e8:124::f1:12:1+51578"
-    },
+      }
+    }
+  },
+  "message_details": {
+    "processId": "3167",
+    "severity": 4,
     "facility": 3,
-    "ip": "127.0.0.1",
-    "error": "BGP_SESSION_NOT_CONFIGURED",
+    "hostPrefix": "re0-",
+    "pri": "28",
+    "processName": "rpd",
     "host": "gw2.fin1",
-    "yang_model": "openconfig-bgp",
-    "timestamp": 1511197084,
-    "os": "junos",
-    "severity": 4
+    "tag": "bgp_listen_accept",
+    "time": "16:58:04",
+    "date": "Nov 20",
+    "message": "4984: NOTIFICATION sent to 2001:e8:124::f1:12:1+51578 (proto): code 6 (Cease) subcode 5 (Connection Rejected), Reason: Connection attempt from unconfigured neighbor: 2001:e8:124::f1:12:1+51578"
+  },
+  "facility": 3,
+  "ip": "127.0.0.1",
+  "error": "BGP_SESSION_NOT_CONFIGURED",
+  "host": "gw2.fin1",
+  "yang_model": "openconfig-bgp",
+  "timestamp": 1511197084,
+  "os": "junos",
+  "severity": 4
 }
