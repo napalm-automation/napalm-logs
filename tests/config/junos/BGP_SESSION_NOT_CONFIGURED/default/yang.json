@@ -5,10 +5,7 @@
                 "neighbor": {
                     "2001:e8:124::f1:12:1": {
                         "state": {
-                            "session_state": "ACTIVE"
-                        }
-                    }
-                }
+                            "session_state": "IDLE"
             }
         }
     },
