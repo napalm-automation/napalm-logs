@@ -1,6 +1,6 @@
 # This error tag corresponds to syslog messages notifying that this router
 # sent a BGP notification code 6 subcode 5 to another router, which idicates that the peer
-# is trying to esablish as session, but this router does not have the session configured.
+# is trying to esablish a session, but this router does not have the session configured.
 messages:
   - error: BGP_SESSION_NOT_CONFIGURED
     tag: bgp_listen_accept
