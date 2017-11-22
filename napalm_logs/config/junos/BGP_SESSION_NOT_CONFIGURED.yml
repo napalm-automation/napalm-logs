@@ -1,0 +1,16 @@
+# This error tag corresponds to syslog messages notifying that this router
+# sent a BGP notification code 6 subcode 5 to another router, which idicates that the peer
+# is trying to esablish a session, but this router does not have the session configured.
+messages:
+  - error: BGP_SESSION_NOT_CONFIGURED
+    tag: bgp_listen_accept
+    values:
+      peer: ([\w\d:\.]+)
+      port: (\d+)
+      number: (\d+)
+    line: '{number}: NOTIFICATION sent to {peer}+{port} (proto): code 6 (Cease) subcode 5 (Connection Rejected), Reason: Connection attempt from unconfigured neighbor: {peer}+{port}'
+    model: openconfig-bgp
+    mapping:
+      variables: {}
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session_state: IDLE
