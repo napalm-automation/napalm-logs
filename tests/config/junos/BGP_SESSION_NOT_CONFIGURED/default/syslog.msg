@@ -1,1 +1,1 @@
-message": "4984: NOTIFICATION sent to 2001:e8:124::f1:12:1+51528 (proto): code 6 (Cease) subcode 5 (Connection Rejected), Reason: Connection attempt from unconfigured neighbor: 2001:e8:124::f1:12:1+51528
+<28>Nov 20 16:58:04 re0-gw2.fin1 rpd[3167]: bgp_listen_accept:4984: NOTIFICATION sent to 2001:e8:124::f1:12:1+51528 (proto): code 6 (Cease) subcode 5 (Connection Rejected), Reason: Connection attempt from unconfigured neighbor: 2001:e8:124::f1:12:1+51528
