@@ -9,9 +9,9 @@ The default configuration will allow you to publish to Kafka. If you wish to cha
 - The container will map internal port 514 to port 514 on the host and listen for incoming messages.
    - You can change the port which Docker maps to the internal 514 port at container runtime.
    - This provides an easy way to change what port incoming messages are received on.
-- Security is __disabled__ by default. Do not used the default configuration in a production environment!
 
 [A pre-built Docker image is also available on Docker Hub.](https://hub.docker.com/r/nathancatania/napalm-logs/)
+Security is disabled by default in the pre-built image. As such, it is recommended for testing use only; not deployment in production.
 
 ### Customize your configuration
 - The `napalm.tmpl` file is rendered at container runtime and used as the configuration file.
