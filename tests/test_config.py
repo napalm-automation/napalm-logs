@@ -151,7 +151,16 @@ def test_config(os_name, error_name, test_case):
     deserialised_zmq_msg = napalm_logs.utils.unserialize(zmq_msg)
     log.debug('Received from the napalm-logs daemon:')
     log.debug(deserialised_zmq_msg)
-    assert struct_yang_message == json.loads(json.dumps(deserialised_zmq_msg))
+    returned_yang = json.loads(json.dumps(deserialised_zmq_msg))
+    # Pop the timestamp from both as most syslog messages do not specify year
+    # which means that once a year we will have to update all tests if we
+    # check the timestamp.
+    # We still expect both to contain a timestamp though.
+    assert struct_yang_message.pop('timestamp', False),\
+        'Yang test file does not contain a timestamp key for {} under {}'.format(error_name, os_name)
+    assert returned_yang.pop('timestamp', False),\
+        'The returned yang does not contain a timestamp key for {} under {}'.format(error_name, os_name)
+    assert struct_yang_message == returned_yang
 
 
 def test_napalm_logs_shut():
