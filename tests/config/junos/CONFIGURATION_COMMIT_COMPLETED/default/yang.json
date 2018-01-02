@@ -14,10 +14,10 @@
     "pri": "189",
     "processName": "mgd",
     "host": "vmx01",
-    "tag": "UI_COMMIT_PROGRESS",
+    "tag": "UI_COMMIT_COMPLETED",
     "time": "21:44:00",
     "date": "Jul 20",
-    "message": "Commit operation in progress: commit complete"
+    "message": "commit complete"
   },
   "timestamp": 1500587040,
   "facility": 23,
