@@ -227,7 +227,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
             elif dev_os and dev_os not in self.started_os_proc:
                 # Identified the OS, but the corresponding process does not seem to be started.
                 log.info('Unable to queue the message to %s. Is the sub-process started?', dev_os)
-            elif not dev_os:
+            elif not dev_os and self.opts['_server_send_unknown']:
                 # OS not identified, but the user requested to publish the message as-is
                 log.debug('Unable to identify the OS, sending directly to the publishers')
                 to_publish = {

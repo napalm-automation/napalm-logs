@@ -93,12 +93,13 @@ class NapalmLogs:
         self.device_blacklist = device_blacklist
         self.serializer = serializer
         self.device_worker_processes = device_worker_processes
+        self.hwm = hwm
         self.opts = {}
-        self.opts['hwm'] = CONFIG.ZMQ_INTERNAL_HWM if hwm is None else hwm
         # Setup the environment
         self._setup_log()
         self._build_config()
         self._verify_config()
+        self._post_preparation()
         # Private vars
         self.__priv_key = None
         self.__signing_key = None
@@ -121,6 +122,21 @@ class NapalmLogs:
         logging_level = CONFIG.LOGGING_LEVEL.get(self.log_level.lower())
         logging.basicConfig(format=self.log_format,
                             level=logging_level)
+
+    def _post_preparation(self):
+        '''
+        The steps for post-preparation (when the logs, and everything is
+        already setup).
+        '''
+        self.opts['hwm'] = CONFIG.ZMQ_INTERNAL_HWM if self.hwm is None else self.hwm
+        self.opts['_server_send_unknown'] = False
+        for pub in self.publisher:
+            pub_name = pub.keys()[0]
+            pub_opts = pub.values()[0]
+            if 'only_unknown' in pub_opts and pub[pub_name]['only_unknown']:
+                pub[pub_name]['send_unknown'] = True
+            if 'send_unknown' in pub_opts and pub[pub_name]['send_unknown']:
+                self.opts['_server_send_unknown'] = True
 
     def _whitelist_blacklist(self, os_name):
         '''
