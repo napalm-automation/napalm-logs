@@ -51,7 +51,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.port = publisher_opts.pop('port', None) or port
         log.debug('Publishing to %s:%d', self.address, self.port)
         self.serializer = publisher_opts.get('serializer') or serializer
-        self.default_serializer = serializer == SERIALIZER
+        self.default_serializer = self.serializer == SERIALIZER
         self.disable_security = publisher_opts.get('disable_security', disable_security)
         self._transport_type = transport_type
         self.publisher_opts = publisher_opts
