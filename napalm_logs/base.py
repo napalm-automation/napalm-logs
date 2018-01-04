@@ -135,6 +135,8 @@ class NapalmLogs:
             pub_opts = pub.values()[0]
             if 'only_unknown' in pub_opts and pub[pub_name]['only_unknown']:
                 pub[pub_name]['send_unknown'] = True
+            if 'only_raw' in pub_opts and pub[pub_name]['only_raw']:
+                pub[pub_name]['send_raw'] = True
             if 'send_unknown' in pub_opts and pub[pub_name]['send_unknown']:
                 self.opts['_server_send_unknown'] = True
 

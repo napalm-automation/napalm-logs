@@ -56,6 +56,8 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.publisher_opts = publisher_opts
         self.send_raw = publisher_opts.get('send_raw', False)
         self.send_unknown = publisher_opts.get('send_unknown', False)
+        self.only_unknown = publisher_opts.get('only_unknown', False)
+        self.only_raw = publisher_opts.get('only_raw', False)
         if not disable_security:
             self.__safe = nacl.secret.SecretBox(private_key)
             self.__signing_key = signing_key
@@ -118,6 +120,11 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
 
     def _serialize(self, obj, bin_obj):
         if self.default_serializer:
+            # It's just easier to poll a boolean, rather than
+            # re-serializing the message.
+            # The reasoning why this is needed is because the structured
+            # messages are passed anyway serialized between processes,
+            # but the user may request a different serializer.
             return bin_obj
         return self.serializer_fun(obj)
 
@@ -143,15 +150,25 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                     log.error(error, exc_info=True)
                     raise NapalmLogsExit(error)
             obj = umsgpack.unpackb(bin_obj)
-            if (self.send_raw or self.send_unknown) and obj['error'] in ('RAW', 'UNKNOWN'):
-                # When send_raw or send_unknown requested
-                #   and the message is one of them,
-                if self.send_raw and obj['error'] != 'RAW' and\
-                   self.send_unknown and obj['error'] != 'UNKNOWN':
-                    # If send_raw requested but no RAW-type message,
-                    #   or send_unknown but no UNKNOWN-type message,
-                    #   then just jump over this message.
-                    continue
+            if not self.send_unknown and obj['error'] == 'UNKNOWN':
+                # If the message is Unknown type, but the publisher
+                # should not send it, then it should just drop it.
+                continue
+            elif self.only_unknown and obj['error'] != 'UNKNOWN':
+                # If the publisher sends only Unknown message types
+                # aka. is a listener type publisher
+                # but the message in cause is not Unknown,
+                # just skip it, and check the next one in the queue.
+                continue
+            if not self.send_raw and obj['error'] == 'RAW':
+                # If this is a RAW message, but we are not allowed to
+                # publish it, then we should just skip.
+                continue
+            elif self.only_raw and obj['error'] != 'RAW':
+                # If the publisher sends only RAW type messages
+                # but this message is not raw type,
+                # just skip it, and go the next message.
+                continue
             serialized_obj = self._serialize(obj, bin_obj)
             log.debug('Publishing the OC object')
             if not self.disable_security and self.__transport_encrypt:
@@ -164,4 +181,3 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.__up = False
         self.sub.close()
         self.ctx.term()
-        # self.pipe.close()
