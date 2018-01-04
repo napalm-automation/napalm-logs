@@ -133,12 +133,31 @@ class NapalmLogs:
         for pub in self.publisher:
             pub_name = pub.keys()[0]
             pub_opts = pub.values()[0]
+            error_whitelist = pub_opts.get('error_whitelist', [])
+            error_blacklist = pub_opts.get('error_blacklist', [])
+            if 'UNKNOWN' not in error_blacklist:
+                # by default we should not send unknown messages
+                error_blacklist.append('UNKNOWN')
+            if 'RAW' not in error_blacklist:
+                # same with RAW
+                error_blacklist.append('RAW')
+            # This implementation is a bit sub-optimal, but more readable like
+            # that. It is executed only at the init, so just once.
             if 'only_unknown' in pub_opts and pub[pub_name]['only_unknown']:
                 pub[pub_name]['send_unknown'] = True
+                error_whitelist = ['UNKNOWN']
+                error_blacklist = []
             if 'only_raw' in pub_opts and pub[pub_name]['only_raw']:
                 pub[pub_name]['send_raw'] = True
-            if 'send_unknown' in pub_opts and pub[pub_name]['send_unknown']:
-                self.opts['_server_send_unknown'] = True
+                error_whitelist = ['RAW']
+                error_blacklist = []
+            if 'send_unknown' in pub_opts and 'UNKNOWN' in error_blacklist:
+                error_blacklist.remove('UNKNOWN')
+            if 'send_raw' in pub_opts and 'RAW' in error_blacklist:
+                error_blacklist.remove('RAW')
+            self.opts['_server_send_unknown'] |= 'UNKNOWN' in error_whitelist or 'UNKNOWN' not in error_blacklist
+            pub[pub_name]['error_whitelist'] = error_whitelist
+            pub[pub_name]['error_blacklist'] = error_blacklist
 
     def _whitelist_blacklist(self, os_name):
         '''
@@ -146,12 +165,9 @@ class NapalmLogs:
         depending on the whitelist-blacklist logic
         configured by the user.
         '''
-        return (self.device_whitelist and
-                hasattr(self.device_whitelist, '__iter__') and
-                os_name not in self.device_whitelist) or\
-               (self.device_blacklist and
-                hasattr(self.device_blacklist, '__iter__') and
-                os_name in self.device_blacklist)
+        return napalm_logs.ext.check_whitelist_blacklist(os_name,
+                                                         whitelist=self.device_whitelist,
+                                                         blacklist=self.device_blacklist)
 
     @staticmethod
     def _extract_yaml_docstring(stream):
@@ -209,7 +225,7 @@ class NapalmLogs:
             if os_name.startswith('__'):
                 log.debug('Ignoring %s', os_name)
                 continue
-            if self._whitelist_blacklist(os_name):
+            if not self._whitelist_blacklist(os_name):
                 log.debug('Not building config for %s (whitelist-blacklist logic)', os_name)
                 # Ignore devices that are not in the whitelist (if defined),
                 #   or those operating systems that are on the blacklist.
@@ -561,7 +577,7 @@ class NapalmLogs:
         log.info('Starting child processes for each device type')
         started_os_proc = []
         for device_os, device_config in self.config_dict.items():
-            if self._whitelist_blacklist(device_os):
+            if not self._whitelist_blacklist(device_os):
                 log.debug('Not starting process for %s (whitelist-blacklist logic)', device_os)
                 # Ignore devices that are not in the whitelist (if defined),
                 #   or those operating systems that are on the blacklist.

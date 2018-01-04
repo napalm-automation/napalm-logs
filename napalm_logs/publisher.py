@@ -17,6 +17,7 @@ import nacl.utils
 import nacl.secret
 
 # Import napalm-logs pkgs
+import napalm_logs.utils
 from napalm_logs.config import PUB_IPC_URL
 from napalm_logs.config import SERIALIZER
 from napalm_logs.proc import NapalmLogsProc
@@ -51,13 +52,11 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         log.debug('Publishing to %s:%d', self.address, self.port)
         self.serializer = publisher_opts.get('serializer') or serializer
         self.default_serializer = serializer == SERIALIZER
-        self.disable_security = disable_security
+        self.disable_security = publisher_opts.get('disable_security', disable_security)
         self._transport_type = transport_type
         self.publisher_opts = publisher_opts
-        self.send_raw = publisher_opts.get('send_raw', False)
-        self.send_unknown = publisher_opts.get('send_unknown', False)
-        self.only_unknown = publisher_opts.get('only_unknown', False)
-        self.only_raw = publisher_opts.get('only_raw', False)
+        self.error_whitelist = publisher_opts.get('error_whitelist', [])
+        self.error_blacklist = publisher_opts.get('error_blacklist', [])
         if not disable_security:
             self.__safe = nacl.secret.SecretBox(private_key)
             self.__signing_key = signing_key
@@ -89,9 +88,9 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         Setup the transport.
         '''
-        if self.send_raw:
+        if 'RAW' in self.error_whitelist:
             log.info('%s %d will publish partially parsed messages', self._transport_type, self.pub_id)
-        if self.send_unknown:
+        if 'UNKNOWN' in self.error_whitelist:
             log.info('%s %d will publish unknown messages', self._transport_type, self.pub_id)
         transport_class = get_transport(self._transport_type)
         log.debug('Serializing the object for %s using %s',
@@ -150,24 +149,15 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                     log.error(error, exc_info=True)
                     raise NapalmLogsExit(error)
             obj = umsgpack.unpackb(bin_obj)
-            if not self.send_unknown and obj['error'] == 'UNKNOWN':
-                # If the message is Unknown type, but the publisher
-                # should not send it, then it should just drop it.
-                continue
-            elif self.only_unknown and obj['error'] != 'UNKNOWN':
-                # If the publisher sends only Unknown message types
-                # aka. is a listener type publisher
-                # but the message in cause is not Unknown,
-                # just skip it, and check the next one in the queue.
-                continue
-            if not self.send_raw and obj['error'] == 'RAW':
-                # If this is a RAW message, but we are not allowed to
-                # publish it, then we should just skip.
-                continue
-            elif self.only_raw and obj['error'] != 'RAW':
-                # If the publisher sends only RAW type messages
-                # but this message is not raw type,
-                # just skip it, and go the next message.
+            if not napalm_logs.ext.check_whitelist_blacklist(obj['error'],
+                                                             whitelist=self.error_whitelist,
+                                                             blacklist=self.error_blacklist):
+                # Apply the whitelist / blacklist logic
+                # If it doesn't match, jump over.
+                log.debug('This error type is %s. Skipping for %s #%d',
+                          obj['error'],
+                          self._transport_type,
+                          self.pub_id)
                 continue
             serialized_obj = self._serialize(obj, bin_obj)
             log.debug('Publishing the OC object')
@@ -177,7 +167,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
             self.transport.publish(serialized_obj)
 
     def stop(self):
-        log.info('Stopping publisher process')
+        log.info('Stopping publisher process %s (publisher #%d)', self._transport_type, self.pub_id)
         self.__up = False
         self.sub.close()
         self.ctx.term()
