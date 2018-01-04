@@ -11,7 +11,7 @@ import time
 import signal
 import logging
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Import thrid party libs
 import zmq
@@ -225,6 +225,11 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         else:
             year = datetime.now().year
             parsed_time = datetime.strptime('{} {} {}'.format(year, date, time), '%Y {}'.format(time_format))
+            # If the timestamp is in the future then it is likely that the year
+            # is wrong. We subtract 1 day from the parsed time to eleminate any
+            # difference between clocks.
+            if parsed_time - timedelta(days=1) > datetime.now():
+                parsed_time = datetime.strptime('{} {} {}'.format(year - 1, date, time), '%Y {}'.format(time_format))
         return int((parsed_time - datetime(1970, 1, 1)).total_seconds())
 
     def start(self):
