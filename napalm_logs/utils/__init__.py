@@ -352,4 +352,3 @@ def dictupdate(dest, upd):
             for k in upd:
                 dest[k] = upd[k]
         return dest
-
