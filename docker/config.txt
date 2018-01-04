@@ -1,0 +1,6 @@
+disable_security: true
+port: 514
+publish_port: 49017
+auth_port: 49018
+log_file: cli
+log_level: debug
