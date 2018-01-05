@@ -1,0 +1,14 @@
+# Interface GigabitEthernet2, changed state to administratively down
+
+messages:
+  - error: INTERFACE_CHANGED
+    tag: LINK-3-UPDOWN
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+      status: (\w+)
+    line: 'Interface {interface}, changed state to {status}'
+    model: openconfig-interfaces
+    mapping:
+      variables:
+        interfaces//interface//{interface}//state//oper_status: status
+      static: {}
