@@ -7,7 +7,6 @@ from __future__ import absolute_import
 # Import python stdlib
 import os
 import re
-import time
 import signal
 import logging
 import threading
@@ -23,7 +22,6 @@ import napalm_logs.ext.six as six
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import PUB_PX_IPC_URL
 from napalm_logs.config import DEV_IPC_URL
-from napalm_logs.config import UNKNOWN_DEVICE_NAME
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
 

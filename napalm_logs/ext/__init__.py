@@ -75,4 +75,3 @@ def check_whitelist_blacklist(value, whitelist=None, blacklist=None):
         return True
 
     return False
-

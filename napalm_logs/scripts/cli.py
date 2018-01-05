@@ -264,7 +264,6 @@ class NLOptionParser(OptionParser, object):
         # For each module we need to merge the defaults with the
         # config file, but prefer the config file
         listener_opts = defaults.LISTENER_OPTS
-        logger_opts = defaults.LOGGER_OPTS
         publisher_opts = defaults.PUBLISHER_OPTS
         device_whitelist = file_cfg.get('device_whitelist', [])
         device_blacklist = file_cfg.get('device_blacklist', [])
