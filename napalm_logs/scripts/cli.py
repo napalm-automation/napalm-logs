@@ -189,7 +189,7 @@ class NLOptionParser(OptionParser, object):
             '-w', '--device-worker-processes',
             dest='device_worker_processes',
             type=int,
-            help='Number of wroker processes per device.',
+            help='Number of worker processes per device. Default: 1.',
             default=1
         )
 
