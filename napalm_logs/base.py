@@ -131,8 +131,8 @@ class NapalmLogs:
         self.opts['hwm'] = CONFIG.ZMQ_INTERNAL_HWM if self.hwm is None else self.hwm
         self.opts['_server_send_unknown'] = False
         for pub in self.publisher:
-            pub_name = pub.keys()[0]
-            pub_opts = pub.values()[0]
+            pub_name = list(pub.keys())[0]
+            pub_opts = list(pub.values())[0]
             error_whitelist = pub_opts.get('error_whitelist', [])
             error_blacklist = pub_opts.get('error_blacklist', [])
             if 'UNKNOWN' not in error_blacklist:
