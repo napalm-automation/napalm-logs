@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 # Import python std lib
 import json
 import yaml
+import pprint
 import logging
 
 # Import third party libs
@@ -25,6 +26,7 @@ SERIALIZER_LOOKUP = {
     'json': json.dumps,
     'str': str,
     'yaml': yaml.safe_dump,
+    'pprint': pprint.pformat,
     '*': umsgpack.packb  # default serializer
 }
 
