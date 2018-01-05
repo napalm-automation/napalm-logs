@@ -41,9 +41,9 @@ def _generate_test_keys():
     return priv_key, sgn_verify_hex
 
 
-def _start_proc(port=49018):
+def _get_proc_class(port):
     '''
-    Helper to start a process where we run the napalm-logs authenticator.
+    Return the testing napalm-logs authenticator class.
     '''
     pk, sgn_key = _generate_test_keys()
     nlap = NapalmLogsAuthProc('tests/auth/server.crt',
@@ -51,6 +51,14 @@ def _start_proc(port=49018):
                               pk,
                               sgn_key,
                               auth_port=port)
+    return nlap
+
+
+def _start_proc(port=49018):
+    '''
+    Helper to start a process where we run the napalm-logs authenticator.
+    '''
+    nlap = _get_proc_class(port)
     proc = Process(target=nlap.start)
     proc.start()
     return proc
@@ -93,27 +101,15 @@ def test_successful_start():
     Test that the auth process can start properly
     when valid certificate and key are configured.
     '''
-    proc = _start_proc(port=49018)
-    proc.stop()
-
-def test_twice_bind():
-    '''
-    Test that binding twice on the same host/port fails,
-    and raises napalm_logs.exceptions.BindException.
-    '''
-    proc1 = _start_proc(port=49019)
-    assert proc1.is_alive()
-    time.sleep(.1)  # waiting for the auth socket
-    with pytest.raises(napalm_logs.exceptions.BindException):
-        proc2 = _start_proc(port=49019)
-    proc1.stop()
+    proc = _start_proc(port=17171)
+    proc.terminate()
 
 
 def test_client_auth_fail_wrong_port():
     '''
     Test client connect failure on wrong server port.
     '''
-    proc = _start_proc(port=49020)
+    proc = _start_proc(port=17173)
     time.sleep(.1)
     with pytest.raises(napalm_logs.exceptions.ClientConnectException):
         client = ClientAuth('tests/auth/server.crt',
@@ -121,7 +117,7 @@ def test_client_auth_fail_wrong_port():
                             max_try=1,
                             timeout=.1)
         client.stop()
-    proc.stop()
+    proc.terminate()
 
 
 def test_client_auth():
@@ -129,11 +125,11 @@ def test_client_auth():
     Test the auth process startup and a client
     that retrieves the pk and sgn key.
     '''
-    proc = _start_proc(port=49021)
+    proc = _start_proc(port=17174)
     time.sleep(.1)  # waiting for the auth socket
-    client = ClientAuth('tests/auth/server.crt', port=49021)
+    client = ClientAuth('tests/auth/server.crt', port=17174)
     client.stop()
-    proc.stop()
+    proc.terminate()
 
 
 def test_client_keep_alive():
@@ -141,12 +137,12 @@ def test_client_keep_alive():
     Test that the client receives keepalives from
     the auth process.
     '''
-    proc = _start_proc(port=49022)
+    proc = _start_proc(port=17175)
     time.sleep(.1)
     client = ClientAuth('tests/auth/server.crt',
                         max_try=1,
                         timeout=.1,
-                        port=49022)
+                        port=17175)
     time.sleep(.1)  # wait for the client socket
     client.ssl_skt.close()  # force client socket close
     # wait for another keepalive exchange
@@ -155,4 +151,4 @@ def test_client_keep_alive():
     # client.stop() tries to close the auth SSL socket
     # if not alive anymore, this will raise an exception
     # therefore the test will fail
-    proc.stop()
+    proc.terminate()
