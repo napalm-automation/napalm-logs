@@ -104,6 +104,8 @@ Configuration example:
 ``error_whitelist``: ``[]``
 ---------------------------
 
+.. versionadded:: 0.4.0
+
 Publish only the error messages included in this list. The whitelist/blacklist
 logic is  implemented in such a way that if anything is added in this list,
 *only* these message types will be published and nothing else.
@@ -128,6 +130,8 @@ Configuration example:
 
 ``error_blacklist``: ``['RAW', 'UNKNOWN']``
 -------------------------------------------
+
+.. versionadded:: 0.4.0
 
 Filter out the error types publisher. The error messages included in this list 
 will not be published.
@@ -288,6 +292,8 @@ Example:
 
 ``serializer``: ``msgpack``
 ---------------------------
+
+.. versionadded:: 0.4.0
 
 The serializer to be used when publishing the structure napalm-logs document.
 

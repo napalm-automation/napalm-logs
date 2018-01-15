@@ -416,6 +416,8 @@ Configuration file example:
 
 Multiple publishers configuration example (file):
 
+.. versionadded:: 0.4.0
+
 .. code-block:: yaml
 
     publisher:
@@ -487,7 +489,7 @@ Configuration file example:
 The name of the serializer to be used when publishing the napalm-logs 
 structured documents. When working with multiple publishers it is possible to 
 control their serialization method individually, using the
-:ref:`publisher-opts-serializer`` option.
+:ref:`publisher-opts-serializer` option.
 
 Default: ``msgpack``
 
