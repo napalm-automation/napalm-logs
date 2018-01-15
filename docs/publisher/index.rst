@@ -80,139 +80,23 @@ Globally available options
 Additionally, the user can configure the following options, available to all
 publishers:
 
-.. _publisher-opts-send-raw:
+.. _publisher-opts-disable-security:
 
-``send_raw``: ``False``
------------------------
+``disable_security``: ``False``
+-------------------------------
 
-If this option is set, all processed syslog messages, even ones that have not
-matched a configured error, will be published over the specified transport.
-This can be used to forward to log server for storage.
+The message encryption can be disabled per publisher as well. Similar to the
+:ref:`configuration-options-disable-security` is it recommended not to disable 
+security, though this can be needed in certain particular cases.
 
-Example:
-
-.. code-block:: yaml
-
-  publisher:
-    zmq:
-      send_raw: true
-
-.. note::
-
-    This option is just a shortcut to the 
-    :ref:`publisher-opts-error-blacklist` configuration option introduced in 
-    0.4.0 (codename Crowbar), by removing the ``RAW`` error type from the 
-    blacklisted message types, i.e., 
-
-    .. code-block:: yaml
-
-    publisher:
-      zmq:
-        error_blacklist:
-          - UNKNOWN
-
-.. _publisher-opts-only-raw:
-
-``only_raw``: ``False``
------------------------
-
-.. versionadded:: 0.4.0
-
-When this option is enabled, the publisher will publish *only* the syslog 
-messages that could not be parsed.
-
-Example:
+Configuration example:
 
 .. code-block:: yaml
 
   publisher:
-    - zmq:
-        address: 1.2.3.4
-        port: 1234
-    - zmq:
-        address: 5.6.7.8
-        port: 5678
-        only_raw: true
-
-.. note::
-
-    This option is a shortcut to the :ref:`publisher-opts-error-whitelist` 
-    configuration option introduced in 0.4.0 (codename Crowbar), by adding the
-    ``RAW`` message to the whitelist message types, i.e., 
-
-    .. code-block:: yaml
-
-      publisher:
-        - zmq:
-            address: 1.2.3.4
-            port: 1234
-        - zmq:
-            address: 5.6.7.8
-            port: 5678
-            error_whitelist:
-              - RAW
-
-.. _publisher-opts-send-unknown:
-
-``send_unknown``: ``False``
----------------------------
-
-If this option is set, all processed syslog messages, even ones that have not
-matched a certain operating system, will be published over the specified
-transport. This can be used to forward to log server for storage.
-
-Example:
-
-.. code-block:: yaml
-
-  publisher:
-    kafka:
-      send_unknown: true
-
-.. note::
-
-    This option is just a shortcut to the 
-    :ref:`publisher-opts-error-blacklist` option introduced in 0.4.0 (codename 
-    Crowbar), by removing the ``UNKNOWN`` message from the blacklist, i.e.,
-
-    .. code-block:: yaml
-
-        publisher:
-          kafka:
-            error_blacklist:
-              - RAW
-
-.. _publisher-opts-only-unknown:
-
-``only_unknown``: ``False``
----------------------------
-
-.. versionadded:: 0.4.0
-
-When this option is configured, napalm-logs will publish *only* the structured 
-documents that are marked as ``UNKNWON`` (i.e., napalm-logs was unable to parse 
-the message and determine the operating system).
-
-Example:
-
-.. code-block:: yaml
-
-  publisher:
-    kafka:
-      only_unknown: true
-
-.. note::
-
-    This option is a shortcut to the :ref:`publisher-opts-error-whitelist` 
-    option introduced in 0.4.0 (codename Crowbar), by adding the ``UNKNOW`` 
-    message type to the whitelist, i.e.,
-
-    .. code-block:: yaml
-
-      publisher:
-        kafka:
-          error_whitelist:
-            - UNKNOWN
+    - cli:
+        disable_security: true
+    - zmq: {}
 
 .. _publisher-opts-error-whitelist:
 
@@ -263,6 +147,141 @@ Configuration example:
     - zmq:
         error_blacklist:
           - UNKNOWN
+
+.. _publisher-opts-only-raw:
+
+``only_raw``: ``False``
+-----------------------
+
+.. versionadded:: 0.4.0
+
+When this option is enabled, the publisher will publish *only* the syslog 
+messages that could not be parsed.
+
+Example:
+
+.. code-block:: yaml
+
+  publisher:
+    - zmq:
+        address: 1.2.3.4
+        port: 1234
+    - zmq:
+        address: 5.6.7.8
+        port: 5678
+        only_raw: true
+
+.. note::
+
+    This option is a shortcut to the :ref:`publisher-opts-error-whitelist` 
+    configuration option introduced in 0.4.0 (codename Crowbar), by adding the
+    ``RAW`` message to the whitelist message types, i.e., 
+
+    .. code-block:: yaml
+
+      publisher:
+        - zmq:
+            address: 1.2.3.4
+            port: 1234
+        - zmq:
+            address: 5.6.7.8
+            port: 5678
+            error_whitelist:
+              - RAW
+
+.. _publisher-opts-only-unknown:
+
+``only_unknown``: ``False``
+---------------------------
+
+.. versionadded:: 0.4.0
+
+When this option is configured, napalm-logs will publish *only* the structured 
+documents that are marked as ``UNKNWON`` (i.e., napalm-logs was unable to parse 
+the message and determine the operating system).
+
+Example:
+
+.. code-block:: yaml
+
+  publisher:
+    kafka:
+      only_unknown: true
+
+.. note::
+
+    This option is a shortcut to the :ref:`publisher-opts-error-whitelist` 
+    option introduced in 0.4.0 (codename Crowbar), by adding the ``UNKNOW`` 
+    message type to the whitelist, i.e.,
+
+    .. code-block:: yaml
+
+      publisher:
+        kafka:
+          error_whitelist:
+            - UNKNOWN
+
+
+.. _publisher-opts-send-raw:
+
+``send_raw``: ``False``
+-----------------------
+
+If this option is set, all processed syslog messages, even ones that have not
+matched a configured error, will be published over the specified transport.
+This can be used to forward to log server for storage.
+
+Example:
+
+.. code-block:: yaml
+
+  publisher:
+    zmq:
+      send_raw: true
+
+.. note::
+
+    This option is just a shortcut to the 
+    :ref:`publisher-opts-error-blacklist` configuration option introduced in 
+    0.4.0 (codename Crowbar), by removing the ``RAW`` error type from the 
+    blacklisted message types, i.e., 
+
+    .. code-block:: yaml
+
+    publisher:
+      zmq:
+        error_blacklist:
+          - UNKNOWN
+
+.. _publisher-opts-send-unknown:
+
+``send_unknown``: ``False``
+---------------------------
+
+If this option is set, all processed syslog messages, even ones that have not
+matched a certain operating system, will be published over the specified
+transport. This can be used to forward to log server for storage.
+
+Example:
+
+.. code-block:: yaml
+
+  publisher:
+    kafka:
+      send_unknown: true
+
+.. note::
+
+    This option is just a shortcut to the 
+    :ref:`publisher-opts-error-blacklist` option introduced in 0.4.0 (codename 
+    Crowbar), by removing the ``UNKNOWN`` message from the blacklist, i.e.,
+
+    .. code-block:: yaml
+
+        publisher:
+          kafka:
+            error_blacklist:
+              - RAW
 
 .. _publisher-opts-serializer:
 
