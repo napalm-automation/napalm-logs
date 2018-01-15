@@ -41,6 +41,27 @@ Example: listener configuration using custom options
   :ref:`configuration-options-address` and :ref:`configuration-options-port`
   configuration options.
 
+Multiple listeners
+------------------
+
+.. versionadded:: 0.4.0
+
+It is possible to start multiple listeners, each with its separate set of 
+configuration options, however this feature is available only from the 
+configuration file, e.g.:
+
+.. code-block:: yaml
+
+  listener:
+    - tcp:
+        address: 1.2.3.4
+        port: 1234
+        buffer_size: 2048
+        max_clients: 100
+    - udp:
+        address: 5.6.7.8
+        port: 5678
+
 Available listeners and their options
 -------------------------------------
 

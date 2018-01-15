@@ -312,6 +312,7 @@ daemon):
    authentication/index
    listener/index
    publisher/index
+   serializer/index
    logger/index
    syslog/index
    developers/index

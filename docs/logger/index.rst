@@ -4,9 +4,33 @@
 Logger
 ======
 
+.. deprecated:: 0.4.0
+
 .. warning::
 
-    The Logger interface will be deprecated beginning with release 0.4.0.
+    The Logger interface has been deprecated beginning with release 0.4.0.
+    Please use the :ref:`publisher` interface instead, using the 
+    :ref:`publisher-opts-only-raw` or :ref:`publisher-opts-send-raw` Publisher 
+    configuration options. For example, if you used the following configuration 
+    for the Logger:
+
+    .. code-block:: yaml
+
+      logger:
+        kafka:
+          send_raw: true
+
+    The configuration must be updated to:
+
+    .. code-block:
+
+      publisher:
+        - kafka:
+            only_raw: true
+
+    Using ``only_raw`` is recommended to ensure that the Publisher will be used 
+    only for this exact purpose. However, the user can decide what is the most 
+    suitable for their use case.
 
 The logger subsystem uses the modules from the publisher pluggable subsystem to
 send partially parsed syslog messages. The configuration options are the same
