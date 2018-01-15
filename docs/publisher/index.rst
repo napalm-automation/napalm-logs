@@ -263,3 +263,22 @@ Configuration example:
     - zmq:
         error_blacklist:
           - UNKNOWN
+
+.. _publisher-opts-serializer:
+
+``serializer``: ``msgpack``
+---------------------------
+
+The serializer to be used when publishing the structure napalm-logs document.
+
+Default: :ref:`serializer-msgpack`.
+
+You can specify a separate serialize per publisher, e.g.:
+
+.. code-block:: yaml
+
+  publisher:
+    - kafka:
+        serializer: json
+    - cli:
+        serializer: pprint
