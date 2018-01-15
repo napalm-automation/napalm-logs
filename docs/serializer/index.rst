@@ -7,7 +7,7 @@ Serializer
 .. versionadded:: 0.4.0
 
 The Serializer subsystem is a pluggable interface used just before a structured
-napalm-logs document is sent just before being published.
+napalm-logs document is sent to the :ref:`publisher` interface.
 
 The default Serializer used is :ref:`serializer-msgpack`.
 
