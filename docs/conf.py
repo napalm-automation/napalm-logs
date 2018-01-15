@@ -241,7 +241,7 @@ def gen_messages_rst():
     # Start building the docs.
     # Firstly load the messages config, by creating an instance
     #   of the base NapalmLogs class, without starting the engine.
-    nl_ = NapalmLogs()
+    nl_ = NapalmLogs(publisher=[])
     defined_errors = {}
     for os_name, os_cfg in nl_.config_dict.items():
         for message in os_cfg['messages']:

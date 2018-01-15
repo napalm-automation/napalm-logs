@@ -47,6 +47,8 @@ def startup_proc():
     NL_BASE = NapalmLogs(disable_security=True,
                          address=NAPALM_LOGS_TEST_ADDR,
                          port=NAPALM_LOGS_TEST_PORT,
+                         publisher=[{'zmq': {}}],
+                         listener=[{'udp': {}}],
                          publish_address=NAPALM_LOGS_TEST_PUB_ADDR,
                          publish_port=NAPALM_LOGS_TEST_PUB_PORT,
                          log_level=NAPALM_LOGS_TEST_LOG_LEVEL)

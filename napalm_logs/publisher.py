@@ -12,13 +12,17 @@ import threading
 
 # Import third party libs
 import zmq
+import umsgpack
 import nacl.utils
 import nacl.secret
 
 # Import napalm-logs pkgs
+import napalm_logs.utils
 from napalm_logs.config import PUB_IPC_URL
+from napalm_logs.config import SERIALIZER
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.transport import get_transport
+from napalm_logs.serializer import get_serializer
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
 
@@ -34,19 +38,25 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                  address,
                  port,
                  transport_type,
-                 # pipe,
+                 serializer,
                  private_key,
                  signing_key,
                  publisher_opts,
-                 disable_security=False):
+                 disable_security=False,
+                 pub_id=None):
         self.__up = False
         self.opts = opts
-        self.address = address
-        self.port = port
-        # self.pipe = pipe
-        self.disable_security = disable_security
+        self.pub_id = pub_id
+        self.address = publisher_opts.pop('address', None) or address
+        self.port = publisher_opts.pop('port', None) or port
+        log.debug('Publishing to %s:%d', self.address, self.port)
+        self.serializer = publisher_opts.get('serializer') or serializer
+        self.default_serializer = self.serializer == SERIALIZER
+        self.disable_security = publisher_opts.get('disable_security', disable_security)
         self._transport_type = transport_type
         self.publisher_opts = publisher_opts
+        self.error_whitelist = publisher_opts.get('error_whitelist', [])
+        self.error_blacklist = publisher_opts.get('error_blacklist', [])
         if not disable_security:
             self.__safe = nacl.secret.SecretBox(private_key)
             self.__signing_key = signing_key
@@ -63,9 +73,10 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         on the right transport.
         '''
         self.ctx = zmq.Context()
-        log.debug('Setting up the publisher puller')
-        self.sub = self.ctx.socket(zmq.PULL)
-        self.sub.bind(PUB_IPC_URL)
+        log.debug('Setting up the %s publisher subscriber #%d', self._transport_type, self.pub_id)
+        self.sub = self.ctx.socket(zmq.SUB)
+        self.sub.connect(PUB_IPC_URL)
+        self.sub.setsockopt(zmq.SUBSCRIBE, '')
         try:
             self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
             # zmq 2
@@ -77,14 +88,15 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         Setup the transport.
         '''
-        publisher_address = self.publisher_opts.get('address')
-        publisher_port = self.publisher_opts.get('port')
-        if publisher_address:
-            self.address = self.publisher_opts.pop('address')
-        if publisher_port:
-            self.port = self.publisher_opts.pop('port')
-
+        if 'RAW' in self.error_whitelist:
+            log.info('%s %d will publish partially parsed messages', self._transport_type, self.pub_id)
+        if 'UNKNOWN' in self.error_whitelist:
+            log.info('%s %d will publish unknown messages', self._transport_type, self.pub_id)
         transport_class = get_transport(self._transport_type)
+        log.debug('Serializing the object for %s using %s',
+                  self._transport_type,
+                  self.serializer)
+        self.serializer_fun = get_serializer(self.serializer)
         self.transport = transport_class(self.address,
                                          self.port,
                                          **self.publisher_opts)
@@ -93,19 +105,27 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
            getattr(self.transport, 'NO_ENCRYPT') is True:
             self.__transport_encrypt = False
 
-    def _prepare(self, bin_obj):
+    def _prepare(self, serialized_obj):
         '''
         Prepare the object to be sent over the untrusted channel.
         '''
-        # serialize the object
-        # bin_obj = umsgpack.packb(obj)
         # generating a nonce
         nonce = nacl.utils.random(nacl.secret.SecretBox.NONCE_SIZE)
         # encrypting using the nonce
-        encrypted = self.__safe.encrypt(bin_obj, nonce)
+        encrypted = self.__safe.encrypt(serialized_obj, nonce)
         # sign the message
         signed = self.__signing_key.sign(encrypted)
         return signed
+
+    def _serialize(self, obj, bin_obj):
+        if self.default_serializer:
+            # It's just easier to poll a boolean, rather than
+            # re-serializing the message.
+            # The reasoning why this is needed is because the structured
+            # messages are passed anyway serialized between processes,
+            # but the user may request a different serializer.
+            return bin_obj
+        return self.serializer_fun(obj)
 
     def start(self):
         '''
@@ -119,9 +139,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.transport.start()
         self.__up = True
         while self.__up:
-            # bin_obj = self.sub.recv()  # already serialized
             try:
-                # obj = self.pipe.recv()
                 bin_obj = self.sub.recv()
             except zmq.ZMQError as error:
                 if self.__up is False:
@@ -130,14 +148,26 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                 else:
                     log.error(error, exc_info=True)
                     raise NapalmLogsExit(error)
+            obj = umsgpack.unpackb(bin_obj)
+            if not napalm_logs.ext.check_whitelist_blacklist(obj['error'],
+                                                             whitelist=self.error_whitelist,
+                                                             blacklist=self.error_blacklist):
+                # Apply the whitelist / blacklist logic
+                # If it doesn't match, jump over.
+                log.debug('This error type is %s. Skipping for %s #%d',
+                          obj['error'],
+                          self._transport_type,
+                          self.pub_id)
+                continue
+            serialized_obj = self._serialize(obj, bin_obj)
             log.debug('Publishing the OC object')
             if not self.disable_security and self.__transport_encrypt:
-                bin_obj = self._prepare(bin_obj)
-            self.transport.publish(bin_obj)
+                # Encrypt only when needed.
+                serialized_obj = self._prepare(serialized_obj)
+            self.transport.publish(serialized_obj)
 
     def stop(self):
-        log.info('Stopping publisher process')
+        log.info('Stopping publisher process %s (publisher #%d)', self._transport_type, self.pub_id)
         self.__up = False
         self.sub.close()
         self.ctx.term()
-        # self.pipe.close()
