@@ -86,8 +86,9 @@ publishers:
 -------------------------------
 
 The message encryption can be disabled per publisher as well. Similar to the
-:ref:`configuration-options-disable-security` is it recommended not to disable 
-security, though this can be needed in certain particular cases.
+main :ref:`configuration-options-disable-security` configuration option, is it
+recommended **not to disable security**, though this can be needed in certain
+particular cases.
 
 Configuration example:
 
