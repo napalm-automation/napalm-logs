@@ -16,7 +16,8 @@ All of the command line arguments can also be added to a config file.
 ``address``
 -----------
 
-The IP address to use to listen for all incoming syslog messages.
+The IP address to use to listen for all incoming syslog messages. When using
+multiple listeners, it is recommended to specify this option for each listener.
 
 Default: ``0.0.0.0``.
 
@@ -247,11 +248,16 @@ Configuration file example:
 
 .. _configuration-options-listener:
 
-``listener``
-------------
+``listener``: ``udp``
+---------------------
 
 The module to use when listening for incoming syslog messages. For more details,
 see :ref:`listener`.
+
+Starting with the release 0.4.0 (codename Crowbar), you are able to listen to
+the syslog messages over multiple concomitant channels. This capability is
+available only from the configuration file. For more configuration options for 
+the listener interface, please check the :ref:`listener` section.
 
 Default: ``udp``.
 
@@ -266,6 +272,22 @@ Configuration file example:
 .. code-block:: yaml
 
   listener: kafka
+
+Multiple listeners configuration example (file):
+
+.. versionadded:: 0.4.0
+
+.. code-block:: yaml
+
+    listener:
+      - kafka: {}
+      - udp:
+          address: 1.2.3.4
+          port: 5514
+          buffer_size: 2048
+      - tcp:
+          address: 1.2.3.4
+          port: 5515
 
 .. _configuration-options-log-file:
 
@@ -316,8 +338,8 @@ Configuration file example:
 
 .. _configuration-options-log-level:
 
-``log-level``
--------------
+``log-level``: ``WARNING``
+--------------------------
 
 The level at which to log messages. Possible options are ``CRITIAL``, ``ERROR``,
 ``WARNING``, ``INFO``, ``DEBUG``.
@@ -339,12 +361,13 @@ Configuration file example:
 
 .. _configuration-options-port:
 
-``port``
---------
+``port``: ``514``
+-----------------
 
-This can be assigned using ``-p``
-
-The port to use to listen for all incoming syslog messages.
+The port to use to listen for all incoming syslog messages. This can be
+assigned using the CLI argument ``-p``. When working with multiple listeners, 
+it is recommended to specify the ``port`` argument for each listener to avoid
+confusions.
 
 Default: ``514``.
 
@@ -363,10 +386,54 @@ Configuration file example:
 
 .. _configuration-options-publish-address:
 
-``publish-address``
--------------------
+``publisher``: ``zmq``
+----------------------
 
-The IP address to use to output the processed message.
+The channel(s) to be used when publishing the structured napalm-logs documents.
+Starting with release 0.4.0 (codename Crowbar), it is possible to publish the
+messages over multiple channels. Each publisher has it's separate set of 
+configuration options, for more details see :ref:`publisher`.
+
+Default: ``zmq`` (ZeroMQ)
+
+CLI usage example:
+
+.. code-block:: bash
+
+    $ napalm-logs --publisher zmq
+
+Configuration file example:
+
+.. code-block:: yaml
+
+    publisher: zmq
+
+Multiple publishers configuration example (file):
+
+.. code-block:: yaml
+
+    publisher:
+      - zmq:
+          address: 1.2.3.4
+          port: 1234
+      - kafka:
+          bootstrap_servers:
+            - kk1.brokers.example.org
+            - 192.168.0.1
+            - 192.168.0.2:5678
+          topic: napalm-logs-out
+      - http:
+          address: https://example.com/webhook
+
+.. _configuration-options-publish-address:
+
+``publish-address``: ``0.0.0.0``
+--------------------------------
+
+The IP address to use to output the processed message. When publishing the 
+structured napalm-logs documents over multiple transports, it is recommended to 
+specify the ``address`` field per publisher. For more examples, see 
+:ref:`configuration-options-publisher` and :ref:`publisher`.
 
 Default: ``0.0.0.0``.
 
@@ -384,10 +451,13 @@ Configuration file example:
 
 .. _configuration-options-publish-port:
 
-``publish-port``
-----------------
+``publish-port``: ``49017``
+---------------------------
 
-The port to use to output the processes message.
+The port to use to output the processes message. When publishing the structured 
+napalm-logs documents over multiple transports, it is recommended to specify 
+the ``port`` field per publisher. For more examples, see 
+:ref:`configuration-options-publisher` and :ref:`publisher`.
 
 Default: ``49017``.
 
@@ -395,7 +465,7 @@ CLI usage example:
 
 .. code-block:: bash
 
-  $ napalm-logs --publish-port  2048
+  $ napalm-logs --publish-port 2048
 
 Configuration file example:
 
@@ -403,13 +473,43 @@ Configuration file example:
 
   publish_port: 2048
 
+.. _configuration-options-serializer:
+
+``serializer``: ``msgpack``
+---------------------------
+
+The name of the serializer to be used when publishing the napalm-logs 
+structured documents. When working with multiple publishers it is possible to 
+control their serialization method individually, using the
+:ref:`publisher-opts-serializer`` option.
+
+Default: ``msgpack``
+
+CLI Example:
+
+.. code-block:: bash
+
+    $ napalm-logs -s json
+    $ napalm-logs --serializer yaml
+
+Configuration file example:
+
+.. code-block:: yaml
+
+    serializer: json
+
 .. _configuration-options-transport:
 
-``transport``
--------------
+``transport``: ``zmq``
+----------------------
 
 The module to use to output the processed message information. For more details,
 see :ref:`publisher`.
+
+.. warning::
+
+    This option is no longer supported as of release 0.4.0 (Crowbar). Use 
+    :ref:`configuration-options-publisher` instead.
 
 Default: ``zmq`` (ZeroMQ).
 
@@ -419,7 +519,6 @@ CLI usage example:
 
   $ napalm-logs -t kafka
   $ napalm-logs --transport kafka
-  $ napalm-logs --publisher kafka
 
 Configuration file example:
 
@@ -431,7 +530,7 @@ Or:
 
 .. code-block:: yaml
 
-  publisher: kafka
+  transport: kafka
 
 Config File Only Options
 ++++++++++++++++++++++++
