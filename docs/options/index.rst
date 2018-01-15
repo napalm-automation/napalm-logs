@@ -176,6 +176,12 @@ Configuration file example:
 
   disable_security: true
 
+.. note::
+
+    Starting with release :ref:`release-0.4.0`, it is possible to specify 
+    this option for each Publisher individually. See 
+    :ref:`publisher-opts-disable-security`.
+
 .. _configuration-options-extension-config-path:
 
 ``extension-config-path``
@@ -254,7 +260,7 @@ Configuration file example:
 The module to use when listening for incoming syslog messages. For more details,
 see :ref:`listener`.
 
-Starting with the release 0.4.0 (codename Crowbar), you are able to listen to
+Starting with the :ref:`release-0.4.0`, you are able to listen to
 the syslog messages over multiple concomitant channels. This capability is
 available only from the configuration file. For more configuration options for 
 the listener interface, please check the :ref:`listener` section.
@@ -373,7 +379,7 @@ Default: ``514``.
 
 CLI usage example:
 
-.. code-block:: bash
+ code-block:: bash
 
   $ napalm-logs -p 1024
   $ napalm-logs --port 1024
@@ -384,13 +390,13 @@ Configuration file example:
 
   port: 1024
 
-.. _configuration-options-publish-address:
+.. _configuration-options-publisher:
 
 ``publisher``: ``zmq``
 ----------------------
 
 The channel(s) to be used when publishing the structured napalm-logs documents.
-Starting with release 0.4.0 (codename Crowbar), it is possible to publish the
+Starting with :ref:`release-0.4.0`, it is possible to publish the
 messages over multiple channels. Each publisher has it's separate set of 
 configuration options, for more details see :ref:`publisher`.
 
@@ -508,7 +514,7 @@ see :ref:`publisher`.
 
 .. warning::
 
-    This option is no longer supported as of release 0.4.0 (Crowbar). Use 
+    This option is no longer supported as of :ref:`release-0.4.0`. Use 
     :ref:`configuration-options-publisher` instead.
 
 Default: ``zmq`` (ZeroMQ).
