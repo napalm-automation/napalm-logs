@@ -253,10 +253,10 @@ Example:
 
     .. code-block:: yaml
 
-    publisher:
-      zmq:
-        error_blacklist:
-          - UNKNOWN
+      publisher:
+        zmq:
+          error_blacklist:
+            - UNKNOWN
 
 .. _publisher-opts-send-unknown:
 
@@ -283,10 +283,10 @@ Example:
 
     .. code-block:: yaml
 
-        publisher:
-          kafka:
-            error_blacklist:
-              - RAW
+      publisher:
+        kafka:
+          error_blacklist:
+            - RAW
 
 .. _publisher-opts-serializer:
 

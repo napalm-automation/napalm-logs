@@ -4,3 +4,90 @@
 Release 0.4.0 - Codename Crowbar
 ================================
 
+In this release we have a couple of major core improvements and changes, as 
+well as new features and structured messages.
+
+Core improvements and additions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Beginning with this release you are now able to start multiple :ref:`Listeners 
+<listener>` and :ref:`Publishers <publisher>`, that means, the syslog messages 
+from the devices can be received from multiple sources concomitantly, and, 
+similarly, published over multiple channels at the same time. Each can have 
+a separate group of settings, including :ref:`disable_security 
+<publisher-opts-disable-security>` to publish the messages without being 
+encrypted and signed for that specific Publisher only.
+
+Additionally, we have introduced the :ref:`serializer` subsystem that allows to 
+serialize the structured napalm-logs messages in different formats chosen by 
+the user. The following serializers are available:
+
+- :ref:`serializer-msgpack` (which was the only serializer available prior to 
+  this release).
+- :ref:`serializer-json`
+- :ref:`serializer-yaml`
+- :ref:`serializer-str`
+- :ref:`serializer-pprint`
+
+The serializer can be selected globally using the :ref:`serializer 
+<configuration-options-serializer>` configuration option, or per Publisher, 
+using the :ref:`Publisher serializer <publisher-opts-serializer>` option.
+
+At the Publisher level, there are several new options:
+
+- :ref:`disable_security <publisher-opts-disable-security>` to disable the 
+  encryption of the messages, per Publisher.
+- :ref:`serializer <publisher-opts-serializer>` to select the Serializer.
+- :ref:`error_whitelist <publisher-opts-error-whitelist>` to allow only some 
+  messages to be published, based on their
+  :ref:`error tag <message-error-tags>`.
+- :ref:`error_blacklist <publisher-opts-error-blacklist>` to prevent publishing 
+  some messages, based on their :ref:`error tag <message-error-tags>`.
+- :ref:`publisher-opts-only-raw` to publish only :ref:`RAW`-type messages.
+- :ref:`publisher-opts-only-unknown` to publish only :ref:`UNKNOWN`-type messages.
+
+Deprecations
+^^^^^^^^^^^^
+
+Logger Interface Deprecation
+----------------------------
+
+As announced in the :ref:`release-0.3.0` notes, the :ref:`logger` interface has 
+been deprecated due to the possibility to have multiple Publishers introduced 
+in this release. As the :ref:`logger` subsystem used to send only the partially 
+parsed syslog messages, you can achieve the same now using the 
+:ref:`publisher-opts-only-raw` option. For example, given the following 
+configuration for ``napalm-logs < 0.4.0``:
+
+.. code-block:: yaml
+
+  logger:
+    kafka:
+      send_raw: true
+
+Beginning with this release, the equivalent configuration is:
+
+.. code-block:: yaml
+
+  publisher:
+    - kafka:
+        only_raw: true
+
+Other Deprecations
+------------------
+
+The :ref:`transport <configuration-options-transport>` configuration option is no
+longer supported. Make sure to use the
+:ref:`publisher <configuration-options-publisher>` option instead.
+
+
+New Structured Messages
+-----------------------
+
+- :ref:`BGP_SESSION_NOT_CONFIGURED`
+
+The following messages were already defined, now extending the list of 
+supported platforms:
+
+- :ref:`ISIS_NEIGHBOR_DOWN` defined for ``junos``.
+- :ref:`ISIS_NEIGHBOR_UP` defined for ``junos``.
