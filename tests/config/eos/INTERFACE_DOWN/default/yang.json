@@ -1,0 +1,32 @@
+{
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "Ethernet28": {
+          "state": {
+            "oper_status": "DOWN"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 5,
+    "facility": 20,
+    "pri": "165",
+    "processName": "Ebra",
+    "host": "veos01",
+    "tag": "LINEPROTO-5-UPDOWN",
+    "time": "09:42:36",
+    "date": "Feb  6",
+    "message": ": Line protocol on Interface Ethernet28, changed state to down"
+  },
+  "facility": 20,
+  "ip": "127.0.0.1",
+  "error": "INTERFACE_DOWN",
+  "host": "veos01",
+  "yang_model": "openconfig-interfaces",
+  "timestamp": 1517910156,
+  "os": "eos",
+  "severity": 5
+}
