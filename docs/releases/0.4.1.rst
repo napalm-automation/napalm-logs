@@ -1,0 +1,16 @@
+.. _release-0.4.1:
+
+=============
+Release 0.4.1
+=============
+
+This is a minor release for :ref:`release-0.4.0`.
+
+New Structured Messages
+-----------------------
+
+The following messages were already defined, now extending the list of
+supported platforms:
+
+- :ref:`INTERFACE_UP` defined for ``eos``.
+- :ref:`INTERFACE_DOWN` defined for ``eos``.
