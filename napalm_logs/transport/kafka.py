@@ -31,6 +31,8 @@ class KafkaTransport(TransportBase):
             address = kwargs['address']
         if kwargs.get('port'):
             address = kwargs['port']
+        if kwargs.get('no_encrypt'):
+            self.NO_ENCRYPT = kwargs['no_encrypt']
         if kwargs.get('bootstrap_servers'):
             self.bootstrap_servers = kwargs['bootstrap_servers']
         else:
