@@ -155,10 +155,10 @@ Configuration example:
 
 .. _publisher-opts-no-encrypt:
 
-`no_encrypt``: ``False``
+``no_encrypt``: ``False``
 ------------------------
 
-.. versionadded:: 0.5.0
+.. versionadded:: 0.4.2
 
 Do not encrypt messages for this over this publisher
 
