@@ -153,6 +153,23 @@ Configuration example:
         error_blacklist:
           - UNKNOWN
 
+.. _publisher-opts-no-encrypt:
+
+``no_encrypt``: ``False``
+------------------------
+
+.. versionadded:: 0.4.2
+
+Do not encrypt messages for this over this publisher
+
+Configuration example:
+
+.. code-block:: yaml
+
+  publisher:
+    - kafka:
+        no_encrypt: True
+
 .. _publisher-opts-only-raw:
 
 ``only_raw``: ``False``

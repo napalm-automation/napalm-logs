@@ -31,6 +31,8 @@ class ZMQTransport(TransportBase):
             self.port = kwargs['port']
         else:
             self.port = port
+        if kwargs.get('no_encrypt'):
+            self.NO_ENCRYPT = kwargs['no_encrypt']
 
     def start(self):
         self.context = zmq.Context()
