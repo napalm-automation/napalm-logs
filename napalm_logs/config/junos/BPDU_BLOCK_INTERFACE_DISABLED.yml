@@ -6,7 +6,7 @@ messages:
   - error: BPDU_BLOCK_INTERFACE_DISABLED
     tag: ESWD_BPDU_BLOCK_ERROR_DISABLED
     values:
-      interface: ([\w\-\/\.\d]+)
+      interface: ([\w\-\/\.\:]+(?<!\:))
     line: '{interface}: bpdu-block disabled port'
     model: openconfig-interface
     mapping:
