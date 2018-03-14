@@ -51,7 +51,7 @@
     },
     "timestamp": 1521033589,
     "error": "ISIS_NEIGHBOR_DOWN",
-    "ip": "192.168.18.152",
+    "ip": "127.0.0.1",
     "facility": 3,
     "os": "junos",
     "yang_model": "openconfig-isis",
