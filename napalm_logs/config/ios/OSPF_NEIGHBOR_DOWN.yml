@@ -1,4 +1,4 @@
-# Nbr 172.16.46.4 on GigabitEthernet2.45 from FULL to DOWN, Neighbor Down: Dead timer expired
+#<189>521: router1: *Mar 15 10:05:53.044: %OSPF-5-ADJCHG: Process 1, Nbr 172.16.46.4 on GigabitEthernet2.45 from INIT to DOWN, Neighbor Down: Dead timer expired
 
 messages:
   - error: OSPF_NEIGHBOR_DOWN
@@ -6,13 +6,13 @@ messages:
     values:
       neighborIP: (\d+.\d+.\d+.\d+)
       interface: (\w+[\.\-\d\/\w+]+)
-      reasonMessage: ([\w ]+)
+      adjacency-state-change-reason-message: ([\w ]+)
       initStatus: (\w+)
-    line: 'Nbr {neighborIP} on {interface} from {initStatus} to DOWN, Neighbor Down: {reasonMessage}'
+    line: 'Nbr {neighborIP} on {interface} from {initStatus} to DOWN, Neighbor Down: {adjacency-state-change-reason-message}'
     model: openconfig-ospf
     mapping:
       variables:
-        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//area//interfaces//interface//{interface}//neighbors//neighbor//{neighborIP}//state//adjacency-state-change-reason-message: reasonMessage
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//area//interfaces//interface//{interface}//neighbors//neighbor//{neighborIP}//state//adjacency-state-change-reason-message: {adjacency-state-change-reason-message}
       static:
         network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//area//interfaces//interface//{interface}//neighbors//neighbor//{neighborIP}//state//adjacency-state: DOWN
-        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//area//interfaces//interface//{interface}//neighbors//neighbor//{neighborIP}//state//adjacency-state-change-reason: DEAD
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//area//interfaces//interface//{interface}//neighbors//neighbor//{neighborIP}//state//adjacency-state-change-reason: INACTIVE_TIMER
