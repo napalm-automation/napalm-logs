@@ -5,10 +5,10 @@ messages:
     tag: LINK-3-UPDOWN
     values:
       interface: (\w+[\.\-\d\/\w+]+)
-      status: (\w+)
-    line: 'Interface {interface}, changed state to {status}'
+      oper_status: (\w+)
+    line: 'Interface {interface}, changed state to {oper_status}'
     model: openconfig-interfaces
     mapping:
       variables:
-        interfaces//interface//{interface}//state//oper_status: status
+        interfaces//interface//{interface}//state//oper_status: oper_status
       static: {}
