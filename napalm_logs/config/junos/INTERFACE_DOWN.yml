@@ -9,7 +9,7 @@ messages:
       adminStatusValue: (\d)
       operStatusString|upper: (\w+)
       operStatusValue: (\d)
-      interface: ([\w\-\/]+)
+      interface: ([\w\-\/\:]+)
     line: 'ifIndex {snmpID}, ifAdminStatus {adminStatusString}({adminStatusValue}), ifOperStatus {operStatusString}({operStatusValue}), ifName {interface}'
     model: openconfig-interfaces
     mapping:
