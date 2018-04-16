@@ -6,7 +6,7 @@ messages:
   - error: INTERFACE_MAC_LIMIT_REACHED
     tag: L2ALD_MAC_LIMIT_REACHED_IF
     values:
-      interface: ([\w\-\/\:]+)
+      interface: ([\w\-\/\:.]+)
       count: (\d+)
     line: 'Limit on learned MAC addresses reached for {interface}; current count is {count}'
     model: openconfig-interface
