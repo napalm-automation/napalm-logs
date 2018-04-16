@@ -355,7 +355,7 @@ class NapalmLogs:
            'values' not in value or\
            '__python_fun__' not in value:  # Check looks good when using a Python-defined profile.
             return
-        from_line = re.findall('\{(\w+)\}', config['line'])
+        from_line = re.findall(r'\{(\w+)\}', config['line'])
         if set(from_line) == set(config['values']):
             return
         if config.get('error'):
@@ -419,7 +419,7 @@ class NapalmLogs:
                 continue
             # Compare the valid opts with the conifg
             self._verify_config_dict(CONFIG.VALID_CONFIG, dev_config, dev_os)
-        log.debug('Read the config without error \o/')
+        log.debug('Read the config without error')
 
     def _build_config(self):
         '''
