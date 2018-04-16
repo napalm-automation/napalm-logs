@@ -1,0 +1,58 @@
+{
+    "host": "junos.test.env",
+    "yang_message": {
+        "network-instances": {
+            "network-instance": {
+                "global": {
+                    "protocols": {
+                        "protocol": {
+                            "isis": {
+                                "interfaces": {
+                                    "interface": {
+                                        "ge-0/0/1.0": {
+                                            "levels": {
+                                                "level": {
+                                                    "L2": {
+                                                        "adjacencies": {
+                                                            "adjacency": {
+                                                                "second.junos.device": {
+                                                                    "state": {
+                                                                        "adjacency-state": "UP"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "message_details": {
+        "processId": "1167",
+        "facility": 3,
+        "hostPrefix": null,
+        "pri": "30",
+        "processName": "rpd",
+        "host": "junos.test.env",
+        "tag": "RPD_ISIS_ADJUP",
+        "time": "13:34:56",
+        "date": "Mar 14",
+        "message": "IS-IS new L2 adjacency to second.junos.device on ge-0/0/1.0",
+        "severity": 6
+    },
+    "timestamp": 1521034496,
+    "error": "ISIS_NEIGHBOR_UP",
+    "ip": "192.168.18.1",
+    "facility": 3,
+    "os": "junos",
+    "yang_model": "openconfig-isis",
+    "severity": 6
+}
