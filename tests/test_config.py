@@ -139,12 +139,17 @@ def test_config(os_name, error_name, test_case):
     log.debug(raw_message)
     yang_message_filepath = os.path.join(test_path, 'yang.json')
     log.debug('Looking for %s', yang_message_filepath)
-    assert os.path.isfile(yang_message_filepath)
-    with open(yang_message_filepath, 'r') as yang_message_fh:
-        yang_message = yang_message_fh.read()
+    try:
+        with open(yang_message_filepath, 'r') as yang_message_fh:
+            yang_message = yang_message_fh.read()
+    except IOError:
+        yang_message = ''
     log.debug('Read YANG text:')
     log.debug(yang_message)
-    struct_yang_message = json.loads(yang_message)
+    if yang_message:
+        struct_yang_message = json.loads(yang_message)
+    else:
+        struct_yang_message = {}
     log.debug('Struct YANG message:')
     log.debug(struct_yang_message)
     log.debug('Sending the raw message to the napalm-logs daemon')
@@ -154,6 +159,11 @@ def test_config(os_name, error_name, test_case):
     log.debug('Received from the napalm-logs daemon:')
     log.debug(deserialised_zmq_msg)
     returned_yang = json.loads(json.dumps(deserialised_zmq_msg))
+    if not struct_yang_message:
+        # First run, the expected document is empty still empty, so we can
+        # provide the document napalm-logs expects (returns based on the raw
+        # syslog message)
+        assert False, json.dumps(deserialised_zmq_msg, indent=2)
     # Pop the timestamp from both as most syslog messages do not specify year
     # which means that once a year we will have to update all tests if we
     # check the timestamp.
