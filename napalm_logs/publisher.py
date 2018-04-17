@@ -76,7 +76,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         log.debug('Setting up the %s publisher subscriber #%d', self._transport_type, self.pub_id)
         self.sub = self.ctx.socket(zmq.SUB)
         self.sub.connect(PUB_IPC_URL)
-        self.sub.setsockopt(zmq.SUBSCRIBE, '')
+        self.sub.setsockopt(zmq.SUBSCRIBE, b'')
         try:
             self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
             # zmq 2

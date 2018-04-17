@@ -355,7 +355,7 @@ class NapalmLogs:
            'values' not in value or\
            '__python_fun__' not in value:  # Check looks good when using a Python-defined profile.
             return
-        from_line = re.findall('\{(\w+)\}', config['line'])
+        from_line = re.findall(r'\{(\w+)\}', config['line'])
         if set(from_line) == set(config['values']):
             return
         if config.get('error'):
@@ -419,7 +419,7 @@ class NapalmLogs:
                 continue
             # Compare the valid opts with the conifg
             self._verify_config_dict(CONFIG.VALID_CONFIG, dev_config, dev_os)
-        log.debug('Read the config without error \o/')
+        log.debug('Read the config without error')
 
     def _build_config(self):
         '''
@@ -567,7 +567,7 @@ class NapalmLogs:
         # publisher process start
         pub_id = 0
         for pub in self.publisher:
-            publisher_type, publisher_opts = pub.items()[0]
+            publisher_type, publisher_opts = list(pub.items())[0]
             proc = self._start_pub_proc(publisher_type,
                                         publisher_opts,
                                         pub_id)
@@ -592,7 +592,7 @@ class NapalmLogs:
         self._processes.append(self._start_srv_proc(started_os_proc))
         # start listener process
         for lst in self.listener:
-            listener_type, listener_opts = lst.items()[0]
+            listener_type, listener_opts = list(lst.items())[0]
             proc = self._start_lst_proc(listener_type,
                                         listener_opts)
             self._processes.append(proc)

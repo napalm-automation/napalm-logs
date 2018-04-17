@@ -1,6 +1,6 @@
 NAME := napalm_logs
 # This is the version of napalm-logs that will be installed
-VERSION := 0.3.0
+VERSION ?= $(shell cat ../VERSION)
 # This can be changed to build with different BUILD_REQS
 INTERATION := 0
 
@@ -9,6 +9,7 @@ INTERATION := 0
 ## make BUILD_REQS="kafka tornado" build
 
 IMAGE = $(NAME):$(VERSION)-${INTERATION}
+REPO ?= mirceaulinic/napalm-logs
 
 DOCKERFILE ?= Dockerfile
 DOCKER_BUILD_CONTEXT ?= .
@@ -16,6 +17,12 @@ DOCKER_BUILD_CONTEXT ?= .
 .PHONY: build
 build: clean
 	docker build -f $(DOCKERFILE) -t $(IMAGE) $(DOCKER_BUILD_CONTEXT) --build-arg requirements="${BUILD_REQS}" --build-arg version="${VERSION}"
+
+.PHONY: publish
+publish: build
+	docker tag $(IMAGE) $(REPO):$(VERSION)
+	echo "$(DOCKER_PASSWORD)" | docker login -u "$(DOCKER_USERNAME)" --password-stdin
+	docker push $(REPO):$(VERSION)
 
 PORTS:=$(shell grep port config.txt | sed 's/[^0-9]*//g') 
 PORT_MAP:=$(foreach port,$(PORTS),-p $(port):$(port)/udp -p $(port):$(port))

@@ -117,9 +117,9 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             for i, elem in enumerate(sorted(position.items())):
                 sorted_position[elem[1]] = i + 1
             # Escape the line, then remove the escape for the curly bracets so they can be used when formatting
-            escaped = re.escape(line).replace('\{', '{').replace('\}', '}')
+            escaped = re.escape(line).replace(r'\{', '{').replace(r'\}', '}')
             # Replace a whitespace with \s+
-            escaped = escaped.replace('\ ', '\s+')
+            escaped = escaped.replace(r'\ ', r'\s+')
             self.compiled_messages.append(
                 {
                     'error': error,
