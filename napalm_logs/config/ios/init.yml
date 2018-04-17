@@ -1,0 +1,25 @@
+
+#<189>521: router1: *Nov 14 08:30:56.699: %LINK-5-CHANGED: Interface GigabitEthernet2, changed state to administratively down
+# host logging-id needs to be enabled (highly recommended) on the ios-device for the profiles to work
+prefixes:
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      messageId: (\d+)
+      host: (\w+\d)
+      date: (\w+ \s?\d+)
+      time: (\d\d:\d\d:\d\d)
+      milliseconds: (\.\d\d\d)
+      tag: ([\w\d-]+)
+      # some messages contain a process number (eg. OSPF related messages)
+      processId: (\d+)
+    line: '{messageId}: {host}: *{date} {time}{milliseconds}: %{tag}: Process {processId}, '
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      messageId: (\d+)
+      host: (\w+\d)
+      date: (\w+ [\s]?\d+)
+      time: (\d\d:\d\d:\d\d)
+      milliseconds: (\.\d\d\d)
+      tag: ([\w\d-]+)
+    line: '{messageId}: {host}: *{date} {time}{milliseconds}: %{tag}: '
+

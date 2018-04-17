@@ -1,0 +1,60 @@
+{
+  "yang_message": {
+    "network-instances": {
+      "network-instance": {
+        "global": {
+          "protocols": {
+            "protocol": {
+              "ospf": {
+                "ospfv2": {
+                  "areas": {
+                    "area": {
+                      "area": {
+                        "interfaces": {
+                          "interface": {
+                            "GigabitEthernet2.45": {
+                              "neighbors": {
+                                "neighbor": {
+                                  "172.16.46.4": {
+                                    "state": {
+                                      "adjacency-state": "FULL"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "date": "Mar 15",
+    "time": "10:05:53",
+    "hostPrefix": null,
+    "host": "router1",
+    "processName": null,
+    "processId": "1",
+    "tag": "OSPF_ADJCHG",
+    "pri": "190",
+    "message": "<190>521: router1: *Mar 15 10:05:53.044: %OSPF-5-ADJCHG: Process 1, Nbr 172.16.46.4 on GigabitEthernet2.45 from LOADING to FULL, Loading Done",
+    "facility": 3,
+    "severity": 5
+  },
+  "yang_model": "openconfig-ospf",
+  "os": "ios",
+  "facility": 3,
+  "severity": 5,
+  "error": "OSPF_NEIGHBOR_UP",
+  "host": "router1",
+  "ip": "127.0.0.1",
+  "timestamp": 1521108353
+}

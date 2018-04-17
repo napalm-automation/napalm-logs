@@ -1,0 +1,1 @@
+<189>521: router1: *Nov 14 08:30:56.699: %LINK-5-CHANGED: Interface GigabitEthernet2, changed state to administratively down
