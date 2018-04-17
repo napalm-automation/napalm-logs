@@ -5,21 +5,20 @@ prefixes:
   - time_format: "%b %d %H:%M:%S"
     values:
       messageId: (\d+)
-      host: (\w+\d)
-      date: (\w+ \s?\d+)
+      host: ([^ ]+)
+      date: (\w+\s?\d+)
       time: (\d\d:\d\d:\d\d)
-      milliseconds: (\.\d\d\d)
-      tag: ([\w\d-]+)
+      milliseconds: (\d\d\d)
+      tag: ([\w-]+)
       # some messages contain a process number (eg. OSPF related messages)
       processId: (\d+)
-    line: '{messageId}: {host}: *{date} {time}{milliseconds}: %{tag}: Process {processId}, '
+    line: '{messageId}: {host}: *{date} {time}.{milliseconds}: %{tag}: Process {processId}, '
   - time_format: "%b %d %H:%M:%S"
     values:
       messageId: (\d+)
-      host: (\w+\d)
-      date: (\w+ [\s]?\d+)
+      host: ([^ ]+)
+      date: (\w+\s?\d+)
       time: (\d\d:\d\d:\d\d)
-      milliseconds: (\.\d\d\d)
-      tag: ([\w\d-]+)
-    line: '{messageId}: {host}: *{date} {time}{milliseconds}: %{tag}: '
-
+      milliseconds: (\d+)
+      tag: ([\w-]+)
+    line: '{messageId}: {host}: *{date} {time}.{milliseconds}: %{tag}: '

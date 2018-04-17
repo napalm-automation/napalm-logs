@@ -4,8 +4,8 @@ messages:
   - error: OSPF_NEIGHBOR_UP
     tag: OSPF-5-ADJCHG
     values:
-      neighbor: (\d+.\d+.\d+.\d+)
-      interface: (\w+[\.\-\d\/\w+]+)
+      neighbor: ([\w\d:\.]+)
+      interface: ([\w\d\.]+)
       initStatus: (\w+)
     line: 'Nbr {neighbor} on {interface} from {initStatus} to FULL, Loading Done'
     model: openconfig-ospf
