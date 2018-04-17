@@ -7,7 +7,7 @@ messages:
     tag: RPD_OSPF_NBRUP
     values:
       neighbor: ([\w\d:\.]+)
-      interface: ([\w\-\/\:]+)
+      interface: ([\w\-\/\:\.]+)
       area: (\d+\.\d+\.\d+\.\d+)
       reasonMessage: ([\w ]+)
     line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Init to ExStart due to 2WayRcvd (event reason: {reasonMessage})'
@@ -23,7 +23,7 @@ messages:
     tag: RPD_OSPF_NBRUP
     values:
       neighbor: ([\w\d:\.]+)
-      interface: ([\w\-\/\:]+)
+      interface: ([\w\-\/\:\.]+)
       area: (\d+\.\d+\.\d+\.\d+)
       reasonMessage: ([\w ]+)
     line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Init to 2Way due to 2WayRcvd (event reason: {reasonMessage})'
@@ -39,7 +39,7 @@ messages:
     tag: RPD_OSPF_NBRUP
     values:
       neighbor: ([\w\d:\.]+)
-      interface: ([\w\-\/\:]+)
+      interface: ([\w\-\/\:\.]+)
       area: (\d+\.\d+\.\d+\.\d+)
       reasonMessage: ([\w ]+)
     line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Exchange to Full due to ExchangeDone (event reason: {reasonMessage})'
@@ -55,7 +55,7 @@ messages:
     tag: RPD_OSPF_NBRUP
     values:
       neighbor: ([\w\d:\.]+)
-      interface: ([\w\-\/\:]+)
+      interface: ([\w\-\/\:\.]+)
       area: (\d+\.\d+\.\d+\.\d+)
       reasonMessage: ([\w ]+)
     line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Loading to Full due to LoadDone (event reason: {reasonMessage})'

@@ -50,7 +50,7 @@
     },
     "timestamp": 1521034496,
     "error": "ISIS_NEIGHBOR_UP",
-    "ip": "192.168.18.1",
+    "ip": "127.0.0.1",
     "facility": 3,
     "os": "junos",
     "yang_model": "openconfig-isis",

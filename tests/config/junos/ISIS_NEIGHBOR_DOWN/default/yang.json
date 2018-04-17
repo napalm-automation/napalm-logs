@@ -18,7 +18,7 @@
                                                                 "second.junos.device": {
                                                                     "state": {
                                                                         "adjacency-state": "DOWN",
-                                                                        "adjacency-state-change-reason-message": "Aged Out"
+                                                                        "adjacency-state-change-reason-message": "Aged Out: 1521033590.3"
                                                                     }
                                                                 }
                                                             }
@@ -46,7 +46,7 @@
         "tag": "RPD_ISIS_ADJDOWN",
         "time": "13:19:49",
         "date": "Mar 14",
-        "message": "IS-IS lost L2 adjacency to second.junos.device on ge-0/0/1.0, reason: Aged Out",
+        "message": "IS-IS lost L2 adjacency to second.junos.device on ge-0/0/1.0, reason: Aged Out: 1521033590.3",
         "severity": 5
     },
     "timestamp": 1521033589,

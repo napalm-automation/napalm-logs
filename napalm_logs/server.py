@@ -107,7 +107,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 # Add 'pri' and 'message' to the line, and values
                 line = '{{pri}}{}{{message}}'.format(line)
                 # PRI https://tools.ietf.org/html/rfc5424#section-6.2.1
-                values['pri'] = '\<(\d+)\>'
+                values['pri'] = r'\<(\d+)\>'
                 values['message'] = '(.*)'
                 # We will now figure out which position each value is in so we can use it with the match statement
                 position = {}
@@ -117,9 +117,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 for i, elem in enumerate(sorted(position.items())):
                     sorted_position[elem[1]] = i + 1
                 # Escape the line, then remove the escape for the curly bracets so they can be used when formatting
-                escaped = re.escape(line).replace('\{', '{').replace('\}', '}')
+                escaped = re.escape(line).replace(r'\{', '{').replace(r'\}', '}')
                 # Replace a whitespace with \s+
-                escaped = escaped.replace('\ ', '\s+')
+                escaped = escaped.replace(r'\ ', r'\s+')
                 self.compiled_prefixes[dev_os].append({
                     'prefix': re.compile(escaped.format(**values)),
                     'prefix_positions': sorted_position,

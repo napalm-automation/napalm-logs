@@ -7,7 +7,7 @@ messages:
     tag: RPD_OSPF_NBRDOWN
     values:
       neighbor: ([\w\d:\.]+)
-      interface: ([\w\-\/\:]+)
+      interface: ([\w\-\/\:\.]+)
       area: (\d+\.\d+\.\d+\.\d+)
       reasonMessage: ([\w ]+)
     line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Full to Down due to KillNbr (event reason: {reasonMessage})'
@@ -23,7 +23,7 @@ messages:
     tag: RPD_OSPF_NBRDOWN
     values:
       neighbor: ([\w\d:\.]+)
-      interface: ([\w\-\/\:]+)
+      interface: ([\w\-\/\:\.]+)
       area: (\d+\.\d+\.\d+\.\d+)
       reasonMessage: ([\w ]+)
     line: 'OSPF neighbor {neighbor} (realm ospf-v2 {interface} area {area}) state changed from Full to Down due to InActiveTimer (event reason: {reasonMessage})'
