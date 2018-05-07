@@ -13,3 +13,13 @@ messages:
         interfaces//interface//{interface}//state//change_reason: reason
       static:
         interfaces//interface//{interface}//state//admin_status: DOWN
+  - error: INTERFACE_DOWN
+    tag: ETH_PORT_CHANNEL-5-PORT_INDIVIDUAL_DOWN
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+    line: 'individual port {interface} is down'
+    model: openconfig-interfaces
+    mapping:
+      variables: {}
+      static:
+        interfaces//interface//{interface}//state//admin_status: DOWN
