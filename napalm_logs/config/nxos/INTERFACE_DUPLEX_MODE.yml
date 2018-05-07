@@ -1,0 +1,19 @@
+# This message type is received when there's a notification that the interface
+# changed the duplex mode, e.g.,
+#
+# .. code-block:: text
+#
+#   Interface Ethernet1/33, operational duplex mode changed to Full
+
+messages:
+  - error: INTERFACE_DUPLEX_MODE
+    tag: ETHPORT-5-IF_DUPLEX
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+      mode|upper: (\w+)
+    line: 'Interface {interface}, operational duplex mode changed to {mode}'
+    model: openconfig-interfaces
+    mapping:
+      variables:
+        interfaces//interface//{interface}//ethernet//state//duplex_mode: mode
+      static: {}
