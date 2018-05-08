@@ -1,0 +1,14 @@
+# Interface GigabitEthernet2, changed state to administratively down
+
+messages:
+  - error: INTERFACE_DOWN
+    tag: LINK-5-CHANGED
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+      adminStatus|upper: (\w+)
+    line: 'Interface {interface}, changed state to administratively {adminStatus}'
+    model: openconfig-interfaces
+    mapping:
+      variables:
+        interfaces//interface//{interface}//state//admin_status: adminStatus
+      static: {}

@@ -1,0 +1,15 @@
+#<190>521: router1: *Mar 15 10:05:53.044: %OSPF-5-ADJCHG: Process 1, Nbr 172.16.46.4 on GigabitEthernet2.45 from LOADING to FULL, Loading Done
+
+messages:
+  - error: OSPF_NEIGHBOR_UP
+    tag: OSPF-5-ADJCHG
+    values:
+      neighbor: ([\w\d:\.]+)
+      interface: ([\w\d\.]+)
+      initStatus: (\w+)
+    line: 'Nbr {neighbor} on {interface} from {initStatus} to FULL, Loading Done'
+    model: openconfig-ospf
+    mapping:
+      variables: {}
+      static:
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//area//interfaces//interface//{interface}//neighbors//neighbor//{neighbor}//state//adjacency-state: UP

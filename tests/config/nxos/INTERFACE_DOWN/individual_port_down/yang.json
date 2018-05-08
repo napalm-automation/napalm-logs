@@ -1,0 +1,31 @@
+{
+  "ip": "127.0.0.1",
+  "message_details": {
+    "message": "individual port Ethernet1/33 is down",
+    "time": "13:15:07",
+    "date": "2018 Apr 20",
+    "facility": 23,
+    "severity": 6,
+    "tag": "ETH_PORT_CHANNEL-5-PORT_INDIVIDUAL_DOWN",
+    "pri": "190",
+    "host": "nexus-switch"
+  },
+  "error": "INTERFACE_DOWN",
+  "yang_model": "openconfig-interfaces",
+  "facility": 23,
+  "severity": 6,
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "Ethernet1/33": {
+          "state": {
+            "admin_status": "DOWN"
+          }
+        }
+      }
+    }
+  },
+  "host": "nexus-switch",
+  "timestamp": 1524230107,
+  "os": "nxos"
+}

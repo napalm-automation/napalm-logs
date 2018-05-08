@@ -1,0 +1,35 @@
+.. _release-0.5.0:
+
+==================================
+Release 0.5.0 - Codename Drawknife
+==================================
+
+Cisco IOS Support
+-----------------
+
+Initial support for Cisco IOS has been added thanks to Nico Vinzens 
+(@nvinzens), providing notifications for :ref:`INTERFACE_DOWN`, 
+:ref:`OSPF_NEIGHBOR_UP`, and :ref:`OSPF_NEIGHBOR_DOWN`. We welcome your Pull
+Requests to extend this list!
+
+``napalm-logs`` Docker Image
+----------------------------
+
+The initial public version has been provided by Nathan Catania 
+(@nathancatania). Starting with this release, whenever we publish a new 
+``napalm-logs`` version, there will also be a new Docker image pushed to the 
+Docker hub. The image can be pulled from `<https://hub.docker.com/r/mirceaulinic/napalm-logs/>`_,
+e.g., ``docker pull mirceaulinic/napalm-logs:0.5.0``.
+
+New Structured Messages
+-----------------------
+
+- :ref:`INTERFACE_DUPLEX_MODE`, currently available only for ``nxos``.
+
+The following messages were already defined, now extending the list of 
+supported platforms:
+
+- :ref:`INTERFACE_DOWN` added for ``ios`` and ``nxos``.
+- :ref:`INTERFACE_UP` added for ``nxos``.
+- :ref:`OSPF_NEIGHBOR_UP` and :ref:`OSPF_NEIGHBOR_DOWN` added for ``ios``.
+- :ref:`ISIS_NEIGHBOR_DOWN` and :ref:`ISIS_NEIGHBOR_UP` defined for ``junos``.
