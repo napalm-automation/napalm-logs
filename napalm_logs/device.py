@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 # Import thrid party libs
 import zmq
 import umsgpack
+from prometheus_client import Counter
 
 # Import napalm-logs pkgs
 import napalm_logs.utils
@@ -227,6 +228,28 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         '''
         Start the worker process.
         '''
+        # metrics
+        napalm_logs_device_messages_received = Counter(
+            'napalm_logs_device_messages_received',
+            "Count of messages received by the device process",
+            ['device_os']
+        )
+        napalm_logs_device_raw_published_messages = Counter(
+            'napalm_logs_device_raw_published_messages',
+            "Count of raw type published messages",
+            ['device_os']
+        )
+        napalm_logs_device_published_messages = Counter(
+            'napalm_logs_device_published_messages',
+            "Count of published messages",
+            ['device_os']
+        )
+        napalm_logs_device_oc_object_failed = Counter(
+            'napalm_logs_device_oc_object_failed',
+            "Counter of failed OpenConfig object generations",
+            ['device_os']
+        )
+
         self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
@@ -246,6 +269,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 else:
                     raise NapalmLogsExit(error)
             log.debug('%s: dequeued %s, received from %s', self._name, msg_dict, address)
+            napalm_logs_device_messages_received.labels(device_os=self._name).inc()
             host = msg_dict.get('host')
             prefix_id = msg_dict.pop('__prefix_id__')
             if 'timestamp' in msg_dict:
@@ -277,6 +301,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 log.debug(to_publish)
                 # self.pub_pipe.send(to_publish)
                 self.pub.send(umsgpack.packb(to_publish))
+                napalm_logs_device_raw_published_messages.labels(device_os=self._name).inc()
                 continue
             try:
                 if '__python_fun__' in kwargs:
@@ -286,6 +311,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     yang_obj = self._emit(**kwargs)
             except Exception:
                 log.exception('Unexpected error when generating the OC object.', exc_info=True)
+                napalm_logs_device_oc_object_failed.labels(device_os=self._name).inc()
                 continue
             log.debug('Generated OC object:')
             log.debug(yang_obj)
@@ -308,6 +334,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             # self.pub_pipe.send(to_publish)
             self.pub.send(umsgpack.packb(to_publish))
             # self._publish(to_publish)
+            napalm_logs_device_published_messages.labels(device_os=self._name).inc()
 
     def stop(self):
         '''

@@ -15,6 +15,7 @@ import threading
 # Import third party libs
 import zmq
 import umsgpack
+from prometheus_client import Counter
 
 # Import napalm-logs pkgs
 import napalm_logs.ext.six as six
@@ -188,6 +189,34 @@ class NapalmLogsServerProc(NapalmLogsProc):
         inspect and identify the operating system,
         then queue the message correspondingly.
         '''
+        # metric counters
+        napalm_logs_server_messages_received = Counter(
+            "napalm_logs_server_messages_received",
+            "Count of messages received from listener processes"
+        )
+        napalm_logs_server_messages_with_identified_os = Counter(
+            "napalm_logs_server_messages_with_identified_os",
+            "Count of messages with positive os identification",
+            ['device_os']
+        )
+        napalm_logs_server_messages_without_identified_os = Counter(
+            "napalm_logs_server_messages_without_identified_os",
+            "Count of messages with negative os identification"
+        )
+        napalm_logs_server_messages_failed_device_queuing = Counter(
+            "napalm_logs_server_messages_failed_device_queuing",
+            "Count of messages per device os that fail to be queued to a device process",
+            ['device_os']
+        )
+        napalm_logs_server_messages_device_queued = Counter(
+            "napalm_logs_server_messages_device_queued",
+            "Count of messages queued to device processes",
+            ['device_os']
+        )
+        napalm_logs_server_messages_as_is_queued = Counter(
+            "napalm_logs_server_messages_as_is_queued",
+            "Count of messages queued as is"
+        )
         self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
@@ -211,7 +240,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
             else:
                 msg = msg.encode('utf-8')
             log.debug('[%s] Dequeued message from %s: %s', address, msg, time.time())
+            napalm_logs_server_messages_received.inc()
             dev_os, msg_dict = self._identify_os(msg)
+
             if dev_os and dev_os in self.started_os_proc:
                 # Identified the OS and the corresponding process is started.
                 # Then send the message in the right queue
@@ -222,9 +253,15 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 self.pub.send_multipart([dev_os,
                                          umsgpack.packb((msg_dict, address))])
                 # self.os_pipes[dev_os].send((msg_dict, address))
+                napalm_logs_server_messages_with_identified_os.labels(device_os=dev_os).inc()
+                napalm_logs_server_messages_device_queued.labels(device_os=dev_os).inc()
+
             elif dev_os and dev_os not in self.started_os_proc:
                 # Identified the OS, but the corresponding process does not seem to be started.
                 log.info('Unable to queue the message to %s. Is the sub-process started?', dev_os)
+                napalm_logs_server_messages_with_identified_os.labels(device_os=dev_os).inc()
+                napalm_logs_server_messages_failed_device_queuing.labels(device_os=dev_os).inc()
+
             elif not dev_os and self.opts['_server_send_unknown']:
                 # OS not identified, but the user requested to publish the message as-is
                 log.debug('Unable to identify the OS, sending directly to the publishers')
@@ -238,6 +275,13 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     'model_name': 'unknown'
                 }
                 self.publisher_pub.send(umsgpack.packb(to_publish))
+                napalm_logs_server_messages_as_is_queued.inc()
+                napalm_logs_server_messages_without_identified_os.inc()
+
+            elif not dev_os and not self.opts['_server_send_unknown']:
+                # OS not identified and we are told to do nothing
+                log.debug('Unable to identify the OS')
+                napalm_logs_server_messages_without_identified_os.inc()
 
     def stop(self):
         log.info('Stopping server process')
