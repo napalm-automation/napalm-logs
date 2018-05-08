@@ -30,3 +30,4 @@ script:
 - tox
 after_success:
 - coveralls
+- if [ $TRAVIS_TAG ]; then curl -X POST https://readthedocs.org/build/napalm-logs; fi
