@@ -305,6 +305,7 @@ daemon):
    :maxdepth: 1
 
    installation/index
+   docker/index
    device_config/index
    options/index
    clients/index
