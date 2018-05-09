@@ -213,9 +213,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
             "Count of messages queued to device processes",
             ['device_os']
         )
-        napalm_logs_server_messages_as_is_queued = Counter(
-            "napalm_logs_server_messages_as_is_queued",
-            "Count of messages queued as is"
+        napalm_logs_server_messages_unknown_queued = Counter(
+            "napalm_logs_server_messages_unknown_queued",
+            "Count of messages queued as unknown"
         )
         self._setup_ipc()
         # Start suicide polling thread
@@ -275,7 +275,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     'model_name': 'unknown'
                 }
                 self.publisher_pub.send(umsgpack.packb(to_publish))
-                napalm_logs_server_messages_as_is_queued.inc()
+                napalm_logs_server_messages_unknown_queued.inc()
                 napalm_logs_server_messages_without_identified_os.inc()
 
             elif not dev_os and not self.opts['_server_send_unknown']:

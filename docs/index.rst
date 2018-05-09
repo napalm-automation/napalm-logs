@@ -309,6 +309,7 @@ daemon):
    options/index
    clients/index
    messages/index
+   metrics/index
    authentication/index
    listener/index
    publisher/index

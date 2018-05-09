@@ -160,6 +160,11 @@ class NLOptionParser(OptionParser, object):
             help=('Prometheus metrics HTTP server listener bind port. Default: {0}'.format(defaults.METRICS_PORT))
         )
         self.add_option(
+            '--metrics-dir',
+            dest='metrics_dir',
+            help=('Directory to store metrics in. Must be writable by the processes. Default: {0}'.format(defaults.METRICS_DIR))
+        )
+        self.add_option(
             '--certificate',
             dest='certificate',
             help=('Absolute path to the SSL certificate used for client authentication.')
@@ -349,6 +354,8 @@ class NLOptionParser(OptionParser, object):
                                defaults.METRICS_ADDRESS,
             'metrics_port': self.options.metrics_port or file_cfg.get('metrics_port') or
                                defaults.METRICS_PORT,
+            'metrics_dir': self.options.metrics_dir or file_cfg.get('metrics_dir') or
+                               defaults.METRICS_DIR,
             'certificate': cert,
             'keyfile': self.options.keyfile or file_cfg.get('keyfile'),
             'disable_security': disable_security,

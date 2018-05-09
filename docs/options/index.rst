@@ -127,7 +127,7 @@ Configuration file example:
 The port to listen on for incoming metrics requests. This is the port that
 the Prometheus HTTP server exposes metrics from.
 
-Default: ``9215``
+Default: ``9443``
 
 CLI usgae example:
 
@@ -140,6 +140,26 @@ Configuration file example:
 .. code-block:: yaml
 
   metrics_port: 2022
+
+``metrics-dir``
+-------------
+
+The directory used by the processes for metrics collection. This directory must
+be writable. If the directory does not exist, we attempt to create it.
+
+Default: ``/tmp/napalm_logs_metrics``
+
+CLI usgae example:
+
+.. code-block:: bash
+
+  $ napalm-logs --metrics-dir /tmp/a_new_dir_for_metrics
+
+Configuration file example:
+
+.. code-block:: yaml
+
+  metrics_dir: /tmp/a_new_dir_for_metrics
 
 .. _configuration-options-certificate:
 
