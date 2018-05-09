@@ -21,7 +21,7 @@ import nacl.utils
 import nacl.secret
 import nacl.signing
 import nacl.encoding
-from prometheus_client import start_http_server, CollectorRegistry, multiprocess
+from prometheus_client import start_http_server, CollectorRegistry, multiprocess, core
 
 # Import napalm-logs pkgs
 import napalm_logs.utils
@@ -130,26 +130,26 @@ class NapalmLogs:
         """
         Start metric exposition
         """
-        if self.metrics_enabled:
+        path = os.environ.get("prometheus_multiproc_dir")
+        if not os.path.exists(self.metrics_dir):
+            try:
+                log.info("Creating metrics directory")
+                os.makedirs(self.metrics_dir)
+            except OSError:
+                log.error("Failed to create metrics directory!")
+                raise ConfigurationException("Failed to create metrics directory!")
+            path = self.metrics_dir
+        elif path != self.metrics_dir:
+            path = self.metrics_dir
+        os.environ['prometheus_multiproc_dir'] = path
+        log.info("Cleaning metrics collection directory")
+        log.debug("Metrics directory set to: {}".format(path))
+        files = os.listdir(path)
+        for f in files:
+            if f.endswith(".db"):
+                os.remove(os.path.join(path, f))
             log.debug("Starting metrics exposition")
-            path = os.environ.get("prometheus_multiproc_dir")
-            if not os.path.exists(self.metrics_dir):
-                try:
-                    log.info("Creating metrics directory")
-                    os.makedirs(self.metrics_dir)
-                except OSError:
-                    log.error("Failed to create metrics directory!")
-                    raise ConfigurationException("Failed to create metrics directory!")
-                path = self.metrics_dir
-            elif path != self.metrics_dir:
-                path = self.metrics_dir
-            os.environ['prometheus_multiproc_dir'] = path
-            log.info("Cleaning metrics collection directory")
-            log.debug("Metrics directory set to: {}".format(path))
-            files = os.listdir(path)
-            for f in files:
-                if f.endswith(".db"):
-                    os.remove(os.path.join(path, f))
+        if self.metrics_enabled:
             registry = CollectorRegistry()
             multiprocess.MultiProcessCollector(registry)
             start_http_server(

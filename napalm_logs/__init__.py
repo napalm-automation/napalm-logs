@@ -16,7 +16,7 @@ import os
 os.environ['prometheus_multiproc_dir'] = "/tmp/napalm_logs_metrics"
 
 # Import napalm-logs pkgs
-from napalm_logs.base import NapalmLogs
+from napalm_logs.base import NapalmLogs  # noqa: E402
 
 try:
     __version__ = pkg_resources.get_distribution('napalm-logs').version

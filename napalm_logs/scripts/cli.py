@@ -162,7 +162,8 @@ class NLOptionParser(OptionParser, object):
         self.add_option(
             '--metrics-dir',
             dest='metrics_dir',
-            help=('Directory to store metrics in. Must be writable by the processes. Default: {0}'.format(defaults.METRICS_DIR))
+            help=('Directory to store metrics in. Must be writable by the processes. '
+                  'Default: {0}'.format(defaults.METRICS_DIR))
         )
         self.add_option(
             '--certificate',
