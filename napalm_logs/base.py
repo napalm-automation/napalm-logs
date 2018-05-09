@@ -21,7 +21,7 @@ import nacl.utils
 import nacl.secret
 import nacl.signing
 import nacl.encoding
-from prometheus_client import start_http_server, CollectorRegistry, multiprocess, core
+from prometheus_client import start_http_server, CollectorRegistry, multiprocess
 
 # Import napalm-logs pkgs
 import napalm_logs.utils
@@ -52,7 +52,7 @@ class NapalmLogs:
                  metrics_enabled=False,
                  metrics_address='0.0.0.0',
                  metrics_port='9215',
-                 metrics_dir=None,
+                 metrics_dir='/tmp/napalm_logs_metrics',
                  certificate=None,
                  keyfile=None,
                  disable_security=False,
