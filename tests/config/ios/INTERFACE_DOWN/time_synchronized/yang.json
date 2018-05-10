@@ -1,0 +1,33 @@
+{
+	"yang_message": {
+		"interfaces": {
+			"interface": {
+				"GigabitEthernet2": {
+					"state": {
+						"admin_status": "DOWN"
+					}
+				}
+			}
+		}
+	},
+	"message_details": {
+		"facility": 23,
+		"time": "08:30:56",
+		"pri": "189",
+		"host": "router1",
+		"tag": "LINK-5-CHANGED",
+		"messageId": "521",
+		"date": "Nov 14",
+		"message": "Interface GigabitEthernet2, changed state to administratively down",
+		"milliseconds": "699",
+		"severity": 5
+	},
+	"host": "router1",
+	"timestamp": 1510648256,
+	"error": "INTERFACE_DOWN",
+	"ip": "127.0.0.1",
+	"facility": 23,
+	"os": "ios",
+	"yang_model": "openconfig-interfaces",
+	"severity": 5
+}
