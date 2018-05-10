@@ -6,7 +6,7 @@ prefixes:
     values:
       messageId: (\d+)
       host: ([^ ]+)
-      date: \*?(\w+\s*\d+)
+      date: \*?(\w+\s+\d+)
       time: (\d\d:\d\d:\d\d)
       milliseconds: (\d\d\d)
       tag: ([\w-]+)
@@ -17,7 +17,7 @@ prefixes:
     values:
       messageId: (\d+)
       host: ([^ ]+)
-      date: \*?(\w+\s*\d+)
+      date: \*?(\w+\s+\d+)
       time: (\d\d:\d\d:\d\d)
       milliseconds: (\d+)
       tag: ([\w-]+)
