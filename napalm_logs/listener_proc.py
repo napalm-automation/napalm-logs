@@ -52,6 +52,8 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         Setup the transport.
         '''
         listener_class = get_listener(self._listener_type)
+        self.address = self.listener_opts.pop('address', self.address)
+        self.port = self.listener_opts.pop('port', self.port)
         self.listener = listener_class(self.address,
                                        self.port,
                                        **self.listener_opts)
