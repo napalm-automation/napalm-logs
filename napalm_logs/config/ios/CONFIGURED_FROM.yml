@@ -1,0 +1,15 @@
+# <189>24: test-ztp: May 23 2018 12:09:09 MEST: %SYS-5-CONFIG_I: Configured from tftp://10.83.21.224//cisco-bootstrap by console
+# <189>28: test-ztp: May 23 2018 10:19:33 MEST: %SYS-5-CONFIG_I: Configured from console by admin on vty0 (10.31.0.24)
+
+messages:
+  - error: CONFIGURED_FROM
+    tag: SYS-5-CONFIG_I
+    values:
+      configured_from: (\w+[\W\w]+)
+      configured_by: (\w+[\s\.\(\)\d\w]+)
+    line: 'Configured from {configured_from} by {configured_by}'
+    model: NO_MODEL
+    mapping:
+      variables:
+        system//logging//console//config//from: configured_from
+        system//logging//console//config//by: configured_by
