@@ -1,6 +1,5 @@
-# <189>24: test-ztp: May 23 2018 12:09:09 MEST: %SYS-5-CONFIG_I: Configured from tftp://10.83.21.224//cisco-bootstrap by console
-# <189>28: test-ztp: May 23 2018 10:19:33 MEST: %SYS-5-CONFIG_I: Configured from console by admin on vty0 (10.31.0.24)
-
+# <189>24: test-ztp: May 23 15:49:32.302: %SYS-5-CONFIG_I: Configured from tftp://10.83.21.224//cisco-bootstrap by console
+# <189>30: test-ztp: May 23 13:56:15.055: %SYS-5-CONFIG_I: Configured from console by admin on vty0 (10.31.0.24)
 messages:
   - error: CONFIGURED_FROM
     tag: SYS-5-CONFIG_I
