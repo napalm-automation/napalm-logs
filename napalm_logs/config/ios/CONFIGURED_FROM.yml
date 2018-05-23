@@ -4,11 +4,12 @@ messages:
   - error: CONFIGURED_FROM
     tag: SYS-5-CONFIG_I
     values:
-      configured_from: (\w+[\W\w]+)
-      configured_by: (\w+[\s\.\(\)\d\w]+)
-    line: 'Configured from {configured_from} by {configured_by}'
+      configuredfrom: (\w+[\W\w]+)
+      configuredby: (\w+[\s\.\(\)\d\w]+)
+    line: 'Configured from {configuredfrom} by {configuredby}'
     model: NO_MODEL
     mapping:
       variables:
-        system//logging//console//config//from: configured_from
-        system//logging//console//config//by: configured_by
+        system//logging//console//config//from: configuredfrom
+        system//logging//console//config//by: configuredby
+      static: {}
