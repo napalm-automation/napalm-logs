@@ -12,7 +12,7 @@ import logging
 try:
     import kafka
     HAS_KAFKA = True
-except ImportError as err:
+except ImportError:
     HAS_KAFKA = False
 
 # Import napalm-logs pkgs
