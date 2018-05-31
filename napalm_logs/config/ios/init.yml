@@ -9,10 +9,11 @@ prefixes:
       date: \*?(\w+\s+\d+)
       time: (\d\d:\d\d:\d\d)
       milliseconds: (\d\d\d)
+      timeZone: \s?(\w+)?
       tag: ([\w-]+)
       # some messages contain a process number (eg. OSPF related messages)
       processId: (\d+)
-    line: '{messageId}: {host}: {date} {time}.{milliseconds}: %{tag}: Process {processId}, '
+    line: '{messageId}: {host}: {date} {time}.{milliseconds}{timeZone}: %{tag}: Process {processId}, '
   - time_format: "%b %d %H:%M:%S"
     values:
       messageId: (\d+)
@@ -20,5 +21,6 @@ prefixes:
       date: \*?(\w+\s+\d+)
       time: (\d\d:\d\d:\d\d)
       milliseconds: (\d+)
+      timeZone: \s?(\w+)?
       tag: ([\w-]+)
-    line: '{messageId}: {host}: {date} {time}.{milliseconds}: %{tag}: '
+    line: '{messageId}: {host}: {date} {time}.{milliseconds}{timeZone}: %{tag}: '
