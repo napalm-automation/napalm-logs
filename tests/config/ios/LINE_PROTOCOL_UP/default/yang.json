@@ -1,0 +1,33 @@
+{
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "FastEthernet0/2": {
+          "state": {
+            "oper_status": "UP"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 5,
+    "facility": 23,
+    "messageId": "1440",
+    "pri": "189",
+    "host": "test-switch1",
+    "tag": "LINEPROTO-5-UPDOWN",
+    "time": "13:35:45",
+    "date": "Jun  1",
+    "message": "Line protocol on Interface FastEthernet0/2, changed state to up",
+    "milliseconds": "562"
+  },
+  "facility": 23,
+  "ip": "127.0.0.1",
+  "error": "INTERFACE_UP",
+  "host": "test-switch1",
+  "yang_model": "openconfig-interfaces",
+  "timestamp": 1527860145,
+  "os": "ios",
+  "severity": 5
+}
