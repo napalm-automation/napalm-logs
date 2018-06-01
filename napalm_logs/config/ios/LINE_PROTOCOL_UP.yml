@@ -1,14 +1,12 @@
-# Interface GigabitEthernet2, changed state to administratively down
-
+# Line protocol on Interface FastEthernet0/2, changed state to up
 messages:
   - error: INTERFACE_UP
     tag: LINEPROTO-5-UPDOWN
     values:
       interface: (\w+[\.\-\d\/\w+]+)
-      adminStatus|upper: (\w+)
     line: 'Line protocol on Interface {interface}, changed state to up'
     model: openconfig-interfaces
     mapping:
-      variables: {}
       static:
         interfaces//interface//{interface}//state//oper_status: UP
+      variables: {}
