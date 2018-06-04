@@ -1,7 +1,7 @@
 # Interface GigabitEthernet2, changed state to administratively down
 
 messages:
-  - error: INTERFACE_DOWN
+  - error: INTERFACE_ADMIN_DOWN
     tag: LINK-5-CHANGED
     values:
       interface: (\w+[\.\-\d\/\w+]+)

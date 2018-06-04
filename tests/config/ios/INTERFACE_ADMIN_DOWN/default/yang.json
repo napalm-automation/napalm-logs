@@ -27,7 +27,7 @@
   "ip": "127.0.0.1",
   "host": "router1",
   "yang_model": "openconfig-interfaces",
-  "error": "INTERFACE_DOWN",
+  "error": "INTERFACE_ADMIN_DOWN",
   "os": "ios",
   "severity": 5
 }

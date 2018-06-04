@@ -24,7 +24,7 @@
   },
   "facility": 23,
   "ip": "127.0.0.1",
-  "error": "INTERFACE_DOWN",
+  "error": "INTERFACE_ADMIN_DOWN",
   "host": "NetAuto_CSRv-03",
   "yang_model": "openconfig-interfaces",
   "timestamp": 1525870167,
