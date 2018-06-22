@@ -17,6 +17,7 @@
     "host": "router1",
     "tag": "LINK-5-CHANGED",
     "time": "08:30:56",
+    "timeZone": null,
     "date": "Nov 14",
     "messageId": "521",
     "milliseconds": "699",

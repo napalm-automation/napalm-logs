@@ -13,22 +13,22 @@
   "message_details": {
     "severity": 5,
     "facility": 23,
-    "messageId": "117",
+    "time": "15:25:53",
     "pri": "189",
     "host": "NetAuto_CSRv-03",
     "tag": "LINK-5-CHANGED",
-    "time": "12:49:27",
-    "timeZone": null,
-    "date": "May  9",
-    "message": "Interface GigabitEthernet2, changed state to administratively down",
-    "milliseconds": "098"
+    "messageId": "1179",
+    "date": "May 31",
+    "timeZone": "MEST",
+    "message": "Interface GigabitEthernet2, changed state to administratively down from 10.83.75.201",
+    "milliseconds": "743"
   },
   "facility": 23,
   "ip": "127.0.0.1",
   "error": "INTERFACE_DOWN",
   "host": "NetAuto_CSRv-03",
   "yang_model": "openconfig-interfaces",
-  "timestamp": 1525870167,
+  "timestamp": 1527780353,
   "os": "ios",
   "severity": 5
 }
