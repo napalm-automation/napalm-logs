@@ -18,6 +18,7 @@
     "host": "NetAuto_CSRv-03",
     "tag": "LINK-5-CHANGED",
     "time": "12:49:27",
+    "timeZone": null,
     "date": "May  9",
     "message": "Interface GigabitEthernet2, changed state to administratively down",
     "milliseconds": "098"

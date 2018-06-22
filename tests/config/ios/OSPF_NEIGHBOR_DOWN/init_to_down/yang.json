@@ -41,6 +41,7 @@
   "message_details": {
     "date": "Mar 15",
     "time": "10:05:53",
+    "timeZone": null,
     "host": "router1",
     "processId": "1",
     "tag": "OSPF-5-ADJCHG",

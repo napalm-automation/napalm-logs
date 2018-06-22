@@ -20,6 +20,7 @@
     "host": "test-ztp",
     "tag": "SYS-5-CONFIG_I",
     "time": "13:56:15",
+    "timeZone": null,
     "date": "May 23",
     "message": "Configured from console by admin on vty0 (10.31.0.24)",
     "milliseconds": "055"
