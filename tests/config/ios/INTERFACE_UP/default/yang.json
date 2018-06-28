@@ -18,6 +18,7 @@
     "host": "test-switch1",
     "tag": "LINEPROTO-5-UPDOWN",
     "time": "13:35:45",
+    "timeZone": null,
     "date": "Jun  1",
     "message": "Line protocol on Interface FastEthernet0/2, changed state to up",
     "milliseconds": "562"

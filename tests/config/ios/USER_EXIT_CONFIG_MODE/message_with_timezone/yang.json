@@ -4,7 +4,7 @@
       "user": {
         "admin": {
           "action": {
-            "vty": "vty0 (10.31.0.24)",
+            "vty": "console",
             "exit_config_mode": true,
             "from": "console"
           }
@@ -15,22 +15,22 @@
   "message_details": {
     "severity": 5,
     "facility": 23,
-    "messageId": "30",
+    "time": "15:54:54",
     "pri": "189",
     "host": "test-ztp",
     "tag": "SYS-5-CONFIG_I",
-    "time": "13:56:15",
-    "timeZone": null,
-    "date": "May 23",
-    "message": "Configured from console by admin on vty0 (10.31.0.24)",
-    "milliseconds": "055"
+    "messageId": "27",
+    "date": "May 31",
+    "timeZone": "MEST",
+    "message": "Configured from console by admin on console",
+    "milliseconds": "567"
   },
   "facility": 23,
   "ip": "127.0.0.1",
   "error": "USER_EXIT_CONFIG_MODE",
   "host": "test-ztp",
   "yang_model": "NO_MODEL",
-  "timestamp": 1527083775,
+  "timestamp": 1527782094,
   "os": "ios",
   "severity": 5
 }

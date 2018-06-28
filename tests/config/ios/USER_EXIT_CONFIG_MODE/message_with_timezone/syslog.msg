@@ -1,0 +1,1 @@
+<189>27: test-ztp: May 31 15:54:54.567 MEST: %SYS-5-CONFIG_I: Configured from console by admin on console
