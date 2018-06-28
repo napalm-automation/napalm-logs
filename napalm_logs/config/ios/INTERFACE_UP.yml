@@ -1,0 +1,12 @@
+# Line protocol on Interface FastEthernet0/2, changed state to up
+messages:
+  - error: INTERFACE_UP
+    tag: LINEPROTO-5-UPDOWN
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+    line: 'Line protocol on Interface {interface}, changed state to up'
+    model: openconfig-interfaces
+    mapping:
+      static:
+        interfaces//interface//{interface}//state//oper_status: UP
+      variables: {}
