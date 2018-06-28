@@ -1,1 +1,1 @@
-<189>1432: test-switch1: Jun  1 12:50:26.172: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/2, changed state to down
+<189>521: router1: *Nov 14 08:30:56.699: %LINK-5-CHANGED: Interface GigabitEthernet2, changed state to administratively down
