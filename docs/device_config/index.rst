@@ -30,6 +30,6 @@ partially parsed messages), but this behaviour is disabled by default.
 To allow publishing messages from operating systems that are not supported yet
 by napalm-logs (but they will not be parsed at all), you can configure the
 :ref:`publisher-opts-send-unknown` option on the publisher (i.e.,
-``send_unknow: true``). To publish partially parsed messages from supported
+``send_unknown: true``). To publish partially parsed messages from supported
 operating systems, but without a mapping for a certain class of messages, you
 can use the :ref:`publisher-opts-send-raw` option.
