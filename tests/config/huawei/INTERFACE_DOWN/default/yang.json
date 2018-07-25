@@ -1,0 +1,34 @@
+{
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "Ethernet0/0/8": {
+          "state": {
+            "oper_status": "DOWN"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "facility": 3,
+    "severity": 5,
+    "otherThings": "(l)",
+    "pri": "29",
+    "messageId": "4997",
+    "host": "my-awesome-huawei-switch",
+    "tag": "01IFNET/4/IF_STATE",
+    "time": "01:00:34",
+    "date": "2018-7-23",
+    "message": "Interface Ethernet0/0/8 has turned into DOWN state.",
+    "milliseconds": "270"
+  },
+  "ip": "127.0.0.1",
+  "error": "INTERFACE_DOWN",
+  "host": "my-awesome-huawei-switch",
+  "yang_model": "openconfig-interfaces",
+  "timestamp": 1532300434,
+  "os": "huawei",
+  "facility": 3,
+  "severity": 5
+}
