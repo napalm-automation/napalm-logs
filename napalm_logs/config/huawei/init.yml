@@ -14,6 +14,6 @@ prefixes:
       milliseconds: (\d{3})
       host: ([^ ]+)
       tag: (\w+\/\w+\/\w+)
-      otherThings: (\(\w+\))
+      informationType: (\(\w+\))
       messageId: \[(\d+)\]
-    line: '{date} {time}.{milliseconds}.1 {host} %%{tag}{otherThings}{messageId}:'
+    line: '{date} {time}.{milliseconds}.1 {host} %%{tag}{informationType}{messageId}:'
