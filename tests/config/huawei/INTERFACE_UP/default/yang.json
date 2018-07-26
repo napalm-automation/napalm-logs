@@ -13,7 +13,7 @@
   "message_details": {
     "facility": 3,
     "severity": 5,
-    "otherThings": "(l)",
+    "informationType": "(l)",
     "pri": "29",
     "messageId": "4997",
     "host": "my-awesome-huawei-switch",
