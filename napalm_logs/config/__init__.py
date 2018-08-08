@@ -99,6 +99,7 @@ VALID_CONFIG = {
 
 # listener
 BUFFER_SIZE = 1024
+REUSE_PORT = False
 TIMEOUT = 60
 
 # device
