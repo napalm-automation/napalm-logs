@@ -83,3 +83,9 @@ MSG
 ---
 
 The MSG part contains the text of the message itself.
+
+Date and Time Notes
+-------------------
+
+Most syslog messages do not incude the year in the message timestamp. Napalm-logs overcomes this by appending the year from the server. While rare, it is possible to form an invalid date when the device
+emitting the syslog has an incorrect local time set (e.g. February 29, 2018 where 2018 is not a leap year). In such cases, Napalm-logs falls back to using the date and time of the server.

@@ -216,12 +216,26 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             parsed_time = datetime.strptime('{} {}'.format(date, time), time_format)
         else:
             year = datetime.now().year
-            parsed_time = datetime.strptime('{} {} {}'.format(year, date, time), '%Y {}'.format(time_format))
-            # If the timestamp is in the future then it is likely that the year
-            # is wrong. We subtract 1 day from the parsed time to eleminate any
-            # difference between clocks.
-            if parsed_time - timedelta(days=1) > datetime.now():
-                parsed_time = datetime.strptime('{} {} {}'.format(year - 1, date, time), '%Y {}'.format(time_format))
+            try:
+                parsed_time = datetime.strptime('{} {} {}'.format(year, date, time), '%Y {}'.format(time_format))
+                # If the timestamp is in the future then it is likely that the year
+                # is wrong. We subtract 1 day from the parsed time to eleminate any
+                # difference between clocks.
+                if parsed_time - timedelta(days=1) > datetime.now():
+                    parsed_time = datetime.strptime(
+                        '{} {} {}'.format(year - 1, date, time),
+                        '%Y {}'.format(time_format)
+                    )
+            except ValueError:
+                # It is rare but by appending the year from the server, we could produce
+                # an invalid date such as February 29, 2018 (2018 is not a leap year). This
+                # is caused by the device emitting the syslog having an incorrect local date set.
+                # In such cases, we fall back to the full date from the server and log this action.
+                parsed_time = datetime.now().strftime(time_format)
+                log.info(
+                    "Invalid date produced while formatting syslog date. Falling back to server date [%s]",
+                    self._name
+                )
         return int((parsed_time - datetime(1970, 1, 1)).total_seconds())
 
     def start(self):
