@@ -21,6 +21,19 @@ Example:
     tcp:
       buffer_size: 2048
 
+``reuse_port``: ``false``
+-------------------------
+
+Enable or disable SO_REUSEPORT on listener's socket.
+
+Example:
+
+.. code-block:: yaml
+
+  listener:
+    udp:
+      reuse_port: true
+
 ``socket_timeout``: ``60``
 --------------------------
 
