@@ -1,0 +1,93 @@
+.. _release-0.6.0:
+
+================================
+Release 0.6.0 - Codename Fretsaw
+================================
+
+Prometheus Metrics
+------------------
+
+John Anderson (@lampwins) added support for Prometheus metrics. While this
+feature is optional, ``napalm-logs`` has an additional requirements starting 
+with this release: the `prometheus_client 
+<https://pypi.org/project/prometheus_client/>`_ Python library for Prometheus 
+instrumentation, which is used to expose the metrics via an HTTP server.
+The implementation is fully compliant with Prometheus scraping, so you need 
+only point your Prometheus server to the exposed metrics to scrape them.
+
+See :ref:`metrics` for further details and configuration options, as well as 
+the new options: :ref:`onfiguration-options-enable-metrics`,
+:ref:`configuration-options-metrics-address`, 
+:ref:`configuration-options-metrics-port`, and 
+:ref:`configuration-options-metrics-dir`.
+
+Brocade NetIron Support
+-----------------------
+
+Initial support for Brocade NetIron has been added thanks to Johan van den 
+Dorpe (@johanek), providing notifications for 
+:ref:`BGP_NEIGHBOR_STATE_CHANGED`, when the BGP peer is ``UP``, ``DOWN``,
+``IDLE``, or ``ESTABLISHED`` (as defined in the ``openconfig-bgp`` YANG model).
+The platform is available as ``netiron``.
+
+Huawei VRP Support
+------------------
+
+Starting with this release, also Huawei VRP is supported under the ``huawei`` 
+name, firing notifications for :ref:`INTERFACE_UP` and :ref:`INTERFACE_DOWN`. 
+This has been added thanks to Antoine Meillet (@inetAnt).
+The platform is available as ``huawei``.
+
+As the list of supported platforms keeps growing, do consider using the 
+:ref:`configuration-options-device-blacklist` and 
+:ref:`configuration-options-device-whitelist` for fine tuning.
+
+More configuration options
+--------------------------
+
+Antoine Meillet (@inetAnt) also added more options for the :ref:`listener-tcp` 
+and :ref:`listener-udp`, to enable or disable the ``SO_REUSEPORT`` on 
+listener's socket - see :ref:`listener-tcp-reuse-port` and 
+:ref:`listener-udp-reuse-port`, respectively.
+
+Improvements
+------------
+
+Simon Bitterli (@bittsi) added timezone support for Cisco IOS.
+
+Bug fixes
+---------
+
+Due to a known issue, multiple platforms having the same 
+:ref:`syslog-header`, ``napalm-logs`` was unable to match them. Luke Overend 
+fixed this, which would also permit us in the future to have both ``junos``
+and UNIX message parsing concomitantly.
+
+John Anderson (@lampwins) also fixed a core issue with the time extraction when 
+the syslog message doesn't provide it.
+
+Known issues
+------------
+
+When a message is not fully parsed and matched, but there are multiple 
+platforms identified as it could belong to, when the
+:ref:`publisher-opts-send-raw` Publisher option is enabled, the message will be
+published twice. This is currently being tracked under 
+https://github.com/napalm-automation/napalm-logs/issues/246.
+
+
+New Structured Messages
+-----------------------
+
+- :ref:`USER_EXIT_CONFIG_MODE` added by Simon Bitterli (@bittsi) providing the 
+  counterpart of the existing :ref:`USER_ENTER_CONFIG_MODE`. This message is 
+  particularly important on Cisco IOS platforms (but not limited to), after an 
+  user applied a configuration change into the running config, or bootstrapped 
+  via TFTP. This message is currently available for ``ios`` only.
+
+The following messages were already defined, now extending the list of 
+supported platforms:
+
+- :ref:`INTERFACE_UP` added for ``huawei``.
+- :ref:`INTERFACE_DOWN` added for ``huawei``.
+- :ref:`BGP_NEIGHBOR_STATE_CHANGED` added for ``netiron``.

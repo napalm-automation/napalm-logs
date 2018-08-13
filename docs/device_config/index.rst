@@ -14,6 +14,9 @@ systems:
    iosxr
    eos
    nxos
+   ios
+   netiron
+   huawei
 
 To see how to configure the network device, check the documents referenced
 above. Note that the examples in each case represents the configuration used to
