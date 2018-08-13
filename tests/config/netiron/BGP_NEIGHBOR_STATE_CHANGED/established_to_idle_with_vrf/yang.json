@@ -1,0 +1,34 @@
+{
+  "yang_message": {
+    "bgp": {
+      "neighbors": {
+        "neighbor": {
+          "2607:a999:4999::1": {
+            "state": {
+              "session-state": "IDLE",
+              "session-state-change-event": "Rcv Notification:Hold Timer Expired"
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 5,
+    "date": "May 19",
+    "pri": "13",
+    "host": "HOSTNAME",
+    "tag": "BGP",
+    "time": "05:01:59",
+    "message": "Peer (VRF: default-vrf) 2607:a999:4999::1 DOWN (Rcv Notification:Hold Timer Expired)",
+    "facility": 1
+  },
+  "yang_model": "openconfig-bgp",
+  "os": "netiron",
+  "facility": 1,
+  "severity": 5,
+  "error": "BGP_NEIGHBOR_STATE_CHANGED",
+  "host": "HOSTNAME",
+  "ip": "127.0.0.1",
+  "timestamp": 1526706119764
+}

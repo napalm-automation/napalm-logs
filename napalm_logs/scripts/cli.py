@@ -142,6 +142,30 @@ class NLOptionParser(OptionParser, object):
             help=('Authenticator bind port. Default: {0}'.format(defaults.AUTH_PORT))
         )
         self.add_option(
+            '--enable-metrics',
+            dest='metrics_enabled',
+            action="store_true",
+            default=False,
+            help=('Enable metrics collection and exporting (Prometheus metrics).')
+        )
+        self.add_option(
+            '--metrics-address',
+            dest='metrics_address',
+            help=('Prometheus metrics HTTP server listener address. Default: {0}'.format(defaults.METRICS_ADDRESS))
+        )
+        self.add_option(
+            '--metrics-port',
+            dest='metrics_port',
+            type=int,
+            help=('Prometheus metrics HTTP server listener bind port. Default: {0}'.format(defaults.METRICS_PORT))
+        )
+        self.add_option(
+            '--metrics-dir',
+            dest='metrics_dir',
+            help=('Directory to store metrics in. Must be writable by the processes. '
+                  'Default: {0}'.format(defaults.METRICS_DIR))
+        )
+        self.add_option(
             '--certificate',
             dest='certificate',
             help=('Absolute path to the SSL certificate used for client authentication.')
@@ -258,6 +282,7 @@ class NLOptionParser(OptionParser, object):
                                 format=log_fmt)  # log to filecm
         cert = self.options.certificate or file_cfg.get('certificate')
         disable_security = self.options.disable_security or file_cfg.get('disable_security', False)
+        metrics_enabled = self.options.metrics_enabled or file_cfg.get('metrics_enabled', False)
         if not cert and disable_security is False:
             log.error('certfile must be specified for server-side operations')
             raise ValueError('Please specify a valid SSL certificate.')
@@ -325,6 +350,13 @@ class NLOptionParser(OptionParser, object):
                             defaults.AUTH_ADDRESS,  # noqa
             'auth_port': self.options.auth_port or file_cfg.get('auth_port') or
                          defaults.AUTH_PORT,
+            'metrics_enabled': metrics_enabled,
+            'metrics_address': self.options.metrics_address or file_cfg.get('metrics_address') or
+                               defaults.METRICS_ADDRESS,
+            'metrics_port': self.options.metrics_port or file_cfg.get('metrics_port') or
+                               defaults.METRICS_PORT,
+            'metrics_dir': self.options.metrics_dir or file_cfg.get('metrics_dir') or
+                               defaults.METRICS_DIR,
             'certificate': cert,
             'keyfile': self.options.keyfile or file_cfg.get('keyfile'),
             'disable_security': disable_security,

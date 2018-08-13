@@ -13,6 +13,7 @@ import threading
 # Import third party libs
 import zmq
 import umsgpack
+from prometheus_client import Counter
 
 # Import napalm-logs pkgs
 from napalm_logs.config import LST_IPC_URL
@@ -52,6 +53,8 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         Setup the transport.
         '''
         listener_class = get_listener(self._listener_type)
+        self.address = self.listener_opts.pop('address', self.address)
+        self.port = self.listener_opts.pop('port', self.port)
         self.listener = listener_class(self.address,
                                        self.port,
                                        **self.listener_opts)
@@ -76,6 +79,17 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         '''
         Listen to messages and publish them.
         '''
+        # counter metrics for messages
+        c_logs_ingested = Counter(
+            'napalm_logs_listener_logs_ingested',
+            'Count of ingested log messages',
+            ['listener_type', 'address', 'port'],
+        )
+        c_messages_published = Counter(
+            'napalm_logs_listener_messages_published',
+            'Count of published messages',
+            ['listener_type', 'address', 'port'],
+        )
         self._setup_ipc()
         log.debug('Using the %s listener', self._listener_type)
         self._setup_listener()
@@ -99,7 +113,9 @@ class NapalmLogsListenerProc(NapalmLogsProc):
             if not log_message:
                 log.info('Empty message received from %s. Not queueing to the server.', log_source)
                 continue
+            c_logs_ingested.labels(listener_type=self._listener_type, address=self.address, port=self.port).inc()
             self.pub.send(umsgpack.packb((log_message, log_source)))
+            c_messages_published.labels(listener_type=self._listener_type, address=self.address, port=self.port).inc()
 
     def stop(self):
         log.info('Stopping the listener process')

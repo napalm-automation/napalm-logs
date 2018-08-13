@@ -1,0 +1,53 @@
+# This error tag corresponds to syslog messages notifying that the configured
+# bgp neighbor has changed state
+messages:
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    tag: BGP
+    values:
+      instance: ([\w-]+)
+      peer: ([\w\d:\.]+)
+      reason: (.*)
+    line: 'Peer (VRF: {instance}) {peer} UP ({reason})'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//session-state-change-event: reason
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: ESTABLISHED
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    tag: BGP
+    values:
+      instance: ([\w-]+)
+      peer: ([\w\d:\.]+)
+      reason: (.*)
+    line: 'Peer (VRF: {instance}) {peer} DOWN ({reason})'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//session-state-change-event: reason
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: IDLE
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    tag: BGP
+    values:
+      peer: ([\w\d:\.]+)
+      reason: (.*)
+    line: 'Peer {peer} UP ({reason})'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//session-state-change-event: reason
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: ESTABLISHED
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    tag: BGP
+    values:
+      peer: ([\w\d:\.]+)
+      reason: (.*)
+    line: 'Peer {peer} DOWN ({reason})'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//session-state-change-event: reason
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: IDLE

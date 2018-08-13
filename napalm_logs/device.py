@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 # Import thrid party libs
 import zmq
 import umsgpack
+from prometheus_client import Counter
 
 # Import napalm-logs pkgs
 import napalm_logs.utils
@@ -215,18 +216,54 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             parsed_time = datetime.strptime('{} {}'.format(date, time), time_format)
         else:
             year = datetime.now().year
-            parsed_time = datetime.strptime('{} {} {}'.format(year, date, time), '%Y {}'.format(time_format))
-            # If the timestamp is in the future then it is likely that the year
-            # is wrong. We subtract 1 day from the parsed time to eleminate any
-            # difference between clocks.
-            if parsed_time - timedelta(days=1) > datetime.now():
-                parsed_time = datetime.strptime('{} {} {}'.format(year - 1, date, time), '%Y {}'.format(time_format))
+            try:
+                parsed_time = datetime.strptime('{} {} {}'.format(year, date, time), '%Y {}'.format(time_format))
+                # If the timestamp is in the future then it is likely that the year
+                # is wrong. We subtract 1 day from the parsed time to eleminate any
+                # difference between clocks.
+                if parsed_time - timedelta(days=1) > datetime.now():
+                    parsed_time = datetime.strptime(
+                        '{} {} {}'.format(year - 1, date, time),
+                        '%Y {}'.format(time_format)
+                    )
+            except ValueError:
+                # It is rare but by appending the year from the server, we could produce
+                # an invalid date such as February 29, 2018 (2018 is not a leap year). This
+                # is caused by the device emitting the syslog having an incorrect local date set.
+                # In such cases, we fall back to the full date from the server and log this action.
+                parsed_time = datetime.now().strftime(time_format)
+                log.info(
+                    "Invalid date produced while formatting syslog date. Falling back to server date [%s]",
+                    self._name
+                )
         return int((parsed_time - datetime(1970, 1, 1)).total_seconds())
 
     def start(self):
         '''
         Start the worker process.
         '''
+        # metrics
+        napalm_logs_device_messages_received = Counter(
+            'napalm_logs_device_messages_received',
+            "Count of messages received by the device process",
+            ['device_os']
+        )
+        napalm_logs_device_raw_published_messages = Counter(
+            'napalm_logs_device_raw_published_messages',
+            "Count of raw type published messages",
+            ['device_os']
+        )
+        napalm_logs_device_published_messages = Counter(
+            'napalm_logs_device_published_messages',
+            "Count of published messages",
+            ['device_os']
+        )
+        napalm_logs_device_oc_object_failed = Counter(
+            'napalm_logs_device_oc_object_failed',
+            "Counter of failed OpenConfig object generations",
+            ['device_os']
+        )
+
         self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
@@ -246,6 +283,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 else:
                     raise NapalmLogsExit(error)
             log.debug('%s: dequeued %s, received from %s', self._name, msg_dict, address)
+            napalm_logs_device_messages_received.labels(device_os=self._name).inc()
             host = msg_dict.get('host')
             prefix_id = msg_dict.pop('__prefix_id__')
             if 'timestamp' in msg_dict:
@@ -277,6 +315,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 log.debug(to_publish)
                 # self.pub_pipe.send(to_publish)
                 self.pub.send(umsgpack.packb(to_publish))
+                napalm_logs_device_raw_published_messages.labels(device_os=self._name).inc()
                 continue
             try:
                 if '__python_fun__' in kwargs:
@@ -286,6 +325,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     yang_obj = self._emit(**kwargs)
             except Exception:
                 log.exception('Unexpected error when generating the OC object.', exc_info=True)
+                napalm_logs_device_oc_object_failed.labels(device_os=self._name).inc()
                 continue
             log.debug('Generated OC object:')
             log.debug(yang_obj)
@@ -308,6 +348,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             # self.pub_pipe.send(to_publish)
             self.pub.send(umsgpack.packb(to_publish))
             # self._publish(to_publish)
+            napalm_logs_device_published_messages.labels(device_os=self._name).inc()
 
     def stop(self):
         '''
