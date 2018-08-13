@@ -8,6 +8,8 @@ Receive the unstructured syslog messages over TCP.
 
 Available options:
 
+.. _listener-tcp-buffer-size:
+
 ``buffer_size``: ``1024``
 -------------------------
 
@@ -21,10 +23,15 @@ Example:
     tcp:
       buffer_size: 2048
 
+
+.. _listener-tcp-reuse-port:
+
 ``reuse_port``: ``false``
 -------------------------
 
-Enable or disable SO_REUSEPORT on listener's socket.
+.. versionadded:: 0.6.0
+
+Enable or disable ``SO_REUSEPORT`` on listener's socket.
 
 Example:
 
@@ -33,6 +40,9 @@ Example:
   listener:
     udp:
       reuse_port: true
+
+
+.. _listener-tcp-socket-timeout:
 
 ``socket_timeout``: ``60``
 --------------------------
@@ -46,6 +56,9 @@ Example:
   listener:
     tcp:
       socket_timeout: 5
+
+
+.. _listener-tcp-max-clients:
 
 ``max_clients``: ``5``
 ----------------------

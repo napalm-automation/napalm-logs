@@ -79,7 +79,9 @@ Configuration file example:
 .. _configuration-options-enable-metrics:
 
 ``enable-metrics``
--------------
+------------------
+
+.. versionadded:: 0.6.0
 
 Enable metrics collection exposition (Prometheus metrics).
 
@@ -100,7 +102,9 @@ Configuration file example:
 .. _configuration-options-metrics-address:
 
 ``metrics-address``
------------
+-------------------
+
+.. versionadded:: 0.6.0
 
 The IP address to use to listen for all incoming metrics requests. This is the
 address that the Prometheus HTTP server exposes metrics from.
@@ -122,7 +126,9 @@ Configuration file example:
 .. _configuration-options-metrics-port:
 
 ``metrics-port``
--------------
+----------------
+
+.. versionadded:: 0.6.0
 
 The port to listen on for incoming metrics requests. This is the port that
 the Prometheus HTTP server exposes metrics from.
@@ -141,8 +147,12 @@ Configuration file example:
 
   metrics_port: 2022
 
+.. _configuration-options-metrics-dir:
+
 ``metrics-dir``
--------------
+---------------
+
+.. versionadded:: 0.6.0
 
 The directory used by the processes for metrics collection. This directory must
 be writable. If the directory does not exist, we attempt to create it.

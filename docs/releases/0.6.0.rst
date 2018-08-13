@@ -28,7 +28,7 @@ Initial support for Brocade NetIron has been added thanks to Johan van den
 Dorpe (@johanek), providing notifications for 
 :ref:`BGP_NEIGHBOR_STATE_CHANGED`, when the BGP peer is ``UP``, ``DOWN``,
 ``IDLE``, or ``ESTABLISHED`` (as defined in the ``openconfig-bgp`` YANG model).
-The platforms is available as ``netiron``.
+The platform is available as ``netiron``.
 
 Huawei VRP Support
 ------------------
@@ -36,6 +36,7 @@ Huawei VRP Support
 Starting with this release, also Huawei VRP is supported under the ``huawei`` 
 name, firing notifications for :ref:`INTERFACE_UP` and :ref:`INTERFACE_DOWN`. 
 This has been added thanks to Antoine Meillet (@inetAnt).
+The platform is available as ``huawei``.
 
 As the list of supported platforms keeps growing, do consider using the 
 :ref:`configuration-options-device-blacklist` and 
