@@ -38,7 +38,7 @@ Example:
 .. code-block:: yaml
 
   listener:
-    udp:
+    tcp:
       reuse_port: true
 
 
