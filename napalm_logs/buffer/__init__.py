@@ -11,11 +11,17 @@ import logging
 # Exceptions
 from napalm_logs.exceptions import InvalidBufferException
 
+# Import buffer classes
+from napalm_logs.buffer.redis import RedisBuffer
+from napalm_logs.buffer.memory import MemoryBuffer
+
 log = logging.getLogger(__file__)
 
 BUFFER_LOOKUP = {
-    'mem': memory.buffer,
-    'redis': redis.buffer
+    'mem': MemoryBuffer,
+    'memory': MemoryBuffer,
+    'cache': MemoryBuffer,
+    'redis': RedisBuffer
 }
 
 
