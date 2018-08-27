@@ -9,10 +9,6 @@ from __future__ import unicode_literals
 import logging
 import datetime
 
-# Import napalm-logs pkgs
-# exceptions
-from napalm_logs.exceptions import BufferException
-
 log = logging.getLogger(__name__)
 
 
