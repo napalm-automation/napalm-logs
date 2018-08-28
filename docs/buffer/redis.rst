@@ -7,6 +7,12 @@ Redis
 This :ref:`buffer` interface caches the messages into
 `Redis <https://redis.io/>`_.
 
+.. note::
+
+    This driver is available only when the underlying library ``redis``, 
+    available as system package, or
+    `Python library <https://pypi.org/project/redis/>`_.
+
 .. _buffer-redis-opts:
 
 Options
