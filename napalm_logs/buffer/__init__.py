@@ -12,8 +12,8 @@ import logging
 from napalm_logs.exceptions import InvalidBufferException
 
 # Import buffer classes
-from napalm_logs.buffer.redis import RedisBuffer
 from napalm_logs.buffer.memory import MemoryBuffer
+from napalm_logs.buffer.redisbuf import RedisBuffer
 
 log = logging.getLogger(__file__)
 

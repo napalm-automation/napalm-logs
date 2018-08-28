@@ -292,6 +292,7 @@ class NLOptionParser(OptionParser, object):
         publisher_opts = defaults.PUBLISHER_OPTS
         device_whitelist = file_cfg.get('device_whitelist', [])
         device_blacklist = file_cfg.get('device_blacklist', [])
+        buffer_cfg = file_cfg.get('buffer', {})
 
         listener = []
         if self.options.listener:
@@ -370,7 +371,8 @@ class NLOptionParser(OptionParser, object):
             'device_worker_processes': self.options.device_worker_processes or\
                                        file_cfg.get('device_worker_processes') or 1,
             'serializer': self.options.serializer or file_cfg.get('serializer') or
-                               defaults.SERIALIZER
+                          defaults.SERIALIZER,
+            'buffer': buffer_cfg
         }
         return cfg
 

@@ -8,6 +8,7 @@ from __future__ import absolute_import
 import os
 import re
 import time
+import base64
 import signal
 import logging
 import threading
@@ -37,10 +38,12 @@ class NapalmLogsServerProc(NapalmLogsProc):
     def __init__(self,
                  opts,
                  config,
-                 started_os_proc):
+                 started_os_proc,
+                 buffer=None):
         self.opts = opts
         self.config = config
         self.started_os_proc = started_os_proc
+        self._buffer = buffer
         self.__up = False
         self.compiled_prefixes = None
         self._compile_prefixes()
@@ -85,6 +88,20 @@ class NapalmLogsServerProc(NapalmLogsProc):
         except AttributeError:
             # zmq 3
             self.publisher_pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
+
+    def _cleanup_buffer(self):
+        '''
+        Periodically cleanup the buffer.
+        '''
+        if not self._buffer:
+            return
+        while True:
+            time.sleep(60)
+            log.debug('Cleaning up buffer')
+            items = self._buffer.items()
+            # The ``items`` function should also cleanup the buffer
+            log.debug('Collected items')
+            log.debug(list(items))
 
     def _compile_prefixes(self):
         '''
@@ -207,6 +224,11 @@ class NapalmLogsServerProc(NapalmLogsProc):
             "napalm_logs_server_messages_received",
             "Count of messages received from listener processes"
         )
+        napalm_logs_server_skipped_buffered_messages = Counter(
+            'napalm_logs_server_skipped_buffered_messages',
+            'Count of messages skipped as they were already buffered',
+            ['device_os']
+        )
         napalm_logs_server_messages_with_identified_os = Counter(
             "napalm_logs_server_messages_with_identified_os",
             "Count of messages with positive os identification",
@@ -232,6 +254,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
         )
         self._setup_ipc()
         # Start suicide polling thread
+        cleanup = threading.Thread(target=self._cleanup_buffer)
+        cleanup.start()
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
@@ -264,6 +288,15 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     log.debug('Queueing message to %s', dev_os)
                     if six.PY3:
                         dev_os = bytes(dev_os, 'utf-8')
+                    if self._buffer:
+                        message = '{dev_os}/{msg}'.format(dev_os=dev_os, msg=msg_dict['message'])
+                        message_key = base64.b64encode(message)
+                        if self._buffer[message_key]:
+                            log.info('"%s" seems to be already buffered, skipping', msg_dict['message'])
+                            napalm_logs_server_skipped_buffered_messages.labels(device_os=dev_os).inc()
+                            continue
+                        log.debug('"%s" is not buffered yet, added', msg_dict['message'])
+                        self._buffer[message_key] = 1
                     self.pub.send_multipart([dev_os,
                                              umsgpack.packb((msg_dict, address))])
                     # self.os_pipes[dev_os].send((msg_dict, address))
@@ -290,11 +323,6 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     }
                     self.publisher_pub.send(umsgpack.packb(to_publish))
                     napalm_logs_server_messages_unknown_queued.inc()
-                    napalm_logs_server_messages_without_identified_os.inc()
-
-                elif not dev_os and not self.opts['_server_send_unknown']:
-                    # OS not identified and we are told to do nothing
-                    log.debug('Unable to identify the OS')
                     napalm_logs_server_messages_without_identified_os.inc()
 
     def stop(self):
