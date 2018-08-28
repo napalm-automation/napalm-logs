@@ -289,7 +289,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     if six.PY3:
                         dev_os = bytes(dev_os, 'utf-8')
                     if self._buffer:
-                        message = '{dev_os}/{msg}'.format(dev_os=dev_os, msg=msg_dict['message'])
+                        message = '{dev_os}/{host}/{msg}'.format(dev_os=dev_os,
+                                                                 host=msg_dict['host'],
+                                                                 msg=msg_dict['message'])
                         message_key = base64.b64encode(message)
                         if self._buffer[message_key]:
                             log.info('"%s" seems to be already buffered, skipping', msg_dict['message'])
