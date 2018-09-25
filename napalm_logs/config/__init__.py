@@ -33,6 +33,7 @@ ZMQ_INTERNAL_HWM = 1000
 METRICS_ADDRESS = '0.0.0.0'
 METRICS_PORT = 9443
 METRICS_DIR = "/tmp/napalm_logs_metrics"
+BUFFER_EXPIRE_TIME = 5
 
 # Allowed names for the init files.
 OS_INIT_FILENAMES = (
