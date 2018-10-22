@@ -1,0 +1,34 @@
+{
+    "_stamp": "2018-10-22T12:19:25.688954", 
+    "error": "USER_ENTER_CONFIG_MODE", 
+    "facility": 20, 
+    "host": "GeorgeSwitch", 
+    "ip": "172.16.0.2", 
+    "message_details": {
+        "date": "Oct 22", 
+        "facility": 20, 
+        "host": "GeorgeSwitch", 
+        "message": ": Enter configuration mode from console by admin on vty3 (172.16.0.1)", 
+        "pri": "165", 
+        "processName": "ConfigAgent", 
+        "severity": 5, 
+        "tag": "SYS-5-CONFIG_E", 
+        "time": "12:19:52"
+    }, 
+    "os": "eos", 
+    "severity": 5, 
+    "timestamp": 1540210792, 
+    "yang_message": {
+        "users": {
+            "user": {
+                "admin": {
+                    "action": {
+                        "enter_config_mode": true
+                    }
+                }
+            }
+        }
+    }, 
+    "yang_model": "NO_MODEL"
+}
+
