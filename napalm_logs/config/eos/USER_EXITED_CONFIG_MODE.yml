@@ -1,0 +1,16 @@
+messages:
+  # 'error' should be unique and vendor agnostic.
+  - error: USER_EXIT_CONFIG_MODE
+    tag: SYS-5-CONFIG_I
+    values:
+      source: (\w+)
+      user: (\w+)
+      vterm: (\w+) 
+      ip4: ([\w\d:\.]+)
+    line: 'Configured from {source} by {user} on {vterm} ({ip4})'
+    model: NO_MODEL
+    mapping:
+      variables: {}
+      static:
+        users//user//{user}//action//exit_config_mode: True
+

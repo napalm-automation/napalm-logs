@@ -1,0 +1,14 @@
+messages:
+  - error: USER_WRITE_CONFIG
+    tag: SYS-5-CONFIG_STARTUP
+    values:
+      user: (\w+)
+      vterm: (\w+) 
+      ip: ([\w\d:\.]+)
+      path: ([\w\:\-\/]+)
+    line: 'Startup config saved from {path} by {user} on {vterm} ({ip})'
+    model: NO_MODEL
+    mapping:
+      variables: {}
+      static:
+        users//user//{user}//action//write_config: True

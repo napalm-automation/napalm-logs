@@ -1,0 +1,32 @@
+{
+	"host": "GeorgeSwitch",
+	"yang_message": {
+		"users": {
+			"user": {
+				"admin": {
+					"action": {
+						"exit_config_mode": true
+					}
+				}
+			}
+		}
+	},
+	"message_details": {
+		"facility": 20,
+		"pri": "165",
+		"processName": "ConfigAgent",
+		"host": "GeorgeSwitch",
+		"tag": "SYS-5-CONFIG_I",
+		"time": "12:23:41",
+		"date": "Oct 23",
+		"message": ": Configured from console by admin on vty3 (127.0.0.1)",
+		"severity": 5
+	},
+	"timestamp": 1540297421,
+	"error": "USER_EXIT_CONFIG_MODE",
+	"ip": "127.0.0.1",
+	"facility": 20,
+	"os": "eos",
+	"yang_model": "NO_MODEL",
+	"severity": 5
+}
