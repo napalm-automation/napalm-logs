@@ -26,6 +26,7 @@ from prometheus_client import start_http_server, CollectorRegistry, multiprocess
 # Import napalm-logs pkgs
 import napalm_logs.utils
 import napalm_logs.config as CONFIG
+import napalm_logs.buffer
 # processes
 from napalm_logs.auth import NapalmLogsAuthProc
 from napalm_logs.device import NapalmLogsDeviceProc
@@ -66,7 +67,8 @@ class NapalmLogs:
                  device_whitelist=[],
                  hwm=None,
                  device_worker_processes=1,
-                 serializer='msgpack'):
+                 serializer='msgpack',
+                 buffer=None):
         '''
         Init the napalm-logs engine.
 
@@ -103,6 +105,8 @@ class NapalmLogs:
         self.serializer = serializer
         self.device_worker_processes = device_worker_processes
         self.hwm = hwm
+        self._buffer_cfg = buffer
+        self._buffer = None
         self.opts = {}
         # Setup the environment
         self._setup_log()
@@ -111,6 +115,7 @@ class NapalmLogs:
         self._post_preparation()
         # Start the Prometheus metrics server
         self._setup_metrics()
+        self._setup_buffer()
         # Private vars
         self.__priv_key = None
         self.__signing_key = None
@@ -125,6 +130,19 @@ class NapalmLogs:
         if exc_type is not None:
             log.error('Exiting due to unhandled exception', exc_info=True)
             self.__raise_clean_exception(exc_type, exc_value, exc_traceback)
+
+    def _setup_buffer(self):
+        '''
+        Setup the buffer subsystem.
+        '''
+        if not self._buffer_cfg or not isinstance(self._buffer_cfg, dict):
+            return
+        buffer_name = list(self._buffer_cfg.keys())[0]
+        buffer_class = napalm_logs.buffer.get_interface(buffer_name)
+        log.debug('Setting up buffer interface "%s"', buffer_name)
+        if 'expire_time' not in self._buffer_cfg[buffer_name]:
+            self._buffer_cfg[buffer_name]['expire_time'] = CONFIG.BUFFER_EXPIRE_TIME
+        self._buffer = buffer_class(**self._buffer_cfg[buffer_name])
 
     def _setup_metrics(self):
         """
@@ -534,7 +552,8 @@ class NapalmLogs:
         log.debug('Starting the server process')
         server = NapalmLogsServerProc(self.opts,
                                       self.config_dict,
-                                      started_os_proc)
+                                      started_os_proc,
+                                      buffer=self._buffer)
         proc = Process(target=server.start)
         proc.start()
         proc.description = 'Server process'

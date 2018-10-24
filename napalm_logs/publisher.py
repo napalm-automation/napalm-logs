@@ -61,6 +61,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         if not disable_security:
             self.__safe = nacl.secret.SecretBox(private_key)
             self.__signing_key = signing_key
+        self._strip_message_details = publisher_opts.pop('strip_message_details', False)
         self._setup_transport()
 
     def _exit_gracefully(self, signum, _):
@@ -166,6 +167,9 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                     log.error(error, exc_info=True)
                     raise NapalmLogsExit(error)
             obj = umsgpack.unpackb(bin_obj)
+            if self._strip_message_details:
+                obj.pop('message_details', None)
+                bin_obj = self.serializer_fun(obj)
             napalm_logs_publisher_received_messages.labels(
                 publisher_type=self._transport_type,
                 address=self.address,

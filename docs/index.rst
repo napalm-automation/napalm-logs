@@ -316,6 +316,7 @@ daemon):
    publisher/index
    serializer/index
    logger/index
+   buffer/index
    syslog/index
    developers/index
    releases/index

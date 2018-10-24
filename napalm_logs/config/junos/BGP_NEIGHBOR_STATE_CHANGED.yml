@@ -12,7 +12,7 @@ messages:
       event: (\w+)
       oldState|bgp_state_convert: (\w+)
       newState|bgp_state_convert: (\w+)
-    line: 'BGP peer {peer} ({peeringType} AS {asn}) changed state from {oldState} to {newState} (event {event}) (instance master)'
+    line: 'BGP peer {peer} ({peeringType} AS {asn}) changed state from {oldState} to {newState} (event {event})'
     model: openconfig-bgp
     mapping:
       variables:

@@ -325,3 +325,20 @@ You can specify a separate serialize per publisher, e.g.:
         serializer: json
     - cli:
         serializer: pprint
+
+.. _publisher-opts-strip-message-details:
+
+``strip_message_details``: ``False``
+------------------------------------
+
+.. versionadded:: 0.7.0
+
+Strip the ``message_details`` key before publishing the object.
+
+Configuration example:
+
+.. code-block:: yaml
+
+  publisher:
+    - kafka:
+        strip_message_details: true

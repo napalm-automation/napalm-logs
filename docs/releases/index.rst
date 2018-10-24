@@ -8,11 +8,12 @@ Release Notes
 Latest Release
 ^^^^^^^^^^^^^^
 
-- :ref:`release-0.6.0`
+- :ref:`release-0.7.0`
 
 Previous Releases
 ^^^^^^^^^^^^^^^^^
 
+- :ref:`release-0.6.0`
 - :ref:`release-0.5.0`
 - :ref:`release-0.4.2`
 - :ref:`release-0.4.1`

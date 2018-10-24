@@ -1,0 +1,1 @@
+<13>Oct 15 12:17:17 HOSTNAME OSPF: nbr state changed, rid 10.10.80.14, nbr addr 10.10.228.70, nbr rid 10.10.80.17, state full 

@@ -1,0 +1,15 @@
+#<13>Oct 15 12:17:10 HOSTNAME OSPF: nbr state changed, rid 10.10.80.14, nbr addr 10.10.228.70, nbr rid 10.10.80.17, state down
+
+messages:
+  - error: OSPF_NEIGHBOR_DOWN
+    tag: OSPF
+    values:
+      routerid: ([\w\d:\.]+)
+      neighboraddr: ([\w\d:\.]+)
+      neighborrid: ([\w\d\.]+)
+    line: 'nbr state changed, rid {routerid}, nbr addr {neighboraddr}, nbr rid {neighborrid}, state down'
+    model: openconfig-ospf
+    mapping:
+      variables: {}
+      static:
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//area//interfaces//interface//interface//neighbors//neighbor//{neighboraddr}//state//adjacency-state: DOWN
