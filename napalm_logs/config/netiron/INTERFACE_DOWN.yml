@@ -1,0 +1,14 @@
+#<14>Nov  6 13:36:45 HOSTNAME System: Interface ethernet 1/1/36, state down
+
+messages:
+  - error: INTERFACE_DOWN
+    tag: System
+    values:
+      interface: (\w+[\.\-\d\/\w]+)
+      protocol: ([\w\d:\.]+)
+    line: 'Interface {protocol} {interface}, state down'
+    model: openconfig-interfaces
+    mapping:
+      variables: {}
+      static:
+        interfaces//interface//{protocol}{interface}//state//oper_status: DOWN

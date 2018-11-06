@@ -1,0 +1,1 @@
+<14>Nov  6 13:36:45 HOSTNAME System: Interface ethernet 1/1/36, state down
