@@ -1,0 +1,24 @@
+{
+  "message_details": {
+    "facility": 3,
+    "host": "ztp-tankstelle_1-ts",
+    "port": "port02",
+    "message": "CTS => 0",
+    "tag": "SIGNAL",
+    "time": "15:42:06.972",
+    "pri": "30",
+    "date": "2018-Nov- 9",
+    "severity": 6
+  },
+  "facility": 3,
+  "os": "opengear",
+  "error": "SIGNAL",
+  "yang_model": "NO_MODEL",
+  "ip": "127.0.0.1",
+  "host": "ztp-tankstelle_1-ts",
+  "yang_message": {
+    "signal": "changed"
+  },
+  "timestamp": 1541778126,
+  "severity": 6
+}

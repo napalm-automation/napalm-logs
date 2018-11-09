@@ -1,0 +1,20 @@
+#<30>ztp-tankstelle_1-ts autoresponse 2018-Nov- 9 15:41:30 AR: name=DeviceBoot, index=2, ref=2, state=Triggered, event=config.ports.port2.serial.event.pattern2.rx, value=Booting...
+
+messages:
+  - error: AUTORESPONSE
+    tag: AR
+    values:
+      name: (\w+)
+      index: (\d+)
+      ref: (\d+)
+      state: (\w+)
+      event: (.*)
+      value: (.*)
+    line: 'name={name}, index={index}, ref={ref}, state={state}, event={event}, value={value}'
+    model: NO_MODEL
+    mapping:
+      static:
+        autoresponse//{name}//triggered: true
+      variables:
+        autoresponse//{name}//event: event
+        autoresponse//{name}//value: value

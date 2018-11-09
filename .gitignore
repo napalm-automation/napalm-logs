@@ -94,3 +94,5 @@ ENV/
 .ropeproject
 report.json
 
+# PyCharm stuff
+.idea

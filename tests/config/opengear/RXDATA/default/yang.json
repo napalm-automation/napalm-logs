@@ -1,0 +1,24 @@
+{
+  "severity": 6,
+  "host": "ztp-tankstelle_1-ts",
+  "error": "RXDATA",
+  "yang_model": "NO_MODEL",
+  "yang_message": {
+    "data": "received"
+  },
+  "ip": "127.0.0.1",
+  "os": "opengear",
+  "facility": 3,
+  "timestamp": 1541777905,
+  "message_details": {
+    "severity": 6,
+    "time": "15:38:25.341",
+    "message": "tankstelle_1-port2-dev#",
+    "port": "port02",
+    "pri": "30",
+    "tag": "RXDATA",
+    "facility": 3,
+    "host": "ztp-tankstelle_1-ts",
+    "date": "2018-Nov- 9"
+  }
+}
