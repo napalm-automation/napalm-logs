@@ -23,6 +23,9 @@ from napalm_logs.transport.kafka import KafkaTransport
 from napalm_logs.transport.http import HAS_TORNADO
 from napalm_logs.transport.http import HAS_REQUESTS
 from napalm_logs.transport.http import HTTPTransport
+# ~~~ Promethus ~~~
+from napalm_logs.transport.prometheus import PrometheusTransport
+from napalm_logs.transport.prometheus import HAS_PROMETHEUS_CLIENT
 # from napalm_logs.transport.rabbitmq import RabbitMQTransport
 
 log = logging.getLogger(__file__)
@@ -45,6 +48,9 @@ if HAS_KAFKA:
 
 if HAS_REQUESTS or HAS_TORNADO:
     TRANSPORT_LOOKUP['http'] = HTTPTransport
+
+if HAS_PROMETHEUS_CLIENT:
+    TRANSPORT_LOOKUP['prometheus'] = PrometheusTransport
 
 
 def get_transport(name):
