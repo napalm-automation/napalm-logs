@@ -9,5 +9,5 @@ messages:
     model: NO_MODEL
     mapping:
       static:
-        user_activity//{user}//logout: true
+        users//user//{user}//action//logout: true
       variables: {}
