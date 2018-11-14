@@ -17,7 +17,11 @@
   "ip": "127.0.0.1",
   "host": "ztp-tankstelle_1-ts",
   "yang_message": {
-    "signal": "changed"
+    "signal": {
+      "changed": true,
+      "type": "CTS",
+      "value": "0"
+    }
   },
   "timestamp": 1541778126,
   "severity": 6

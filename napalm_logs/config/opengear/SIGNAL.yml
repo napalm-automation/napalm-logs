@@ -10,5 +10,7 @@ messages:
     model: NO_MODEL
     mapping:
       static:
-        signal: changed
-      variables: {}
+        signal//changed: true
+      variables:
+        signal//type: type
+        signal//value: value
