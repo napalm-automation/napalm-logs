@@ -209,7 +209,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
             else:
                 log.debug('No match found for %s', dev_os)
         if not ret:
-            log.debug('Not matched any OS')
+            log.debug('Not matched any OS, returning original log')
+            msg_dict = {'message': msg}
             ret.append((None, msg_dict))
         return ret
 
