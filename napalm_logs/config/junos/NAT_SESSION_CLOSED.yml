@@ -16,10 +16,10 @@ messages:
       natSourcePort: (\d+)
       natDestinationAddress: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
       natDestinationPort: (\d+)
-      srcNatRuleName: ([^ ]+)
+      srcNatRuleName: (?:source rule ([^ ]+)|N\/A N\/A)
       protocolId: (\d+)
       miscData: (.*)
-    line: 'session closed {reason}: {sourceAddress}/{sourcePort}->{destinationAddress}/{destinationPort} {serviceName} {natSourceAddress}/{natSourcePort}->{natDestinationAddress}/{natDestinationPort} source rule {srcNatRuleName} N/A N/A {protocolId} {miscData}'
+    line: 'session closed {reason}: {sourceAddress}/{sourcePort}->{destinationAddress}/{destinationPort} {serviceName} {natSourceAddress}/{natSourcePort}->{natDestinationAddress}/{natDestinationPort} {srcNatRuleName} N/A N/A {protocolId} {miscData}'
     model: NO_MODEL
     mapping:
       variables:
