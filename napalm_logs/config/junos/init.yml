@@ -25,3 +25,14 @@ prefixes:
       # Most log lines have a process ID, however some do not
       processId: (\d+)
     line: '{date} {time} {hostPrefix}{host} {tag}[{processId}]:'
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\w+\s+\d+)
+      time: (\d\d:\d\d:\d\d)
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      fpcId: (\d+)
+      tag: (\w+)
+      # Some logs have data which can be inside brackets or parenthesis
+      additionalData: (?:(?:\[|\()(.+)(?:\]|\)))?
+    line: '{date} {time} {hostPrefix}{host} fpc{fpcId} {tag}{additionalData}:'
