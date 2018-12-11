@@ -1,0 +1,32 @@
+{
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "Ethernet1/3": {
+          "state": {
+            "admin_status": "DOWN",
+            "change_reason": "Error disabled. Reason:Received REINIT_NO_FLAP request"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 6,
+    "facility": 23,
+    "pri": "190",
+    "host": "sw01.test",
+    "tag": "ETHPORT-5-IF_DOWN_ERROR_DISABLED",
+    "time": "08:12:52",
+    "date": "2018 Oct 31",
+    "message": "Interface Ethernet1/3 is down (Error disabled. Reason:Received REINIT_NO_FLAP request)"
+  },
+  "facility": 23,
+  "ip": "127.0.0.1",
+  "error": "INTERFACE_DOWN",
+  "host": "sw01.test",
+  "yang_model": "openconfig-interfaces",
+  "timestamp": 1540973572,
+  "os": "nxos",
+  "severity": 6
+}
