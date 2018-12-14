@@ -1,0 +1,26 @@
+# Dec 14 12:08:59 HOSTNAME Bgp: %BGP-5-ADJCHANGE: peer 192.0.2.2 (VRF default AS 12345) old state Established event AdminReset new state Idle
+# Dec 14 12:09:00 HOSTNAME Bgp: %BGP-5-ADJCHANGE: peer 192.0.2.2 (VRF default AS 12345) old state OpenConfirm event Established new state Established
+
+# This error tag corresponds to syslog messages notifying that the configured
+# bgp neighbor has changed state
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    tag: BGP-5-ADJCHANGE
+    values:
+      peer: ([\w\d:\.]+)
+      asn: (\d+)
+      vrf: (\w+)
+      event: (\w+)
+      oldState|bgp_state_convert: (\w+)
+      newState|bgp_state_convert: (\w+)
+    line: ': peer {peer} (VRF {vrf} AS {asn}) old state {oldState} event {event} new state {newState}'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//peer_as: asn
+        bgp//neighbors//neighbor//{peer}//state//session-state-change-event: event
+        bgp//neighbors//neighbor//{peer}//state//session-state: newState
+        bgp//neighbors//neighbor//{peer}//state//session-state-old: oldState
+      static: {}
