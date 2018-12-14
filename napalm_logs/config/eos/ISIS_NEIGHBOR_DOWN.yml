@@ -1,0 +1,17 @@
+# This message is sent when the isis neighbor is down
+#Dec 14 12:07:43 HOSTNAME Isis: %ISIS-4-ISIS_ADJCHG: L1 Neighbor State Change for SystemID 1920.0000.2006 on et7 to DOWN: interface went down or no IP address on interface
+messages:
+  - error: ISIS_NEIGHBOR_DOWN
+    tag: ISIS-4-ISIS_ADJCHG
+    values:
+      neighbor: (\S+)
+      interface: (\S+)
+      level: (L\d)
+      downReason: (.*)
+    line: '{level} Neighbor State Change for SystemID {neighbor} on {interface} to DOWN: {downReason}'
+    model: openconfig-isis
+    mapping:
+      variables:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state-change-reason-message: downReason
+      static:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state: DOWN
