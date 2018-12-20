@@ -1,0 +1,15 @@
+# This message is sent when the isis neighbor is up
+#Dec 14 12:08:12 HOSTNAME Isis: %ISIS-4-ISIS_ADJCHG: L1 Neighbor State Change for SystemID 1920.0000.2006 on et7 to UP
+messages:
+  - error: ISIS_NEIGHBOR_UP
+    tag: ISIS-4-ISIS_ADJCHG
+    values:
+      neighbor: (\S+)
+      interface: (\S+)
+      level: (L\d)
+    line: '{level} Neighbor State Change for SystemID {neighbor} on {interface} to UP'
+    model: openconfig-isis
+    mapping:
+      static:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state: UP
+      variables: {}

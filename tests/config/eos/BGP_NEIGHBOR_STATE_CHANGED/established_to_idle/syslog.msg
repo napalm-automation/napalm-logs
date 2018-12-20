@@ -1,0 +1,1 @@
+<13>Dec 14 12:08:59 HOSTNAME Bgp: %BGP-5-ADJCHANGE: peer 192.0.2.2 (VRF default AS 12345) old state Established event AdminReset new state Idle
