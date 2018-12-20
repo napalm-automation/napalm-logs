@@ -1,0 +1,32 @@
+{
+  "message_details": {
+    "facility": 3,
+    "host": "ztp-tankstelle_1-ts",
+    "port": "port02",
+    "message": "root",
+    "tag": "LOGOUT",
+    "time": "10:47:34.318",
+    "pri": "30",
+    "date": "2018-Nov-12",
+    "severity": 6
+  },
+  "facility": 3,
+  "os": "opengear",
+  "error": "USER_LOGOUT",
+  "yang_model": "NO_MODEL",
+  "ip": "127.0.0.1",
+  "host": "ztp-tankstelle_1-ts",
+  "yang_message": {
+      "users": {
+          "user": {
+              "root": {
+                  "action": {
+                      "logout": true
+                  }
+              }
+          }
+      }
+  },
+  "timestamp": 1542019654,
+  "severity": 6
+}

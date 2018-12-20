@@ -1,0 +1,30 @@
+{
+  "host": "ztp-tankstelle_1-ts",
+  "severity": 6,
+  "timestamp": 1541778090,
+  "os": "opengear",
+  "message_details": {
+    "tag": "AR",
+    "time": "15:41:30",
+    "severity": 6,
+    "type": "autoresponse",
+    "facility": 3,
+    "pri": "30",
+    "message": "name=DeviceBoot, index=2, ref=2, state=Triggered, event=config.ports.port2.serial.event.pattern2.rx, value=Booting...",
+    "host": "ztp-tankstelle_1-ts",
+    "date": "2018-Nov- 9"
+  },
+  "facility": 3,
+  "yang_message": {
+    "autoresponse": {
+      "DeviceBoot": {
+        "event": "config.ports.port2.serial.event.pattern2.rx",
+        "value": "Booting...",
+        "triggered": true
+      }
+    }
+  },
+  "yang_model": "NO_MODEL",
+  "error": "AUTORESPONSE",
+  "ip": "127.0.0.1"
+}
