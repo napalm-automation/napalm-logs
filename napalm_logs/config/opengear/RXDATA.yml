@@ -4,8 +4,8 @@ messages:
   - error: RXDATA
     tag: RXDATA
     values:
-      console_message: (.*)
-    line: '{console_message}'
+      consoleMessage: (.*)
+    line: '{consoleMessage}'
     model: NO_MODEL
     mapping:
       static:
