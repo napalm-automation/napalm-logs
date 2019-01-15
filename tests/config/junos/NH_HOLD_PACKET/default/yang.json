@@ -1,0 +1,30 @@
+{
+  "ip": "127.0.0.1",
+  "host": "vmx01",
+  "yang_message": {
+    "nh": {
+      "hold_packet": {
+        "id": "6891"
+      }
+    }
+  },
+  "message_details": {
+    "facility": 0,
+    "hostPrefix": "re0.",
+    "pri": "7",
+    "host": "vmx01",
+    "tag": "NH",
+    "date": "Jan 15",
+    "message": "hold packet out failed, ID 6891",
+    "additionalData": null,
+    "severity": 7,
+    "fpcId": "1",
+    "time": "08:18:57"
+  },
+  "error": "NH_HOLD_PACKET",
+  "timestamp": 1547540337,
+  "facility": 0,
+  "os": "junos",
+  "yang_model": "NO_MODEL",
+  "severity": 7
+}
