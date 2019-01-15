@@ -1,0 +1,13 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: NH_HOLD_PACKET
+    tag: NH
+    values:
+      id: (\d+)
+    line: 'hold packet out failed, ID {id}'
+    model: NO_MODEL
+    mapping:
+      variables:
+        nh//hold_packet//id: id
+      static: {}
