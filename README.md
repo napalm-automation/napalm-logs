@@ -1,7 +1,7 @@
 # napalm-logs
  
 napalm-logs is a Python library that listens to syslog messages from network
-devices and returns strucuted data following the [OpenConfig](http://www.openconfig.net/)
+devices and returns structured data following the [OpenConfig](http://www.openconfig.net/)
 or [IETF](https://github.com/YangModels/yang/tree/master/standard/ietf) YANG models.
 
 <img src="logo.png" data-canonical-src="logo.png" width="300" />
