@@ -1,0 +1,30 @@
+{
+  "ip": "127.0.0.1",
+  "host": "vmx01",
+  "yang_message": {
+    "nh": {
+      "install": {
+        "failed": "525207"
+      }
+    }
+  },
+  "message_details": {
+    "facility": 0,
+    "hostPrefix": "re0.",
+    "pri": "7",
+    "host": "vmx01",
+    "tag": "expr_nh_unilist_install",
+    "date": "Jan 16",
+    "message": "Creation of handle for nh 525207 failed",
+    "additionalData": null,
+    "severity": 7,
+    "fpcId": "0",
+    "time": "06:30:04"
+  },
+  "error": "NH_INSTALL_FAILED",
+  "timestamp": 1547620204,
+  "facility": 0,
+  "os": "junos",
+  "yang_model": "NO_MODEL",
+  "severity": 7
+}
