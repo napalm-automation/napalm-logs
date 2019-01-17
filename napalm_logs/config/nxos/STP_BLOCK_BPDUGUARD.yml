@@ -1,0 +1,12 @@
+messages:
+  - error: STP_BLOCK_BPDUGUARD
+    tag: STP-2-BLOCK_BPDUGUARD
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+    line: 'Received BPDU on port {interface} with BPDU Guard enabled. Disabling port.'
+    model: openconfig-interfaces
+    mapping:
+      variables: {}
+      static:
+        interfaces//interface//{interface}//state//change_reason: BPDUGuard
+        interfaces//interface//{interface}//state//admin_status: DOWN

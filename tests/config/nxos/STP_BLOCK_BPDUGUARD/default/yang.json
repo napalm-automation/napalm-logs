@@ -1,0 +1,32 @@
+{
+  "ip": "127.0.0.1",
+  "host": "switch01",
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "Ethernet1/43": {
+          "state": {
+            "admin_status": "DOWN",
+            "change_reason": "BPDUGuard"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "host": "switch01",
+    "tag": "STP-2-BLOCK_BPDUGUARD",
+    "severity": 5,
+    "facility": 23,
+    "date": "2019 Jan 16",
+    "message": "Received BPDU on port Ethernet1/43 with BPDU Guard enabled. Disabling port.",
+    "time": "04:40:19",
+    "pri": "189"
+  },
+  "error": "STP_BLOCK_BPDUGUARD",
+  "timestamp": 1547613619,
+  "facility": 23,
+  "os": "nxos",
+  "yang_model": "openconfig-interfaces",
+  "severity": 5
+}
