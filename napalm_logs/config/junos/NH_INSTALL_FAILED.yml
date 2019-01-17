@@ -1,0 +1,13 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: NH_INSTALL_FAILED
+    tag: expr_nh_unilist_install
+    values:
+      id: (\d+)
+    line: 'Creation of handle for nh {id} failed'
+    model: NO_MODEL
+    mapping:
+      variables:
+        nh//install//failed: id
+      static: {}
