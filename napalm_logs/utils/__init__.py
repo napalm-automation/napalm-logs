@@ -210,6 +210,14 @@ def bgp_state_convert(state):
     return state_dict.get(state, state.upper())
 
 
+def bfd_state_convert(state):
+    """
+    Given a matched BFD state, map it to a vendor agnostic version.
+    """
+    state_dict = {'AdminDown': 'ADMIN_DOWN'}
+    return state_dict.get(state, state.upper())
+
+
 def unserialize(binary):
     '''
     Unpack the original OpenConfig object,
