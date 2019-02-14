@@ -1,0 +1,37 @@
+{
+  "yang_message": {
+    "bfd": {
+      "interfaces": {
+        "interface": {
+          "id": "Ethernet50/1",
+          "peers": {
+            "peer": {
+              "state": {
+                "session-state": "UP"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 5,
+    "date": "Feb  7",
+    "pri": "165",
+    "host": "HOSTNAME",
+    "tag": "BFD-5-STATE_CHANGE",
+    "time": "22:22:35",
+    "message": ": peer (vrf:default, ip:18.11.5.1, intf:Ethernet50/1, srcIp:0.0.0.0, type:normal) changed state from Down to Up diag None",
+    "facility": 20,
+    "processName": "Bfd"
+  },
+  "yang_model": "openconfig-bfd",
+  "os": "eos",
+  "facility": 20,
+  "severity": 5,
+  "error": "BFD_STATE_CHANGE",
+  "host": "HOSTNAME",
+  "ip": "127.0.0.1",
+  "timestamp": 1526706119764
+}
