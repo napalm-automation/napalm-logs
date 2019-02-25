@@ -206,7 +206,9 @@ def bgp_state_convert(state):
     Given a matched BGP state, map it to a vendor agnostic version.
     """
     state_dict = {'OpenSent': 'OPEN_SENT',
-                  'OpenConfirm': 'OPEN_CONFIRM'}
+                  'OpenConfirm': 'OPEN_CONFIRM',
+                  'Up': 'ESTABLISHED',
+                  'Down': 'ACTIVE'}
     return state_dict.get(state, state.upper())
 
 
