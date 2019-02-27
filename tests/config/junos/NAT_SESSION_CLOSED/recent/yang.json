@@ -1,0 +1,44 @@
+{
+    "yang_message": {
+        "security": {
+            "flow": {
+                "closed": {
+                    "reason": "idle Timeout",
+                    "source_address": "172.16.0.1",
+                    "source_port": "23456",
+                    "destination_address": "8.8.8.8",
+                    "destination_port": "443",
+                    "service_name": "junos-https",
+                    "nat_source_address": "172.16.0.2",
+                    "nat_source_port": "12345",
+                    "nat_destination_address": "8.8.8.8",
+                    "nat_destination_port": "443",
+                    "src_nat_rule_name": "LAN",
+                    "protocol_id": "6",
+                    "misc_data": "allow-any PRIVATE PUBLIC 123456 N/A(N/A) hu-1/0/0.0 UNKNOWN UNKNOWN UNKNOWN"
+                }
+            }
+        }
+    },
+    "message_details": {
+        "processId": null,
+        "severity": 6,
+        "facility": 1,
+        "hostPrefix": null,
+        "pri": "14",
+        "processName": "RT_FLOW",
+        "host": "srx-firewall",
+        "tag": "RT_FLOW_SESSION_CLOSE",
+        "time": "13:12:00",
+        "date": "Dec 13",
+        "message": "session closed idle Timeout: 172.16.0.1/23456->8.8.8.8/443 0x0 junos-https 172.16.0.2/12345->8.8.8.8/443 0x0 source rule LAN N/A N/A 6 allow-any PRIVATE PUBLIC 123456 N/A(N/A) hu-1/0/0.0 UNKNOWN UNKNOWN UNKNOWN"
+    },
+    "timestamp": 1500587040,
+    "facility": 1,
+    "ip": "127.0.0.1",
+    "host": "srx-firewall",
+    "yang_model": "NO_MODEL",
+    "error": "NAT_SESSION_CLOSED",
+    "os": "junos",
+    "severity": 6
+}
