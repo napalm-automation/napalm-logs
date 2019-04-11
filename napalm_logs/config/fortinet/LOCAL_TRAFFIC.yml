@@ -1,0 +1,41 @@
+# Logs files for traffic identified as type=traffic and subtype=local (FortiOs 5.4) 
+#
+# <189>date=2019-04-04 time=09:19:21 devname=fw01 devid=FG800D0123456789 logid=0001000014 type=traffic 
+# subtype=local level=notice vd=root srcip=172.30.0.1 srcport=48770 srcintf="wan1" dstip=172.16.0.1 
+# dstport=443 dstintf="root" sessionid=3841389285 proto=6 action=close policyid=0 policytype=local-in-policy 
+# dstcountry="France" srccountry="France" trandisp=noop service="HTTPS" app="Web Management(HTTPS)" 
+# duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat="unscanned"
+#
+messages:
+  - error: 'LOCAL_TRAFFIC'
+    tag: "subtype=local"
+    values:
+      level: ([^ ]+)
+      vd: ([^ ]+)
+      srcip: ([^ ]+)
+      srcport: ([^ ]+)
+      srcintf: ([^ ]+)
+      dstip: ([^ ]+)
+      dstport: ([^ ]+)
+      dstintf: ([^ ]+)
+      sessiondId: ([^ ]+)
+      protocolId: ([^ ]+)
+      action: ([^ ]+)
+      miscData: (.*)
+    line: '{level} {vd} {srcip} {srcport} {srcintf} {dstip} {dstport} {dstintf} {sessiondId} {protocolId} {action} {miscData}'
+    model: NO_MODEL
+    mapping:
+      variables:
+        session//traffic//local//level: level
+        session//traffic//local//vdom: vd
+        session//traffic//local//source_ip: srcip
+        session//traffic//local//source_port: srcport
+        session//traffic//local//source_interface: srcintf
+        session//traffic//local//destination_ip: dstip
+        session//traffic//local//destination_port: dstport
+        session//traffic//local//destination_interface: dstintf
+        session//traffic//local//session_id: sessiondId
+        session//traffic//local//protocol_id: protocolId
+        session//traffic//local//action: action
+        session//traffic//local//misc_data: miscData
+      static: {}
