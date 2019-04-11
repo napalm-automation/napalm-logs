@@ -11,7 +11,7 @@
          "destination_ip": "10.10.10.10",
          "destination_port": "179",
          "destination_interface": "port3",
-         "poluu_id": "d4954a18-3b72-51e9-1163-77fc436ef3c9"
+         "poluu_id": "d4954a18-3b72-51e9-1163-77fc436ef3c9",
          "session_id": "1768791677",
          "protocol_id": "6",
          "action": "timeout",
