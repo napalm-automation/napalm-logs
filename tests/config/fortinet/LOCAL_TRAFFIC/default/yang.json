@@ -14,7 +14,7 @@
          "session_id": "3841389285",
          "protocol_id": "6",
          "action": "close",
-         "misc_data": "dstcountry='France' srccountry='France' trandisp=noop service='HTTPS' app='Web Management(HTTPS)' duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat="unscanned'"
+         "misc_data": "dstcountry='France' srccountry='France' trandisp=noop service='HTTPS' app='Web Management(HTTPS)' duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat='unscanned'"
        }
      }
    }
