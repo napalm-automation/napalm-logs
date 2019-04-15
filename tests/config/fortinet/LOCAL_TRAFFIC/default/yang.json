@@ -32,7 +32,7 @@
  "date": "2019-04-04",
  "message": "level=notice vd=root srcip=172.30.0.1 srcport=48770 srcintf='wan1' dstip=172.16.0.1 dstport=443 dstintf='root' sessionid=3841389285 proto=6 action=close policyid=0 policytype=local-in-policy dstcountry='France' srccountry='France' trandisp=noop service='HTTPS' app='Web Management(HTTPS)' duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat='unscanned'"
  },
- "timestamp": 1552629390,
+ "timestamp": 1552629392,
  "facility": 23,
  "ip": "127.0.0.1",
  "host": "fw01",
