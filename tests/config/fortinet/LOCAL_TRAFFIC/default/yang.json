@@ -23,8 +23,8 @@
         "severity": 5,
         "facility": 23,
         "devid": "FG800D0123456789",
-        "pri": "189"
-        "logid": 0001000014,
+        "pri": "189",
+        "logid": "0001000014",
         "processName": "type=traffic",
         "host": "fw01",
         "tag": "subtype=local",
