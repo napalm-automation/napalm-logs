@@ -9,7 +9,6 @@
 # dstcountry="France" srccountry="France" trandisp=noop service="HTTPS" app="Web Management(HTTPS)" 
 # duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat="unscanned"
 #
-#
 prefixes:
   - time_format: "%Y-%m-%d %H:%M:%S"
     values:
