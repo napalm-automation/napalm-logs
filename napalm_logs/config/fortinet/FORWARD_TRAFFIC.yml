@@ -1,4 +1,4 @@
-# Logs files identified as type=traffic and subtype=forward (FortiOs 5.4)
+# Logs files identified as type=traffic and subtype=forward (FortiOs 5.4).
 #
 # <189>date=2019-04-09 time=04:27:29 devname=fw01 devid=FG800D0123456789 logid=0000000013 type=traffic subtype=forward 
 # level=notice vd=root srcip=1.1.1.1 srcport=19982 srcintf="port1" dstip=10.10.10.10 dstport=179 dstintf="port3" 
