@@ -1,43 +1,43 @@
 {
- "yang_message": {
-   "session": {
-     "traffic": {
-       "local": {
-         "level": "level=notice",
-         "vdom": "vd=root",
-         "source_ip": "srcip=172.30.0.1",
-         "source_port": "srcport=48770",
-         "source_interface": "srcintf=wan1",
-         "destination_ip": "dstip=172.16.0.1",
-         "destination_port": "dstport=443",
-         "destination_interface": "dstintf=root",
-         "session_id": "sessionid=3841389285",
-         "protocol_id": "proto=6",
-         "action": "action=close",
-         "misc_data": "dstcountry='France' srccountry='France' trandisp=noop service='HTTPS' app='Web Management(HTTPS)' duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat='unscanned'"
-       }
-     }
-   }
- },
- "message_details": {
- "processId": null,
- "severity": 5,
- "facility": 23,
- "hostPrefix": null,
- "pri": "189",
- "processName": "type=traffic",
- "host": "fw01",
- "tag": "subtype=local",
- "time": "09:19:21",
- "date": "2019-04-04",
- "message": "level=notice vd=root srcip=172.30.0.1 srcport=48770 srcintf='wan1' dstip=172.16.0.1 dstport=443 dstintf='root' sessionid=3841389285 proto=6 action=close policyid=0 policytype=local-in-policy dstcountry='France' srccountry='France' trandisp=noop service='HTTPS' app='Web Management(HTTPS)' duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat='unscanned'"
- },
- "timestamp": 1552629390,
- "facility": 23,
- "ip": "127.0.0.1",
- "host": "fw01",
- "yang_model": "NO_MODEL",
- "error": "LOCAL_TRAFFIC",
- "os": "fortinet",
- "severity": 5
+    "yang_message": {
+        "session": {
+            "traffic": {
+                "local": {
+                    "level": "level=notice",
+                    "vdom": "vd=root",
+                    "source_ip": "srcip=172.30.0.1",
+                    "source_port": "srcport=48770",
+                    "source_interface": "srcintf=wan1",
+                    "destination_ip": "dstip=172.16.0.1",
+                    "destination_port": "dstport=443",
+                    "destination_interface": "dstintf=root",
+                    "session_id": "sessionid=3841389285",
+                    "protocol_id": "proto=6",
+                    "action": "action=close",
+                    "misc_data": "dstcountry='France' srccountry='France' trandisp=noop service='HTTPS' app='Web Management(HTTPS)' duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat='unscanned'"
+                }
+            }
+        }
+    },
+    "message_details": {
+        "severity": 5,
+        "facility": 23,
+        "devid": "FG800D0123456789",
+        "pri": "189"
+        "logid": 0001000014,
+        "processName": "type=traffic",
+        "host": "fw01",
+        "tag": "subtype=local",
+        "time": "09:19:21",
+        "date": "2019-04-04",
+        "message": "level=notice vd=root srcip=172.30.0.1 srcport=48770 srcintf='wan1' dstip=172.16.0.1 dstport=443 dstintf='root' sessionid=3841389285 proto=6 action=close policyid=0 policytype=local-in-policy dstcountry='France' srccountry='France' trandisp=noop service='HTTPS' app='Web Management(HTTPS)' duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat='unscanned'"
+    },
+    "timestamp": 1552629390,
+    "facility": 23,
+    "ip": "127.0.0.1",
+    "host": "fw01",
+    "yang_model": "NO_MODEL",
+    "error": "LOCAL_TRAFFIC",
+    "os": "fortinet",
+    "severity": 5
 }
