@@ -1,44 +1,44 @@
 {
- "yang_message": {
-   "session": {
-     "traffic": {
-       "forward": {
-         "level": "notice",
-         "vdom": "root",
-         "source_ip": "1.1.1.1",
-         "source_port": "19982",
-         "source_interface": "port1",
-         "destination_ip": "10.10.10.10",
-         "destination_port": "179",
-         "destination_interface": "port3",
-         "poluu_id": "d4954a18-3b72-51e9-1163-77fc436ef3c9",
-         "session_id": "1768791677",
-         "protocol_id": "6",
-         "action": "timeout",
-         "misc_data": "dstcountry='Reserved' srccountry='Reserved' trandisp=noop service='BGP' duration=25 sentbyte=300 rcvdbyte=0 sentpkt=5 rcvdpkt=0 appcat='unscanned' crscore=5 craction=262144 crlevel=low"
-       }
-     }
-   }
- },
- "message_details": {
- "processId": null,
- "severity": 5,
- "facility": 23,
- "hostPrefix": null,
- "pri": "189",
- "processName": "type=traffic",
- "host": "fw01",
- "tag": "subtype=forward",
- "time": "04:27:29",
- "date": "2019-04-09",
- "message": "level=notice vd=root srcip=1.1.1.1 srcport=19982 srcintf='port1' dstip=10.10.10.10 dstport=179 dstintf='port3' poluuid=d4954a18-3b72-51e9-1163-77fc436ef3c9 sessionid=1768791677 proto=6 action=timeout policyid=34 policytype=policy dstcountry='Reserved' srccountry='Reserved' trandisp=noop service='BGP' duration=25 sentbyte=300 rcvdbyte=0 sentpkt=5 rcvdpkt=0 appcat='unscanned' crscore=5 craction=262144 crlevel=low"
- },
- "timestamp": 1554786149,
- "facility": 23,
- "ip": "127.0.0.1",
- "host": "fw01",
- "yang_model": "NO_MODEL",
- "error": "FORWARD_TRAFFIC",
- "os": "fortinet",
- "severity": 5
+    "yang_message": {
+        "session": {
+            "traffic": {
+                "forward": {
+                    "level": "level=notice",
+                    "vdom": "vd=root",
+                    "source_ip": "srcip=1.1.1.1",
+                    "source_port": "srcport=19982",
+                    "source_interface": "srcintf=\"port1\"",
+                    "destination_ip": "dstip=10.10.10.10",
+                    "destination_port": "dstport=179",
+                    "destination_interface": "dstintf=\"port3\"",
+                    "poluu_id": "poluuid=d4954a18-3b72-51e9-1163-77fc436ef3c9",
+                    "session_id": "sessionid=1768791677",
+                    "protocol_id": "proto=6",
+                    "action": "action=timeout",
+                    "misc_data": "policyid=34 policytype=policy dstcountry=\"Reserved\" srccountry=\"Reserved\" trandisp=noop service=\"BGP\" duration=25 sentbyte=300 rcvdbyte=0 sentpkt=5 rcvdpkt=0 appcat=\"unscanned\" crscore=5 craction=262144 crlevel=low"
+                }
+            }
+        }
+    },
+    "message_details": {
+        "logid": "0000000013",
+        "severity": 5,
+        "facility": 23,
+        "devid": "FG800D0123456789",
+        "pri": "189",
+        "processName": "type=traffic",
+        "host": "fw01",
+        "tag": "subtype=forward",
+        "time": "04:27:29",
+        "date": "2019-04-09",
+        "message": "level=notice vd=root srcip=1.1.1.1 srcport=19982 srcintf=\"port1\" dstip=10.10.10.10 dstport=179 dstintf=\"port3\" poluuid=d4954a18-3b72-51e9-1163-77fc436ef3c9 sessionid=1768791677 proto=6 action=timeout policyid=34 policytype=policy dstcountry=\"Reserved\" srccountry=\"Reserved\" trandisp=noop service=\"BGP\" duration=25 sentbyte=300 rcvdbyte=0 sentpkt=5 rcvdpkt=0 appcat=\"unscanned\" crscore=5 craction=262144 crlevel=low"
+    },
+    "timestamp": 1554786149,
+    "facility": 23,
+    "ip": "127.0.0.1",
+    "host": "fw01",
+    "yang_model": "NO_MODEL",
+    "error": "FORWARD_TRAFFIC",
+    "os": "fortinet",
+    "severity": 5
 }
