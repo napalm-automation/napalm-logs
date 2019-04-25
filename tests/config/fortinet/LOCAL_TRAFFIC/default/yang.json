@@ -1,0 +1,43 @@
+{
+    "yang_message": {
+        "session": {
+            "traffic": {
+                "local": {
+                    "level": "notice",
+                    "vdom": "root",
+                    "source_ip": "172.30.0.1",
+                    "source_port": "48770",
+                    "source_interface": "\"wan1\"",
+                    "destination_ip": "172.16.0.1",
+                    "destination_port": "443",
+                    "destination_interface": "\"root\"",
+                    "session_id": "3841389285",
+                    "protocol_id": "6",
+                    "action": "close",
+                    "misc_data": "policyid=0 policytype=local-in-policy dstcountry=\"France\" srccountry=\"France\" trandisp=noop service=\"HTTPS\" app=\"Web Management(HTTPS)\" duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat=\"unscanned\""
+                }
+            }
+        }
+    },
+    "message_details": {
+        "logid": "0001000014",
+        "severity": 5,
+        "facility": 23,
+        "devid": "FG800D0123456789",
+        "pri": "189",
+        "processName": "traffic",
+        "host": "fw01",
+        "tag": "local",
+        "time": "09:19:21",
+        "date": "2019-04-04",
+        "message": "level=notice vd=root srcip=172.30.0.1 srcport=48770 srcintf=\"wan1\" dstip=172.16.0.1 dstport=443 dstintf=\"root\" sessionid=3841389285 proto=6 action=close policyid=0 policytype=local-in-policy dstcountry=\"France\" srccountry=\"France\" trandisp=noop service=\"HTTPS\" app=\"Web Management(HTTPS)\" duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat=\"unscanned\""
+    },
+    "timestamp": 1552629390,
+    "facility": 23,
+    "ip": "127.0.0.1",
+    "host": "fw01",
+    "yang_model": "NO_MODEL",
+    "error": "LOCAL_TRAFFIC",
+    "os": "fortinet",
+    "severity": 5
+}
