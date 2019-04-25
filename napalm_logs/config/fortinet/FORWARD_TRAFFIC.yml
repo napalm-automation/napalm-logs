@@ -10,18 +10,18 @@ messages:
   - error: 'FORWARD_TRAFFIC'
     tag: "forward"
     values:
-      level: (?<=level=)(.*)(?=\s+vd=)
-      vd: (?<=vd=)(.*)(?=\s+srcip=)
-      srcip: (?<=srcip=)(.*)(?=\s+srcport=)
-      srcport: (?<=srcport=)(.*)(?=\s+srcintf=)
-      srcintf: (?<=srcintf=)(.*)(?=\s+dstip=)
-      dstip: (?<=dstip=)(.*)(?=\s+dstport=)
-      dstport: (?<=dstport=)(.*)(?=\s+dstintf=)
-      dstintf: (?<=dstintf=)(.*)(?=\s+poluuid=)
-      poluuId: (?<=poluuid=)(.*)(?=\s+sessionid=)
-      sessiondId: (?<=sessionid=)(.*)(?=\s+proto=)
-      protocolId: (?<=proto=)(.*)(?=\s+action=)
-      action: (?<=action=)(.*)(?=\s+policyid=)
+      level: (\w+)
+      vd: (.*)
+      srcip: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      srcport: (\d+)
+      srcintf: (.*)
+      dstip: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      dstport: (\d+)
+      dstintf: (.*)
+      poluuId: (.*)
+      sessiondId: (\d+)
+      protocolId: (\d+)
+      action: (\w+)
       miscData: (.*)
     line: 'level={level} vd={vd} srcip={srcip} srcport={srcport} srcintf={srcintf} dstip={dstip} dstport={dstport} dstintf={dstintf} poluuid={poluuId} sessionid={sessiondId} proto={protocolId} action={action} {miscData}'
     model: NO_MODEL
