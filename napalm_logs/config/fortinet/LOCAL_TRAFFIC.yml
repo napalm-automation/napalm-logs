@@ -8,21 +8,21 @@
 #
 messages:
   - error: 'LOCAL_TRAFFIC'
-    tag: "subtype=local"
+    tag: "local"
     values:
-      level: ([^ ]+)
-      vd: ([^ ]+)
-      srcip: ([^ ]+)
-      srcport: ([^ ]+)
-      srcintf: ([^ ]+)
-      dstip: ([^ ]+)
-      dstport: ([^ ]+)
-      dstintf: ([^ ]+)
-      sessiondId: ([^ ]+)
-      protocolId: ([^ ]+)
-      action: ([^ ]+)
+      level: (?<=level=)(.*)(?=\s+vd=)
+      vd: (?<=vd=)(.*)(?=\s+srcip=)
+      srcip: (?<=srcip=)(.*)(?=\s+srcport=)
+      srcport: (?<=srcport=)(.*)(?=\s+srcintf=)
+      srcintf: (?<=srcintf=)(.*)(?=\s+dstip=)
+      dstip: (?<=dstip=)(.*)(?=\s+dstport=)
+      dstport: (?<=dstport=)(.*)(?=\s+dstintf=)
+      dstintf: (?<=dstintf=)(.*)(?=\s+sessionid=)
+      sessiondId: (?<=sessionid=)(.*)(?=\s+proto=)
+      protocolId: (?<=proto=)(.*)(?=\s+action=)
+      action: (?<=action=)(.*)(?=\s+policyid=)
       miscData: (.*)
-    line: '{level} {vd} {srcip} {srcport} {srcintf} {dstip} {dstport} {dstintf} {sessiondId} {protocolId} {action} {miscData}'
+    line: 'level={level} vd={vd} srcip={srcip} srcport={srcport} srcintf={srcintf} dstip={dstip} dstport={dstport} dstintf={dstintf} sessionid={sessiondId} proto={protocolId} action={action} {miscData}'
     model: NO_MODEL
     mapping:
       variables:
