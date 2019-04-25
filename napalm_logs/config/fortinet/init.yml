@@ -14,9 +14,9 @@ prefixes:
     values:
       date: (\d+-\d+-\d+)
       time: (\d\d:\d\d:\d\d)
-      host: (?<=devname=)(.*)(?=\s+devid=)
-      devid: (?<=devid=)(.*)(?=\s+logid=) 
-      logid: (?<=logid=)(.*)(?=\s+type=)
-      processName: (?<=type=)(.*)(?=\s+subtype=)
-      tag: (?<=subtype=)(.*)(?=\s+level=)
+      host: (.*)
+      devid: (.*) 
+      logid: (\d+)
+      processName: (\w+)
+      tag: (\w+)
     line: 'date={date} time={time} devname={host} devid={devid} logid={logid} type={processName} subtype={tag}'
