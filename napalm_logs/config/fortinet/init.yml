@@ -17,6 +17,6 @@ prefixes:
       host: (?<=devname=)(.*)(?=\s+devid=)
       devid: (?<=devid=)(.*)(?=\s+logid=) 
       logid: (?<=logid=)(.*)(?=\s+type=)
-      processName: ([^ ]+)
-      tag: ([^ ]+)
-    line: 'date={date} time={time} devname={host} devid={devid} logid={logid} {processName} {tag}'
+      processName: (?<=type=)(.*)(?=\s+subtype=)
+      tag: (?<=subtype=)(.*)(?=\s+level=)
+    line: 'date={date} time={time} devname={host} devid={devid} logid={logid} type={processName} subtype={tag}'
