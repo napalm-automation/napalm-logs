@@ -203,7 +203,7 @@ values using replace functions found in napalm_logs.utils.Replace i.e
 This is the YANG model to use to output the log message. You can find all
 models and their structure here_.
 
-.. _here: http://ops.openconfig.net/branches/master/
+.. _here: https://yangcatalog.org/yang-search/
 
 ``mapping``
 ------------
@@ -245,9 +245,10 @@ parts extracted from the syslog message, without any further processing. The
 following keys are mandatory:
 
 - ``host``: the network device hostname, as provided in the syslog message
-prefix section.
+  prefix section.
 - ``tag``: which is the unique identification tag of the syslog message, e.g. in the message ``Mar 30 12:45:19 re0.edge01.bjm01 rpd[15852]: BGP_PREFIX_THRESH_EXCEEDED 1.2.3.4 (External AS 15169): Configured maximum prefix-limit threshold(160) exceeded for inet-unicast nlri: 181 (instance master)``, the ``tag`` is ``BGP_PREFIX_THRESH_EXCEEDED``. Other tag examples: ``bgp_read_message``, ``ROUTING-BGP-5-MAXPFX`` or even ``Alarm set``.
-- ``message``: is the message that what we have defied earlier as *the message section*, e.g. ``User 'dummy' entering configuration mode``.
+- ``message``: is the message that what we have defied earlier as *the message
+  section*, e.g. ``User 'dummy' entering configuration mode``.
 
 .. note::
 

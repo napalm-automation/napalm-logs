@@ -8,7 +8,7 @@ messages:
     values:
       interface: ([\w\-\/\.\:]+(?<!\:))
     line: '{interface}: bpdu-block disabled port'
-    model: openconfig-interface
+    model: openconfig-interfaces
     mapping:
       variables: {}
       static:
