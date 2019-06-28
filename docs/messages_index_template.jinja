@@ -14,7 +14,8 @@ For example, the following syslog message:
 
 ``napalm-logs`` identifies that it was produced by a Junos device and assigns
 the error tag ``BGP_PREFIX_LIMIT_EXCEEDED`` and then will try to map the
-information into the OpenConfig model ``openconfig_bgp``:
+information into the OpenConfig model
+`openconfig-bgp <https://yangcatalog.org/yang-search/yang_tree/openconfig-bgp>`__:
 
 .. code-block:: json
 
@@ -65,7 +66,7 @@ information into the OpenConfig model ``openconfig_bgp``:
 	  "facility": 18,
 	  "ip": "127.0.0.1",
 	  "host": "vmx01",
-	  "yang_model": "openconfig_bgp",
+	  "yang_model": "openconfig-bgp",
 	  "error": "BGP_PREFIX_THRESH_EXCEEDED",
 	  "os": "junos",
 	  "severity": 5
