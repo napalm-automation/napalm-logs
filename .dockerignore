@@ -1,0 +1,9 @@
+.git
+.venv
+*.yml
+*.md
+*.png
+*.ini
+docs
+examples
+tests
