@@ -1,0 +1,43 @@
+# Logs files identified as type=traffic and subtype=forward (FortiOs 5.4).
+#
+# <189>date=2019-04-09 time=04:27:29 devname=fw01 devid=FG800D0123456789 logid=0000000013 type=traffic subtype=forward 
+# level=notice vd=root srcip=1.1.1.1 srcport=19982 srcintf="port1" dstip=10.10.10.10 dstport=179 dstintf="port3" 
+# poluuid=d4954a18-3b72-51e9-1163-77fc436ef3c9 sessionid=1768791677 proto=6 action=timeout policyid=34 policytype=policy 
+# dstcountry="Reserved" srccountry="Reserved" trandisp=noop service="BGP" duration=25 sentbyte=300 rcvdbyte=0 sentpkt=5 
+# rcvdpkt=0 appcat="unscanned" crscore=5 craction=262144 crlevel=low
+#
+messages:
+  - error: 'FORWARD_TRAFFIC'
+    tag: "forward"
+    values:
+      level: (\w+)
+      vd: (.*)
+      srcip: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      srcport: (\d+)
+      srcintf: (.*)
+      dstip: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      dstport: (\d+)
+      dstintf: (.*)
+      poluuId: (.*)
+      sessiondId: (\d+)
+      protocolId: (\d+)
+      action: (\w+)
+      miscData: (.*)
+    line: 'level={level} vd={vd} srcip={srcip} srcport={srcport} srcintf={srcintf} dstip={dstip} dstport={dstport} dstintf={dstintf} poluuid={poluuId} sessionid={sessiondId} proto={protocolId} action={action} {miscData}'
+    model: NO_MODEL
+    mapping:
+      variables:
+        session//traffic//forward//level: level
+        session//traffic//forward//vdom: vd
+        session//traffic//forward//source_ip: srcip
+        session//traffic//forward//source_port: srcport
+        session//traffic//forward//source_interface: srcintf
+        session//traffic//forward//destination_ip: dstip
+        session//traffic//forward//destination_port: dstport
+        session//traffic//forward//destination_interface: dstintf
+        session//traffic//forward//poluu_id: poluuId
+        session//traffic//forward//session_id: sessiondId
+        session//traffic//forward//protocol_id: protocolId
+        session//traffic//forward//action: action
+        session//traffic//forward//misc_data: miscData
+      static: {}

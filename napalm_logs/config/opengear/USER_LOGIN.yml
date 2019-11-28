@@ -1,0 +1,13 @@
+#<30>ztp-tankstelle_1-ts port02 2018-Nov-12 10:47:29.515 LOGIN: root
+
+messages:
+  - error: USER_LOGIN
+    tag: LOGIN
+    values:
+      user: (.*)
+    line: '{user}'
+    model: NO_MODEL
+    mapping:
+      static:
+        users//user//{user}//action//login: true
+      variables: {}

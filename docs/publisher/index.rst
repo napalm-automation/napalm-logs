@@ -156,7 +156,7 @@ Configuration example:
 .. _publisher-opts-no-encrypt:
 
 ``no_encrypt``: ``False``
-------------------------
+-------------------------
 
 .. versionadded:: 0.4.2
 

@@ -1,0 +1,31 @@
+{
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "ethernet3/8": {
+          "state": {
+            "oper_status": "DOWN"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 6,
+    "date": "Nov  6",
+    "pri": "14",
+    "host": "HOSTNAME",
+    "tag": "System",
+    "time": "13:36:28",
+    "message": "Interface ethernet 3/8, state down - remote fault",
+    "facility": 1
+  },
+  "yang_model": "openconfig-interfaces",
+  "os": "netiron",
+  "facility": 1,
+  "severity": 6,
+  "error": "INTERFACE_DOWN",
+  "host": "HOSTNAME",
+  "ip": "127.0.0.1",
+  "timestamp": 1526706119764
+}

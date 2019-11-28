@@ -1,0 +1,31 @@
+{
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "ethernet1/1/18": {
+          "state": {
+            "oper_status": "UP"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 6,
+    "date": "Nov  6",
+    "pri": "14",
+    "host": "HOSTNAME",
+    "tag": "System",
+    "time": "13:37:14",
+    "message": "Interface ethernet 1/1/18, state up",
+    "facility": 1
+  },
+  "yang_model": "openconfig-interfaces",
+  "os": "netiron",
+  "facility": 1,
+  "severity": 6,
+  "error": "INTERFACE_UP",
+  "host": "HOSTNAME",
+  "ip": "127.0.0.1",
+  "timestamp": 1526706119764
+}

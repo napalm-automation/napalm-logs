@@ -23,7 +23,7 @@
     "facility": 3,
     "severity": 1
   },
-  "yang_model": "openconfig-interface",
+  "yang_model": "openconfig-interfaces",
   "os": "junos",
   "facility": 3,
   "severity": 1,

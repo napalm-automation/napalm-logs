@@ -17,6 +17,7 @@ systems:
    ios
    netiron
    huawei
+   sonic
 
 To see how to configure the network device, check the documents referenced
 above. Note that the examples in each case represents the configuration used to

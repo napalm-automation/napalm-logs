@@ -1,0 +1,57 @@
+{
+    "host": "HOSTNAME",
+    "yang_message": {
+        "network-instances": {
+            "network-instance": {
+                "global": {
+                    "protocols": {
+                        "protocol": {
+                            "isis": {
+                                "interfaces": {
+                                    "interface": {
+                                        "et7": {
+                                            "levels": {
+                                                "level": {
+                                                    "L1": {
+                                                        "adjacencies": {
+                                                            "adjacency": {
+                                                                "1920.0000.2006": {
+                                                                    "state": {
+                                                                        "adjacency-state": "UP"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "message_details": {
+        "severity": 6,
+        "facility": 3,
+        "pri": "30",
+        "processName": "Isis",
+        "host": "HOSTNAME",
+        "tag": "ISIS-4-ISIS_ADJCHG",
+        "time": "12:08:12",
+        "date": "Dec 14",
+        "message": ": L1 Neighbor State Change for SystemID 1920.0000.2006 on et7 to UP"
+      },
+      "facility": 3,
+      "ip": "127.0.0.1",
+      "error": "ISIS_NEIGHBOR_UP",
+      "host": "HOSTNAME",
+      "yang_model": "openconfig-isis",
+      "timestamp": 1517905634,
+      "os": "eos",
+      "severity": 6
+}

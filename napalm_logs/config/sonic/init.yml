@@ -1,0 +1,23 @@
+# Prefix profiler for Sonic devices.
+# This profiler matches messages having the following form:
+# (SyslogProtocol23Format)
+#
+# .. code-block:: text
+#
+#   <166>1 2019-02-20T14:34:18.435351+00:00 ss12.00.lab bgpd 
+#   83 - -  %ADJCHANGE: neighbor 100.67.0.142(sp01.02.lab) in vrf Default Up
+#
+prefixes:
+  - time_format: "%Y-%m-%d %H:%M:%S"
+    values:
+      version: (\d+)
+      date: (\d+-\d+-\d+)
+      time: (\d+:\d+:\d+)
+      timeSecfrac: (\d{6})
+      timeOffset: ((?:\+|\-)\d{2}:\d{2})
+      host: ([^ ]+)
+      tag: ([^ ]+)
+      processId: ([^ ]+)
+      messageId: ([^ ]+)
+      structedData: ([^ ]+)
+    line: '{version} {date}T{time}.{timeSecfrac}{timeOffset} {host} {tag} {processId} {messageId} {structedData} '

@@ -1,0 +1,22 @@
+# <166>1 2019-02-20T15:10:35.073589+00:00 ss12.00.lab bgpd 83 - -  %ADJCHANGE: neighbor 100.67.0.142(sp01.02.lab) in vrf Default Down Interface down
+# <166>1 2019-02-20T15:10:50.505646+00:00 ss12.00.lab bgpd 83 - -  %ADJCHANGE: neighbor 100.67.0.142(sp01.02.lab) in vrf Default Up
+
+
+# This error tag corresponds to syslog messages notifying that the configured
+# bgp neighbor has changed state
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    tag: bgpd
+    values:
+      peer: ([\w\d:\.]+)
+      neighborName: ([^\)]+)
+      vrf: (\w+)
+      state|bgp_state_convert: (\w+)
+    line: '%ADJCHANGE: neighbor {peer}({neighborName}) in vrf {vrf} {state}'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//session-state: state
+      static: {}

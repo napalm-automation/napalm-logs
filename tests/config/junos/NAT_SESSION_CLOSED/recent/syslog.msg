@@ -1,0 +1,1 @@
+<14>Dec 13 13:12:00 srx-firewall RT_FLOW: RT_FLOW_SESSION_CLOSE: session closed idle Timeout: 172.16.0.1/23456->8.8.8.8/443 0x0 junos-https 172.16.0.2/12345->8.8.8.8/443 0x0 source rule LAN N/A N/A 6 allow-any PRIVATE PUBLIC 123456 N/A(N/A) hu-1/0/0.0 UNKNOWN UNKNOWN UNKNOWN

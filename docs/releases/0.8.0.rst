@@ -1,0 +1,66 @@
+.. _release-0.8.0:
+
+==============================
+Release 0.8.0 - Codename Gripe
+==============================
+
+Azure SONiC support
+-------------------
+
+Initial support for Azure SONiC has been added thanks to Anthony Iheoma
+(@emfusion)'s contribution, providing notifications for :ref:`INTERFACE_UP`, 
+:ref:`INTERFACE_DOWN`, and :ref:`BGP_NEIGHBOR_STATE_CHANGED`.
+
+Opengear support
+----------------
+
+@gtcat provided support for Opengear console servers, together with a new set 
+of messages: :ref:`USER_LOGIN`, :ref:`USER_LOGOUT`, :ref:`AUTORESPONSE`,
+:ref:`RXDATA`, and :ref:`SIGNAL`. Thanks @gtcat!
+
+Junos FPC logs
+--------------
+
+Thanks to Antoine Meillet (inetAnt)'s `pull 
+request <https://github.com/napalm-automation/napalm-logs/pull/285>`__, 
+napalm-logs is now capable to process Junos FPC logs as well.
+
+Docker image changes
+--------------------
+
+Starting with this release, the Docker images will be hosted under the 
+``napalmautomation`` organisation on Docker Hub. Please make sure to update your 
+Docker references to
+`napalmautomation/napalm-logs <https://hub.docker.com/r/napalmautomation/napalm-logs>`__
+to pull the latest versions. Additionally, we publish a Docker image for the
+``develop`` branch so you don't necessarily have to wait for a new release to
+gather the fixes and features from the most recent PRs being merged.
+
+New Structured Messages
+-----------------------
+
+:ref:`STP_BLOCK_BPDUGUARD` when the switch receives a BPDU on a port with BPDU 
+guard enabled.
+
+:ref:`BFD_STATE_CHANGE` when the BFD status is changed.
+
+:ref:`NH_INSTALL_FAILED` and :ref:`NH_HOLD_PACKET` for Junos.
+
+The following messages were already defined, now extending the list of 
+supported platforms:
+
+- :ref:`INTERFACE_UP` and :ref:`INTERFACE_DOWN` added for 
+  :ref:`device-configuration-netiron` thanks to Johan van den Dorpe (@johanek).
+- :ref:`BGP_NEIGHBOR_STATE_CHANGED`, :ref:`ISIS_NEIGHBOR_UP`, and 
+  :ref:`ISIS_NEIGHBOR_DOWN` added for :ref:`device-configuration-eos` thanks to
+  Johan van den Dorpe (@johanek).
+- :ref:`INTERFACE_UP` and :ref:`INTERFACE_DOWN` added for
+  :ref:`device-configuration-nxos` thanks to Keeran Marquis (@kmarquis).
+
+Final notes
+-----------
+
+As there are more available platforms, all enabled by default, it's probably 
+a good idea to make use of the :ref:`configuration-options-device-blacklist` 
+and :ref:`configuration-options-device-whitelist` options, and maybe even 
+increase the value for :ref:`configuration-options-device-worker-processes`.

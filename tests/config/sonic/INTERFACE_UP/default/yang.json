@@ -1,0 +1,37 @@
+{
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "Ethernet28": {
+          "state": {
+            "oper_status": "UP"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "date": "2019-02-21",
+    "time": "16:46:14",
+    "timeSecfrac": "931186",
+    "version": "1",
+    "timeOffset": "+00:00",
+    "host": "ss12.00.lab",
+    "tag": "orchagent",
+    "processId": "-",
+    "messageId": "-",
+    "structedData": "-",
+    "pri": "13",
+    "message": ":- setHostIntfsOperStatus: Set operation status UP to host interface Ethernet28",
+    "facility": 1,
+    "severity": 5
+  },
+  "ip": "127.0.0.1",
+  "error": "INTERFACE_UP",
+  "host": "ss12.00.lab",
+  "yang_model": "openconfig-interfaces",
+  "timestamp": 1532300433,
+  "os": "sonic",
+  "facility": 1,
+  "severity": 5
+}

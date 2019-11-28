@@ -1,0 +1,13 @@
+#<30>ztp-tankstelle_1-ts port02 2018-Nov-12 10:47:34.318 LOGOUT: root
+
+messages:
+  - error: USER_LOGOUT
+    tag: LOGOUT
+    values:
+      user: (.*)
+    line: '{user}'
+    model: NO_MODEL
+    mapping:
+      static:
+        users//user//{user}//action//logout: true
+      variables: {}

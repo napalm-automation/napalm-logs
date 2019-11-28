@@ -1,0 +1,16 @@
+#<30>ztp-tankstelle_1-ts port02 2018-Nov- 9 15:42:06.972 SIGNAL: CTS => 0
+
+messages:
+  - error: SIGNAL
+    tag: SIGNAL
+    values:
+      type: (.*)
+      value: (\d+)
+    line: '{type} => {value}'
+    model: NO_MODEL
+    mapping:
+      static:
+        signal//changed: true
+      variables:
+        signal//type: type
+        signal//value: value

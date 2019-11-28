@@ -1,0 +1,20 @@
+#<30>ztp-tankstelle_1-ts autoresponse 2018-Nov- 9 15:41:30 AR: name=DeviceBoot, index=2, ref=2, state=Triggered, event=config.ports.port2.serial.event.pattern2.rx, value=Booting...
+#<30>ztp-tankstelle_1-ts port02 2018-Nov- 9 15:38:25.341 RXDATA: tankstelle_1-port2-dev#
+
+prefixes:
+  - time_format: "%Y-%b-%d %H:%M:%S"
+    values:
+      host: ([^ ]+)
+      type: (\w+)
+      date: (\d+-\w+-[\s|\d]\d)
+      time: (\d\d:\d\d:\d\d)
+      tag: (\w+)
+    line: '{host} {type} {date} {time} {tag}: '
+  - time_format: "%Y-%b-%d %H:%M:%S.%f"
+    values:
+      host: ([^ ]+)
+      port: (\w+)
+      date: (\d+-\w+-[\s|\d]\d)
+      time: (\d\d:\d\d:\d\d\.\d+)
+      tag: (\w+)
+    line: '{host} {port} {date} {time} {tag}: '

@@ -1,0 +1,16 @@
+# <13>1 2019-02-21T16:46:10.137986+00:00 ss12.00.lab orchagent - - -  
+# :- setHostIntfsOperStatus: Set operation status DOWN to host interface Ethernet28
+
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: INTERFACE_DOWN
+    tag: orchagent
+    values:
+      interface: (\w+[\.\-\d\/\w]+)
+    line: 'Set operation status DOWN to host interface {interface}'
+    model: openconfig-interfaces
+    mapping:
+      variables: {}
+      static:
+        interfaces//interface//{interface}//state//oper_status: DOWN

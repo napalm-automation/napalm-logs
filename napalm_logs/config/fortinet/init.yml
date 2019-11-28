@@ -1,0 +1,22 @@
+# Prefix profiler for fortinet devices (FortiOS 5.4).
+# This profiler matches messages having the following form:
+#
+# .. code-block:: text
+#
+# <189>date=2019-04-04 time=09:19:21 devname=fw01 devid=FG800D0123456789 logid=0001000014 type=traffic 
+# subtype=local level=notice vd=root srcip=172.30.0.1 srcport=48770 srcintf="wan1" dstip=172.16.0.1 
+# dstport=443 dstintf="root" sessionid=3841389285 proto=6 action=close policyid=0 policytype=local-in-policy 
+# dstcountry="France" srccountry="France" trandisp=noop service="HTTPS" app="Web Management(HTTPS)" 
+# duration=3 sentbyte=28187 rcvdbyte=334857 sentpkt=183 rcvdpkt=242 appcat="unscanned"
+#
+prefixes:
+  - time_format: "%Y-%m-%d %H:%M:%S"
+    values:
+      date: (\d+-\d+-\d+)
+      time: (\d\d:\d\d:\d\d)
+      host: (.*)
+      devid: (.*) 
+      logid: (\d+)
+      processName: (\w+)
+      tag: (\w+)
+    line: 'date={date} time={time} devname={host} devid={devid} logid={logid} type={processName} subtype={tag}'

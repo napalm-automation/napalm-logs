@@ -1,0 +1,73 @@
+# This error tag corresponds to syslog messages notifying that a
+# new session was closed
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: NAT_SESSION_CLOSED
+    tag: RT_FLOW_SESSION_CLOSE
+    values:
+      reason: ([^:]+)
+      sourceAddress: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      sourcePort: (\d+)
+      destinationAddress: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      destinationPort: (\d+)
+      serviceName: ([\w+-?]+)
+      natSourceAddress: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      natSourcePort: (\d+)
+      natDestinationAddress: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      natDestinationPort: (\d+)
+      srcNatRuleName: (?:source rule ([^ ]+)|N\/A N\/A)
+      protocolId: (\d+)
+      miscData: (.*)
+    line: 'session closed {reason}: {sourceAddress}/{sourcePort}->{destinationAddress}/{destinationPort} {serviceName} {natSourceAddress}/{natSourcePort}->{natDestinationAddress}/{natDestinationPort} {srcNatRuleName} N/A N/A {protocolId} {miscData}'
+    model: NO_MODEL
+    mapping:
+      variables:
+        security//flow//closed//reason: reason
+        security//flow//closed//source_address: sourceAddress
+        security//flow//closed//source_port: sourcePort
+        security//flow//closed//destination_address: destinationAddress
+        security//flow//closed//destination_port: destinationPort
+        security//flow//closed//service_name: serviceName
+        security//flow//closed//nat_source_address: natSourceAddress
+        security//flow//closed//nat_source_port: natSourcePort
+        security//flow//closed//nat_destination_address: natDestinationAddress
+        security//flow//closed//nat_destination_port: natDestinationPort
+        security//flow//closed//src_nat_rule_name: srcNatRuleName
+        security//flow//closed//protocol_id: protocolId
+        security//flow//closed//misc_data: miscData
+      static: {}
+  - error: NAT_SESSION_CLOSED
+    tag: RT_FLOW_SESSION_CLOSE
+    values:
+      reason: ([^:]+)
+      sourceAddress: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      sourcePort: (\d+)
+      destinationAddress: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      destinationPort: (\d+)
+      serviceName: ([\w+-?]+)
+      natSourceAddress: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      natSourcePort: (\d+)
+      natDestinationAddress: ((?:[0-9]{1,3}\.){3}[0-9]{1,3})
+      natDestinationPort: (\d+)
+      srcNatRuleName: (?:source rule ([^ ]+)|N\/A N\/A)
+      protocolId: (\d+)
+      miscData: (.*)
+    line: 'session closed {reason}: {sourceAddress}/{sourcePort}->{destinationAddress}/{destinationPort} 0x0 {serviceName} {natSourceAddress}/{natSourcePort}->{natDestinationAddress}/{natDestinationPort} 0x0 {srcNatRuleName} N/A N/A {protocolId} {miscData}'
+    model: NO_MODEL
+    mapping:
+      variables:
+        security//flow//closed//reason: reason
+        security//flow//closed//source_address: sourceAddress
+        security//flow//closed//source_port: sourcePort
+        security//flow//closed//destination_address: destinationAddress
+        security//flow//closed//destination_port: destinationPort
+        security//flow//closed//service_name: serviceName
+        security//flow//closed//nat_source_address: natSourceAddress
+        security//flow//closed//nat_source_port: natSourcePort
+        security//flow//closed//nat_destination_address: natDestinationAddress
+        security//flow//closed//nat_destination_port: natDestinationPort
+        security//flow//closed//src_nat_rule_name: srcNatRuleName
+        security//flow//closed//protocol_id: protocolId
+        security//flow//closed//misc_data: miscData
+      static: {}

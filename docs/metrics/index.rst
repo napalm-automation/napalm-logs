@@ -4,16 +4,16 @@
 Metrics Collection
 ==================
 
-Timeseries metrics my be optionally collected and exported from the server.
-This feature is dissabled by default but can be enabled by passing `--enable-metrics`
+Timeseries metrics may be optionally collected and exported from the server.
+This feature is disabled by default but can be enabled by passing `--enable-metrics`
 when envoking the server.
 
 The metrics offer insight into how the server is processing messages. Each subsystem publishes
-its own set of metrics. These are timeserises data so they are mostly counters of processed
+its own set of metrics. These are timeseries data so they are mostly counters of processed
 elements.
 
 We use the Prometheus metrics format and the metrics are exposed by an HTTP server which by default
-run on port tcp/9443. The implementation is fully complient with Prometheus scraping, so you need only
+run on port tcp/9443. The implementation is fully compliant with Prometheus scraping, so you need only
 point your Prometheus server to the exposed metrics to scrape them.
 
 When using the feature, you must make a directory available which will be used to collect and store
@@ -32,7 +32,7 @@ napalm_logs_listener_logs_ingested
   Count of ingested log messages. Labels are used to seperate metrics for each Listener process.
 
 napalm_logs_listener_messages_published
-  Count of published messages. The are messages published to the message queue for processing by the Server Process.
+  Count of published messages. These are messages published to the message queue for processing by the Server Process.
   Labels are used to seperate metrics for each Listener process.
 
 Server Process
