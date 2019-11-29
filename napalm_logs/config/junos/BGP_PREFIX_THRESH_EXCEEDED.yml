@@ -18,8 +18,8 @@ messages:
     mapping:
       variables:
         bgp//neighbors//neighbor//{peer}//state//peer_as: asn
-        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//state//prefixes//received: current
-        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//ipv4_{type}//prefix_limit//state//max_prefixes: limit
+        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet4//state//prefixes//received: current
+        bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//inet4//ipv4_{type}//prefix_limit//state//max_prefixes: limit
       static: {}
   - error: BGP_PREFIX_THRESH_EXCEEDED
     tag: BGP_PREFIX_THRESH_EXCEEDED
