@@ -68,6 +68,7 @@ Available publishers and their options
 .. toctree::
    :maxdepth: 1
 
+   alerta
    cli
    http
    kafka
