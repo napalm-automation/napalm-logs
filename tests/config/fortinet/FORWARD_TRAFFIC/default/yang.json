@@ -5,10 +5,10 @@
                 "forward": {
                    "level": "notice",
                     "vdom": "root",
-                    "source_ip": "1.1.1.1",
+                    "source_address": "1.1.1.1",
                     "source_port": "19982",
                     "source_interface": "\"port1\"",
-                    "destination_ip": "10.10.10.10",
+                    "destination_address": "10.10.10.10",
                     "destination_port": "179",
                     "destination_interface": "\"port3\"",
                     "poluu_id": "d4954a18-3b72-51e9-1163-77fc436ef3c9",

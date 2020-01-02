@@ -5,10 +5,10 @@
                 "local": {
                     "level": "notice",
                     "vdom": "root",
-                    "source_ip": "172.30.0.1",
+                    "source_address": "172.30.0.1",
                     "source_port": "48770",
                     "source_interface": "\"wan1\"",
-                    "destination_ip": "172.16.0.1",
+                    "destination_address": "172.16.0.1",
                     "destination_port": "443",
                     "destination_interface": "\"root\"",
                     "session_id": "3841389285",
