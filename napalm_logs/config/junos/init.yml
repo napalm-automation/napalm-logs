@@ -36,3 +36,16 @@ prefixes:
       # Some logs have data which can be inside brackets or parenthesis
       additionalData: (?:(?:\[|\()(.+)(?:\]|\)))?
     line: '{date} {time} {hostPrefix}{host} fpc{fpcId} {tag}{additionalData}:'
+  # The following matches dcpfe specific logs
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\w+\s+\d+)
+      time: (\d\d:\d\d:\d\d)
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      fpcId: (\d+)
+      fpcId2: (\d+)
+      tag: (\w+)
+      # Some logs have data which can be inside brackets or parenthesis
+      additionalData: (?:(?:\[|\()(.+)(?:\]|\)))?
+    line: '{date} {time} {hostPrefix}{host} fpc{fpcId} fpc{fpcId2} dcpfe: {tag}{additionalData}:'
