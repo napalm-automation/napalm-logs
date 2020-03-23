@@ -296,21 +296,21 @@ class NapalmLogsServerProc(NapalmLogsProc):
                         message_key = base64.b64encode(message)
                         if self._buffer[message_key]:
                             log.info('"%s" seems to be already buffered, skipping', msg_dict['message'])
-                            napalm_logs_server_skipped_buffered_messages.labels(device_os=dev_os).inc()
+                            napalm_logs_server_skipped_buffered_messages.labels(device_os=dev_os.decode()).inc()
                             continue
                         log.debug('"%s" is not buffered yet, added', msg_dict['message'])
                         self._buffer[message_key] = 1
                     self.pub.send_multipart([dev_os,
                                              umsgpack.packb((msg_dict, address))])
                     # self.os_pipes[dev_os].send((msg_dict, address))
-                    napalm_logs_server_messages_with_identified_os.labels(device_os=dev_os).inc()
-                    napalm_logs_server_messages_device_queued.labels(device_os=dev_os).inc()
+                    napalm_logs_server_messages_with_identified_os.labels(device_os=dev_os.decode()).inc()
+                    napalm_logs_server_messages_device_queued.labels(device_os=dev_os.decode()).inc()
 
                 elif dev_os and dev_os not in self.started_os_proc:
                     # Identified the OS, but the corresponding process does not seem to be started.
                     log.info('Unable to queue the message to %s. Is the sub-process started?', dev_os)
-                    napalm_logs_server_messages_with_identified_os.labels(device_os=dev_os).inc()
-                    napalm_logs_server_messages_failed_device_queuing.labels(device_os=dev_os).inc()
+                    napalm_logs_server_messages_with_identified_os.labels(device_os=dev_os.decode()).inc()
+                    napalm_logs_server_messages_failed_device_queuing.labels(device_os=dev_os.decode()).inc()
 
                 elif not dev_os and self.opts['_server_send_unknown']:
                     # OS not identified, but the user requested to publish the message as-is

@@ -23,6 +23,8 @@ from napalm_logs.transport.kafka import KafkaTransport
 from napalm_logs.transport.http import HAS_TORNADO
 from napalm_logs.transport.http import HAS_REQUESTS
 from napalm_logs.transport.http import HTTPTransport
+# ~~~Alerta~~~
+from napalm_logs.transport.alerta import AlertaTransport
 # from napalm_logs.transport.rabbitmq import RabbitMQTransport
 
 log = logging.getLogger(__file__)
@@ -45,6 +47,9 @@ if HAS_KAFKA:
 
 if HAS_REQUESTS or HAS_TORNADO:
     TRANSPORT_LOOKUP['http'] = HTTPTransport
+
+if HAS_REQUESTS or HAS_TORNADO:
+    TRANSPORT_LOOKUP['alerta'] = AlertaTransport
 
 
 def get_transport(name):

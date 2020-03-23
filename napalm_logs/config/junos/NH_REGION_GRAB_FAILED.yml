@@ -1,0 +1,15 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: NH_REGION_GRAB_FAILED
+    tag: JPRDS_NH
+    values:
+      id: (\d+)
+      nh: (\d+)
+    line: 'jprds_nh_alloc(),{id}: JNH[0] failed to grab new region for NH#{nh}'
+    model: NO_MODEL
+    mapping:
+      variables:
+        nh//region//failed//id: id
+        nh//region//failed//nh: nh
+      static: {}

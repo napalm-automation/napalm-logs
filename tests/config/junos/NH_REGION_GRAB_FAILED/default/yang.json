@@ -1,0 +1,34 @@
+{
+  "yang_message": {
+    "nh": {
+      "region": {
+        "failed": {
+          "nh": "007",
+          "id": "631"
+        }
+      }
+    }
+  },
+  "message_details": {
+    "additionalData": null,
+    "severity": 7,
+    "facility": 0,
+    "hostPrefix": "re0.",
+    "pri": "7",
+    "host": "edge01.bjm01",
+    "tag": "JPRDS_NH",
+    "fpcId": "3",
+    "fpcId2": "3",
+    "time": "00:00:01",
+    "date": "Dec 10",
+    "message": "jprds_nh_alloc(),631: JNH[0] failed to grab new region for NH#007"
+  },
+  "facility": 0,
+  "ip": "127.0.0.1",
+  "error": "NH_REGION_GRAB_FAILED",
+  "host": "edge01.bjm01",
+  "yang_model": "NO_MODEL",
+  "timestamp": 1575936001,
+  "os": "junos",
+  "severity": 7
+}
