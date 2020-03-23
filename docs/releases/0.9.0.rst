@@ -1,0 +1,47 @@
+.. _release-0.9.0:
+
+=================================
+Release 0.9.0 - Codename Hand Saw
+=================================
+
+New Publisher Interface: Alerta
+-------------------------------
+
+Publish napalm-logs events to an `Alerta <https://alerta.io/>`__ endpoint.
+The messages are published as alerts in the form ``<host>::<message ID>``, 
+e.g., ``router1::NTP_SERVER_UNREACHABLE``. See the following screenshot for
+a visual example:
+
+.. image:: alerta_screenshot.png
+    :width: 100%
+    :alt: Alerta Screenshot
+
+The alert is sent together with the complete napalm-logs event data, under the
+``attributes`` Alerta field, which you can potentially use for leveraging 
+various automatic actions or processing from these alerts. Using Alerta is 
+a great option to handle duplicate alerts.
+
+See :ref:`publisher-alerta` for more details.
+
+Update the key name for Fortinet
+--------------------------------
+
+The field ``source_ip``, and ``destination_ip`` have been renamed to 
+``source_address`` and ``destination_address`` respectively. See `PR #313 
+<https://github.com/napalm-automation/napalm-logs/pull/313>`_ for more 
+information.
+
+Fix Prometheus label displaying
+-------------------------------
+
+Avoid to display the 'b' prefix on the label with Python3. Thanks @Koaxiel 
+(Robin Douine) for `PR #317 
+<https://github.com/napalm-automation/napalm-logs/pull/317>`_.
+
+
+New Structured Messages
+-----------------------
+
+:ref:`NH_REGION_GRAB_FAILED` for Junos, a message from the FPC logs when failed
+to grab new region for next-hops. Thanks @luke-orden `PR #314 
+<https://github.com/napalm-automation/napalm-logs/pull/314>`_.
