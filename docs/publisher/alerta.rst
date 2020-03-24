@@ -18,7 +18,7 @@ Publish napalm-logs events to an `Alerta <https://alerta.io/>`__ endpoint.
     Also, note that you need to provide the URL to the Alerta API, typically 
     ending in ``/api``, but that may differ depending on your installation.
 
-.. image:: alerta_screenshot.png
+.. image:: ../_static/alerta_screenshot.png
     :width: 100%
     :alt: Alerta Screenshot
 
