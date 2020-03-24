@@ -12,7 +12,7 @@ The messages are published as alerts in the form ``<host>::<message ID>``,
 e.g., ``router1::NTP_SERVER_UNREACHABLE``. See the following screenshot for
 a visual example:
 
-.. image:: alerta_screenshot.png
+.. image:: ../_static/alerta_screenshot.png
     :width: 100%
     :alt: Alerta Screenshot
 
