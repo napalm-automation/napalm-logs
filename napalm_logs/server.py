@@ -273,10 +273,11 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 else:
                     log.error(error, exc_info=True)
                     raise NapalmLogsExit(error)
-            if six.PY3:
-                msg = str(msg, 'utf-8')
-            else:
-                msg = msg.encode('utf-8')
+            if isinstance(msg, bytes):
+                if six.PY3:
+                    msg = str(msg, 'utf-8')
+                else:
+                    msg = msg.encode('utf-8')
             log.debug('[%s] Dequeued message from %s: %s', address, msg, time.time())
             napalm_logs_server_messages_received.inc()
             os_list = self._identify_os(msg)
