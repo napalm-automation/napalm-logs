@@ -249,7 +249,7 @@ class NLOptionParser(OptionParser, object):
         config = {}
         try:
             with open(filepath, 'r') as fstream:
-                config = yaml.load(fstream)
+                config = yaml.load(fstream, Loader=yaml.FullLoader)
         except (IOError, yaml.YAMLError):
             log.info('Unable to read from %s', filepath)
         # Convert any env variables
