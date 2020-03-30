@@ -308,7 +308,7 @@ class NapalmLogs:
                     try:
                         log.debug('Loading %s as YAML', file_)
                         with open(filepath, 'r') as fstream:
-                            cfg = yaml.load(fstream)
+                            cfg = yaml.load(fstream, Loader=yaml.FullLoader)
                             # Reposition at the top and read the comments.
                             if file_name not in CONFIG.OS_INIT_FILENAMES:
                                 # If the file name is not a profile init.
