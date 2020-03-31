@@ -12,6 +12,7 @@ import logging
 import datetime
 import dateutil
 import threading
+from time import mktime
 
 # Import thrid party libs
 import zmq
@@ -215,7 +216,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         if not date_time:
             tz = dateutil.tz.gettz(timezone)
             date_time = datetime.datetime.now(tz)
-        return int(date_time.strftime('%s'))
+        return int(mktime(date_time.utctimetuple()))
 
     def start(self):
         '''
