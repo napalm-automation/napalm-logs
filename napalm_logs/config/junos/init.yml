@@ -4,7 +4,7 @@
 # Matching white space in `values`
 #
 prefixes:
-  - time_format: "%b %d %H:%M:%S"
+  - time_format: '%b %d %H:%M:%S'
     values:
       date: (\w+\s+\d+)
       time: (\d\d:\d\d:\d\d)
