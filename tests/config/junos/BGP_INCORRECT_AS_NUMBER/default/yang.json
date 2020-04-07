@@ -1,0 +1,37 @@
+{
+  "ip": "127.0.0.1", 
+  "yang_message": {
+    "bgp": {
+      "neighbors": {
+        "neighbor": {
+          "10.37.96.6": {
+            "state": {
+              "session_state": "OPENSENT",
+              "peer_as": "10.37.96.6"
+            }
+          }
+        }
+      }
+    }
+  }, 
+  "facility": 21, 
+  "timestamp": 1585644119, 
+  "severity": 4, 
+  "message_details": {
+    "hostPrefix": null, 
+    "pri": "172", 
+    "processId": "4936", 
+    "facility": 21, 
+    "severity": 4, 
+    "message": "4609: NOTIFICATION sent to 10.37.96.6+44759 (proto): code 2 (Open Message Error) subcode 2 (bad peer AS number), Reason: no group for 10.37.96.6+44759 (proto) from AS 4292019902 found (peer as mismatch) in master(ae1.0), dropping him", 
+    "date": "2020-03-31", 
+    "tag": "bgp_pp_recv", 
+    "host": "some-switch", 
+    "processName": "rpd", 
+    "time": "08:41:59+00:00"
+  }, 
+  "os": "junos", 
+  "yang_model": "openconfig-bgp", 
+  "host": "some-switch", 
+  "error": "BGP_INCORRECT_AS_NUMBER"
+}

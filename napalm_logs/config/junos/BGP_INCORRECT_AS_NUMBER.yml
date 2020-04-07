@@ -1,0 +1,16 @@
+messages:
+  - error: BGP_INCORRECT_AS_NUMBER
+    tag: bgp_pp_recv
+    values:
+      peer: ([\w\d:\.]+)
+      asn: (\d+)
+      number: (\d+)
+      port: (\d+)
+      interface: (.+)
+    line: '{number}: NOTIFICATION sent to {peer}+{port} (proto): code 2 (Open Message Error) subcode 2 (bad peer AS number), Reason: no group for {peer}+{port} (proto) from AS {asn} found (peer as mismatch) in master({interface}), dropping him'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//peer_as: asn
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session_state: OPENSENT
