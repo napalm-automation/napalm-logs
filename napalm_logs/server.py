@@ -290,11 +290,12 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     log.debug('Queueing message to %s', dev_os)
                     if six.PY3:
                         dev_os = bytes(dev_os, 'utf-8')
+                    napalm_logs_server_messages_with_identified_os.labels(device_os=dev_os.decode()).inc()
                     if self._buffer:
-                        message = '{dev_os}/{host}/{msg}'.format(dev_os=dev_os,
+                        message = '{dev_os}/{host}/{msg}'.format(dev_os=dev_os.decode(),
                                                                  host=msg_dict['host'],
                                                                  msg=msg_dict['message'])
-                        message_key = base64.b64encode(message)
+                        message_key = base64.b64encode(bytes(message, 'utf-8')).decode()
                         if self._buffer[message_key]:
                             log.info('"%s" seems to be already buffered, skipping', msg_dict['message'])
                             napalm_logs_server_skipped_buffered_messages.labels(device_os=dev_os.decode()).inc()
@@ -303,8 +304,6 @@ class NapalmLogsServerProc(NapalmLogsProc):
                         self._buffer[message_key] = 1
                     self.pub.send_multipart([dev_os,
                                              umsgpack.packb((msg_dict, address))])
-                    # self.os_pipes[dev_os].send((msg_dict, address))
-                    napalm_logs_server_messages_with_identified_os.labels(device_os=dev_os.decode()).inc()
                     napalm_logs_server_messages_device_queued.labels(device_os=dev_os.decode()).inc()
 
                 elif dev_os and dev_os not in self.started_os_proc:
