@@ -1,0 +1,37 @@
+{
+  "error": "BGP_CONNECTION_RESET",
+  "host": "some-router",
+  "ip": "127.0.0.1",
+  "timestamp": 1585644119,
+  "yang_message": {
+    "bgp": {
+      "neighbors": {
+        "neighbor": {
+          "fd00:1065::1": {
+            "state": {
+              "peer_as": "65500",
+              "session_state": "ACTIVE"
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "date": "2020-03-31",
+    "time": "08:41:59+00:00",
+    "hostPrefix": null,
+    "host": "some-router",
+    "processName": "rpd",
+    "processId": "13037",
+    "tag": "bgp_recv",
+    "pri": "172",
+    "message": "read from peer fd00:1065::1 (External AS 65500) failed: Connection reset by peer",
+    "facility": 21,
+    "severity": 4
+  },
+  "yang_model": "openconfig-bgp",
+  "os": "junos",
+  "facility": 21,
+  "severity": 4
+}

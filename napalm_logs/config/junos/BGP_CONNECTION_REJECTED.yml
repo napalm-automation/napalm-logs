@@ -1,0 +1,15 @@
+messages:
+  - error: BGP_CONNECTION_REJECTED
+    tag: bgp_handle_notify
+    values:
+      peer: ([\w\d:\.]+)
+      asn: (\d+)
+      peeringType: (\w+)
+      number: (\d+)
+    line: '{number}: NOTIFICATION received from {peer} ({peeringType} AS {asn}): code 6 (Cease) subcode 5 (Connection Rejected)'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//peer_as: asn
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session_state: ACTIVE

@@ -1,0 +1,14 @@
+messages:
+  - error: BGP_CONNECTION_RESET
+    tag: bgp_recv
+    values:
+      peer: ([\w\d:\.]+)
+      asn: (\d+)
+      peeringType: (\w+)
+    line: 'read from peer {peer} ({peeringType} AS {asn}) failed: Connection reset by peer'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//peer_as: asn
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session_state: ACTIVE
