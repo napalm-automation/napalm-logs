@@ -372,8 +372,12 @@ class NLOptionParser(OptionParser, object):
                                        file_cfg.get('device_worker_processes') or 1,
             'serializer': self.options.serializer or file_cfg.get('serializer') or
                           defaults.SERIALIZER,
-            'buffer': buffer_cfg
+            'buffer': buffer_cfg,
+            'opts': {}
         }
+        for opt, val in file_cfg.items():
+            if opt not in cfg:
+                cfg['opts'][opt] = val
         return cfg
 
 

@@ -68,7 +68,8 @@ class NapalmLogs:
                  hwm=None,
                  device_worker_processes=1,
                  serializer='msgpack',
-                 buffer=None):
+                 buffer=None,
+                 opts=None):
         '''
         Init the napalm-logs engine.
 
@@ -107,7 +108,7 @@ class NapalmLogs:
         self.hwm = hwm
         self._buffer_cfg = buffer
         self._buffer = None
-        self.opts = {}
+        self.opts = opts if opts else {}
         # Setup the environment
         self._setup_log()
         self._build_config()
