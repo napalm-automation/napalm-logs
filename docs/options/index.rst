@@ -171,6 +171,23 @@ Configuration file example:
 
   metrics_dir: /tmp/a_new_dir_for_metrics
 
+.. _configuration-options-metrics-attrs:
+
+``metrics_include_attributes``
+------------------------------
+
+.. versionadded:: 0.10.0
+
+Disable detailed metrics with attributes per published device OS, hostname, and 
+napalm-logs error type. Default: ``True`` (the metrics will include detailed 
+attributes).
+
+Configuration file example:
+
+.. code-block:: yaml
+
+  metrics_include_attributes: false
+
 .. _configuration-options-certificate:
 
 ``certificate``

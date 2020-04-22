@@ -29,11 +29,11 @@ Listener Process(es)
 --------------------
 
 napalm_logs_listener_logs_ingested
-  Count of ingested log messages. Labels are used to seperate metrics for each Listener process.
+  Count of ingested log messages. Labels are used to separate metrics for each Listener process.
 
 napalm_logs_listener_messages_published
   Count of published messages. These are messages published to the message queue for processing by the Server Process.
-  Labels are used to seperate metrics for each Listener process.
+  Labels are used to separate metrics for each Listener process.
 
 Server Process
 --------------
@@ -42,53 +42,62 @@ napalm_logs_server_messages_received
   Count of messages received from Listener processes.
 
 napalm_logs_server_messages_with_identified_os
-  Count of messages with positive OS identification. Labels are used to seperate metrics for each Device OS.
+  Count of messages with positive OS identification. Labels are used to separate metrics for each Device OS.
 
 napalm_logs_server_messages_without_identified_os
   Count of messages which fail OS identification.
 
 napalm_logs_server_messages_failed_device_queuing
   Count of messages per device OS that fail to be queued to a proper Device process. Note these are messages that
-  pass OS identification and we know how to route them but fail to be queued. Labels are used to seperate metrics
+  pass OS identification and we know how to route them but fail to be queued. Labels are used to separate metrics
   for each Device OS.
 
 napalm_logs_server_messages_device_queued
-  Count of messages sucessfully queued to Device processes. Labels are used to seperate metrics for each Device OS process.
+  Count of messages successfully queued to Device processes. Labels are used to separate metrics for each Device OS process.
 
 napalm_logs_server_messages_unknown_queued
-  Count of messages which fail OS indentification and thus we don't know how to route them, but the user has instructed
+  Count of messages which fail OS identification and thus we don't know how to route them, but the user has instructed
   the system to queue them "as-is."
 
 Device Process(es)
 ------------------
 
 napalm_logs_device_messages_received
-  Count of messages received from the Server process. Labels are used to seperate metrics for each Device OS process.
+  Count of messages received from the Server process. Labels are used to separate metrics for each Device OS process.
 
 napalm_logs_device_raw_published_messages
   Count of raw type published messages. In this case, the message did not match a configured message type but the
-  user has instructed the system to publish the message in a raw format. Labels are used to seperate metrics for
+  user has instructed the system to publish the message in a raw format. Labels are used to separate metrics for
   each Device OS process.
 
 napalm_logs_device_published_messages
-  Count of published messages. These are messages which are sucessfully converted to an OpenConfig format. Labels
-  are used to seperate metrics for each Device OS process.
+  Count of published messages. These are messages which are successfully converted to an OpenConfig format. Labels
+  are used to separate metrics for each Device OS process.
 
-napalm_logs_device_oc_object_failed 
+napalm_logs_device_oc_object_failed
   Counter of failed OpenConfig object generations. These are messages for which the system attempts to map to a
-  known OpenConfig object model but fails. Labels are used to seperate metrics for each Device OS process.
+  known OpenConfig object model but fails. Labels are used to separate metrics for each Device OS process.
+
+napalm_logs_device_published_messages_attrs
+  Count of published messages. This metrics supersedes 
+  ``napalm_logs_device_published_messages`` as it provides a more granular 
+  selection, using two additional labels (besides ``device_os``): ``error`` and 
+  ``host`` for the *napalm-logs* error / message type and the host, 
+  respectively. As this metric has a potential to generate a large amount of 
+  metrics, you are able to disable it by configuring 
+  ``metrics_include_attrbutes: false`` in the napalm-logs configuration file.
 
 Publisher Process(es)
 ---------------------
 
 napalm_logs_publisher_received_messages
-  Count of messages received by the Publisher from Device Process(es). Labels are used to seperate metrics for
+  Count of messages received by the Publisher from Device Process(es). Labels are used to separate metrics for
   each Publisher process.
 
 napalm_logs_publisher_whitelist_blacklist_check_fail
-  Count of messages which fail the whitelist/blacklist check. Labels are used to seperate metrics for each
+  Count of messages which fail the whitelist/blacklist check. Labels are used to separate metrics for each
   Publisher process.
 
 napalm_logs_publisher_messages_published
   Count of published messages. These are messages which are published for clients to receive (i.e. output of the
-  system). Labels are used to seperate metrics for each Publisher process.
+  system). Labels are used to separate metrics for each Publisher process.

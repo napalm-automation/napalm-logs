@@ -243,7 +243,12 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             "Counter of failed OpenConfig object generations",
             ['device_os']
         )
-
+        if self.opts.get('metrics_include_attributes', True):
+            napalm_logs_device_published_messages_attrs = Counter(
+                'napalm_logs_device_published_messages_attrs',
+                "Counter of published messages, with more granular selection",
+                ['device_os', 'host', 'error']
+            )
         self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
@@ -329,6 +334,12 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             self.pub.send(umsgpack.packb(to_publish))
             # self._publish(to_publish)
             napalm_logs_device_published_messages.labels(device_os=self._name).inc()
+            if self.opts.get('metrics_include_attributes', True):
+                napalm_logs_device_published_messages_attrs.labels(
+                    device_os=self._name,
+                    error=to_publish['error'],
+                    host=to_publish['host']
+                ).inc()
 
     def stop(self):
         '''
