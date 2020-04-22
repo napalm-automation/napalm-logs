@@ -6,6 +6,7 @@ from __future__ import absolute_import
 
 # Import pythond stdlib
 import os
+import time
 import signal
 import logging
 import threading
@@ -102,6 +103,7 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         while self.__up:
             try:
                 log_message, log_source = self.listener.receive()
+                receive_timestamp = time.time()
             except ListenerException as lerr:
                 if self.__up is False:
                     log.info('Exiting on process shutdown')
@@ -114,7 +116,7 @@ class NapalmLogsListenerProc(NapalmLogsProc):
                 log.info('Empty message received from %s. Not queueing to the server.', log_source)
                 continue
             c_logs_ingested.labels(listener_type=self._listener_type, address=self.address, port=self.port).inc()
-            self.pub.send(umsgpack.packb((log_message, log_source)))
+            self.pub.send(umsgpack.packb((log_message, log_source, receive_timestamp)))
             c_messages_published.labels(listener_type=self._listener_type, address=self.address, port=self.port).inc()
 
     def stop(self):

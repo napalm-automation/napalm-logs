@@ -265,7 +265,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
             # Take messages from the main queue
             try:
                 bin_obj = self.sub.recv()
-                msg, address = umsgpack.unpackb(bin_obj, use_list=False)
+                msg, address, recv_ts = umsgpack.unpackb(bin_obj, use_list=False)
             except zmq.ZMQError as error:
                 if self.__up is False:
                     log.info('Exiting on process shutdown')
@@ -283,6 +283,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
             os_list = self._identify_os(msg)
 
             for dev_os, msg_dict in os_list:
+                msg_dict['_napalm_logs_received_timestamp'] = recv_ts
                 if dev_os and dev_os in self.started_os_proc:
                     # Identified the OS and the corresponding process is started.
                     # Then send the message in the right queue

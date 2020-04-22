@@ -6,6 +6,7 @@ from __future__ import absolute_import
 
 # Import pythond stdlib
 import os
+import time
 import signal
 import logging
 import threading
@@ -15,7 +16,7 @@ import zmq
 import umsgpack
 import nacl.utils
 import nacl.secret
-from prometheus_client import Counter
+from prometheus_client import Counter, Gauge
 
 # Import napalm-logs pkgs
 import napalm_logs.utils
@@ -149,6 +150,11 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
             "Count of published messages",
             ['publisher_type', 'address', 'port']
         )
+        napalm_logs_processing_delay = Gauge(
+            'napalm_logs_processing_delay',
+            'The time difference in seconds between when the message arrive and published',
+            ['publisher_type', 'address', 'port']
+        )
         self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
@@ -167,6 +173,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                     log.error(error, exc_info=True)
                     raise NapalmLogsExit(error)
             obj = umsgpack.unpackb(bin_obj)
+            recv_ts = obj['message_details'].pop('_napalm_logs_received_timestamp')
             if self._strip_message_details:
                 obj.pop('message_details', None)
                 bin_obj = self.serializer_fun(obj)
@@ -195,6 +202,12 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
             if not self.disable_security and self.__transport_encrypt:
                 # Encrypt only when needed.
                 serialized_obj = self._prepare(serialized_obj)
+            processing_delay = time.time() - float(recv_ts)
+            napalm_logs_processing_delay.labels(
+                publisher_type=self._transport_type,
+                address=self.address,
+                port=self.port
+            ).set(processing_delay)
             self.transport.publish(serialized_obj)
             napalm_logs_publisher_messages_published.labels(
                 publisher_type=self._transport_type,
