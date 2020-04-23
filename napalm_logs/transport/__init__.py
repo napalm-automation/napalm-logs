@@ -26,6 +26,8 @@ from napalm_logs.transport.http import HTTPTransport
 # ~~~Alerta~~~
 from napalm_logs.transport.alerta import AlertaTransport
 # from napalm_logs.transport.rabbitmq import RabbitMQTransport
+# ~~~Prometheus~~~
+from napalm_logs.transport.prometheus import PrometheusTransport
 
 log = logging.getLogger(__file__)
 
@@ -36,6 +38,7 @@ TRANSPORT_LOOKUP = {
     'print': CLITransport,
     'console': CLITransport,
     'log': LogTransport,
+    'prometheus': PrometheusTransport,
     # 'rmq': RabbitMQransport,
     # 'rabbitmq': RabbitMQransport,
     '*': ZMQTransport
