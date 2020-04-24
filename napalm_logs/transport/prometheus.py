@@ -382,14 +382,16 @@ class PrometheusTransport(TransportBase):
             self.metrics['SYSTEM_ALARM'] = Counter(
                 'napalm_logs_system_alarm',
                 'Counter for SYSTEM_ALARM notifications',
-                ['host', 'supply_class', 'supply_name', 'alarm_state']
+                ['host', 'component_name', 'component_class', 'alarm_state', 'alarm_reason']
             )
-        supply = msg['yang_message']['hardware-state']['component']['supply']
+        component = msg['yang_message']['hardware-state']['component']
+        component_name = list(component.keys())[0]
         self.metrics['SYSTEM_ALARM'].labels(
             host=msg['host'],
-            supply_class=supply['class'],
-            supply_name=supply['name'],
-            alarm_state=supply['state']['alarm-state']
+            component_name=component_name,
+            component_class=component[component_name]['class'],
+            alarm_state=component[component_name]['state']['alarm-state'],
+            alarm_reason=component[component_name]['state']['alarm-reason']
         ).inc()
 
     def _parse_ospf_neighbor_up(self, msg):
