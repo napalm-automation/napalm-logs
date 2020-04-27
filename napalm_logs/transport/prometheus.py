@@ -305,7 +305,7 @@ class PrometheusTransport(TransportBase):
             self.metrics['BGP_NEIGHBOR_STATE_CHANGED'] = Counter(
                 'napalm_logs_bgp_neighbor_state_changed',
                 'Counter for BGP_NEIGHBOR_STATE_CHANGED notifications',
-                ['host', 'neighbor', 'peer_as', 'current_state', 'previous_state']
+                ['host', 'neighbor', 'peer_as']
             )
         neigh_dict = msg['yang_message']['bgp']['neighbors']['neighbor']
         neighbor = list(neigh_dict.keys())[0]
@@ -313,8 +313,6 @@ class PrometheusTransport(TransportBase):
             host=msg['host'],
             neighbor=neighbor,
             peer_as=neigh_dict[neighbor]['state']['peer_as'],
-            current_state=neigh_dict[neighbor]['state']['session-state'],
-            previous_state=neigh_dict[neighbor]['state']['session-state-old']
         ).inc()
 
     def _parse_bgp_md5_incorrect(self, msg):
