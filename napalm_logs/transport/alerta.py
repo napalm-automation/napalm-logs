@@ -42,15 +42,28 @@ class AlertaTransport(HTTPTransport):
         if token and 'Authorization' not in self.headers:
             self.headers.update({'Authorization': 'Bearer {}'.format(token)})
         self.environment = kwargs.get('environment')
+        self.pairs = kwargs.get('pairs')
+        if not self.pairs:
+            self.pairs = {
+                'INTERFACE_UP': 'INTERFACE_DOWN',
+                'OSPF_NEIGHBOR_UP': 'OSPF_NEIGHBOR_DOWN',
+                'ISIS_NEIGHBOR_UP': 'ISIS_NEIGHBOR_DOWN'
+            }
 
     def publish(self, obj):
         data = napalm_logs.utils.unserialize(obj)
+        error = data['error']
+        status = 'open'
+        if error in self.pairs:
+            error = self.pairs[error]
+            status = 'closed'
         alerta_data = {
-            'resource': '{host}::{msg}'.format(host=data['host'], msg=data['error']),
+            'resource': '{host}::{msg}'.format(host=data['host'], msg=error),
             'event': data['error'],
             'service': ['napalm-logs'],
             'text': data['message_details']['message'].strip(),
             'attributes': data,
+            'status': status,
         }
         if self.environment:
             alerta_data['environment'] = self.environment
