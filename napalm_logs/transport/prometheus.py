@@ -279,6 +279,12 @@ class PrometheusTransport(TransportBase):
         '''
         self.__parse_bgp_basic(msg)
 
+    def _parse_bgp_session_not_configured(self, msg):
+        '''
+        Build metrics from BGP_SESSION_NOT_CONFIGURED notifications.
+        '''
+        self.__parse_bgp_basic(msg)
+
     def _parse_bgp_connection_rejected(self, msg):
         '''
         Build metrics from BGP_CONNECTION_REJECTED notifications.
