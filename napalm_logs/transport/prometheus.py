@@ -101,6 +101,25 @@ class PrometheusTransport(TransportBase):
             peer_as=neigh_dict[neighbor]['state']['peer_as']
         ).inc()
 
+    def __parse_bgp_no_asn(self, msg):
+        '''
+        Helper to generate Counter metrics for simple BGP notifications - but
+        without the AS number, so only the neighbor IP address.
+        '''
+        error = msg['error']
+        if error not in self.metrics:
+            self.metrics[error] = Counter(
+                'napalm_logs_{error}'.format(error=error.lower()),
+                'Counter for {error} notifications'.format(error=error),
+                ['host', 'neighbor']
+            )
+        neigh_dict = msg['yang_message']['bgp']['neighbors']['neighbor']
+        neighbor = list(neigh_dict.keys())[0]
+        self.metrics[error].labels(
+            host=msg['host'],
+            neighbor=neighbor,
+        ).inc()
+
     def __parse_ospf_neighbor(self, msg):
         error = msg['error']
         if error not in self.metrics:
@@ -283,7 +302,7 @@ class PrometheusTransport(TransportBase):
         '''
         Build metrics from BGP_SESSION_NOT_CONFIGURED notifications.
         '''
-        self.__parse_bgp_basic(msg)
+        self.__parse_bgp_no_asn(msg)
 
     def _parse_bgp_connection_rejected(self, msg):
         '''
@@ -307,34 +326,13 @@ class PrometheusTransport(TransportBase):
         '''
         Build metrics from BGP_NEIGHBOR_STATE_CHANGED.
         '''
-        if 'BGP_NEIGHBOR_STATE_CHANGED' not in self.metrics:
-            self.metrics['BGP_NEIGHBOR_STATE_CHANGED'] = Counter(
-                'napalm_logs_bgp_neighbor_state_changed',
-                'Counter for BGP_NEIGHBOR_STATE_CHANGED notifications',
-                ['host', 'neighbor', 'peer_as']
-            )
-        neigh_dict = msg['yang_message']['bgp']['neighbors']['neighbor']
-        neighbor = list(neigh_dict.keys())[0]
-        self.metrics['BGP_NEIGHBOR_STATE_CHANGED'].labels(
-            host=msg['host'],
-            neighbor=neighbor,
-            peer_as=neigh_dict[neighbor]['state']['peer_as'],
-        ).inc()
+        self.__parse_bgp_basic(msg)
 
     def _parse_bgp_md5_incorrect(self, msg):
         '''
         Build metrics from BGP_MD5_INCORRECT.
         '''
-        if 'BGP_MD5_INCORRECT' not in self.metrics:
-            self.metrics['BGP_MD5_INCORRECT'] = Counter(
-                'napalm_logs_bgp_md5_incorrect',
-                'Counter for BGP_MD5_INCORRECT notifications',
-                ['host', 'neighbor']
-            )
-        self.metrics['BGP_MD5_INCORRECT'].labels(
-            host=msg['host'],
-            neighbor=list(msg['yang_message']['bgp']['neighbors']['neighbor'].keys())[0]
-        ).inc()
+        self.__parse_bgp_no_asn(msg)
 
     def _parse_user_enter_config_mode(self, msg):
         '''
