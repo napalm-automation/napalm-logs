@@ -441,7 +441,11 @@ class PrometheusTransport(TransportBase):
             return
         fun_name = '_parse_{}'.format(data['error'].lower())
         if hasattr(self, fun_name):
-            getattr(self, fun_name)(data)
+            try:
+                getattr(self, fun_name)(data)
+            except Exception:
+                log.error(data, exc_info=True)
+                raise
         else:
             # Anything else goes into __parse_without_details which generates
             # metrics using the napalm-logs error name, and the host as the only
