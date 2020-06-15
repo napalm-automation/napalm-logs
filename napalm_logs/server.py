@@ -253,6 +253,12 @@ class NapalmLogsServerProc(NapalmLogsProc):
             "napalm_logs_server_messages_unknown_queued",
             "Count of messages queued as unknown"
         )
+        if self.opts.get('metrics_include_attributes', True):
+            napalm_logs_server_messages_attrs = Counter(
+                "napalm_logs_server_messages_attrs",
+                "Count of messages from the server process with their details",
+                ['device_os', 'host', 'tag']
+            )
         self._setup_ipc()
         # Start suicide polling thread
         cleanup = threading.Thread(target=self._cleanup_buffer)
@@ -305,6 +311,12 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     self.pub.send_multipart([dev_os,
                                              umsgpack.packb((msg_dict, address))])
                     napalm_logs_server_messages_device_queued.labels(device_os=dev_os.decode()).inc()
+                    if self.opts.get('metrics_server_include_attributes', True):
+                        napalm_logs_server_messages_attrs.labels(
+                            device_os=dev_os.decode(),
+                            host=msg_dict['host'],
+                            tag=msg_dict['tag']
+                        ).inc()
 
                 elif dev_os and dev_os not in self.started_os_proc:
                     # Identified the OS, but the corresponding process does not seem to be started.
