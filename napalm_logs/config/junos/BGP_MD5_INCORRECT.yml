@@ -6,7 +6,7 @@ messages:
   - error: BGP_MD5_INCORRECT
     tag: tcp_auth_ok
     values:
-      peer: (\d+\.\d+\.\d+\.\d+)
+      peer: ([\w\d:\.]+)
       port: (\d+)
     line: 'Packet from {peer}:{port} wrong MD5 digest'
     model: openconfig-bgp
@@ -14,3 +14,14 @@ messages:
       variables: {}
       static:
         bgp//neighbors//neighbor//{peer}//state//session_state: CONNECT
+  - error: BGP_MD5_INCORRECT
+    tag: tcp_auth_ok
+    values:
+      peer: ([\w\d:\.]+)
+      port: (\d+)
+    line: 'Packet from {peer}:{port} missing MD5 digest'
+    model: openconfig-bgp
+    mapping:
+      variables: {}
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session_state: ACTIVE
