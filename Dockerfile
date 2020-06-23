@@ -7,7 +7,7 @@ COPY ./ /var/cache/napalm-logs/
 RUN apk add --no-cache \
     libffi \
     libffi-dev \
-    python-dev \
+    python3-dev \
     build-base \
     && pip --no-cache-dir install cffi /var/cache/napalm-logs/ \
     && rm -rf /var/cache/napalm-logs/
