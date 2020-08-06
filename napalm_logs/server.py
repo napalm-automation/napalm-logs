@@ -301,7 +301,6 @@ class NapalmLogsServerProc(NapalmLogsProc):
                         message = '{dev_os}/{host}/{msg}'.format(dev_os=dev_os.decode(),
                                                                  host=msg_dict['host'],
                                                                  msg=msg_dict['message'])
-                        message_key = base64.b64encode(message)
                         if six.PY3:
                             message_key = base64.b64encode(bytes(message, 'utf-8')).decode()
                         else:
