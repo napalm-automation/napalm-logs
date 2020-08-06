@@ -7,7 +7,7 @@ messages:
     tag: UI_COMMIT
     values:
       user: (\w+)
-      comment: (\w+)
+      comment: (.*)
     line: "User '{user}' requested 'commit' operation (comment: {comment})"
     model: NO_MODEL
     mapping:
