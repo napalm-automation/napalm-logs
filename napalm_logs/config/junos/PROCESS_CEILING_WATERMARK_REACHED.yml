@@ -9,5 +9,5 @@ messages:
     model: NO_MODEL
     mapping:
       variables:
-        jlaunchd//watermark//severity: severity
+        process//ceiling//watermark: severity
       static: {}
