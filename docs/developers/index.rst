@@ -10,3 +10,4 @@ Here we you will find out how to add new functionality to ``napalm-logs``.
    architecture
    pluggable_modules
    device_profiles
+   local_testing
