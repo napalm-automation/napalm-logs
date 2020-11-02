@@ -1,0 +1,64 @@
+{
+  "ip": "127.0.0.1", 
+  "yang_model": "openconfig-network-instance", 
+  "error": "BGP_CEASE_PREFIX_LIMIT_EXCEEDED", 
+  "timestamp": 1585644119, 
+  "os": "junos", 
+  "host": "some-router", 
+  "yang_message": {
+    "network-instances": {
+      "network-instance": {
+        "underlay": {
+          "protocols": {
+            "protocol": {
+              "bgp": {
+                "neighbors": {
+                  "neighbor": {
+                    "172.17.17.1": {
+                      "state": {
+                        "peer_as": "4208010101"
+                      }, 
+                      "afi_safis": {
+                        "afi_safi": {
+                          "inet": {
+                            "state": {
+                              "prefixes": {
+                                "received": 501
+                              }
+                            }, 
+                            "ipv4_unicast": {
+                              "prefix_limit": {
+                                "state": {
+                                  "max_prefixes": 500
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }, 
+  "message_details": {
+    "message": "172.17.17.1 (External AS 4208010101): Shutting down peer due to exceeding configured maximum prefix-limit(500) for inet-unicast nlri: 501 (instance underlay)", 
+    "date": "2020-03-31", 
+    "processId": "13037", 
+    "tag": "BGP_CEASE_PREFIX_LIMIT_EXCEEDED", 
+    "processName": "rpd", 
+    "hostPrefix": null, 
+    "facility": 21, 
+    "pri": "172", 
+    "host": "some-router", 
+    "time": "08:41:59+00:00", 
+    "severity": 4
+  }, 
+  "facility": 21, 
+  "severity": 4
+}

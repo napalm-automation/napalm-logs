@@ -1,0 +1,1 @@
+<172>2020-03-31T08:41:59+00:00 some-router rpd[13037]: BGP_CEASE_PREFIX_LIMIT_EXCEEDED: 172.17.17.1 (External AS 4208010101): Shutting down peer due to exceeding configured maximum prefix-limit(500) for inet-unicast nlri: 501 (instance underlay)

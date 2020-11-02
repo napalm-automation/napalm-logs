@@ -101,6 +101,30 @@ class PrometheusTransport(TransportBase):
             peer_as=neigh_dict[neighbor]['state']['peer_as']
         ).inc()
 
+    def __parse_network_instance_bgp(self, msg):
+        '''
+        Helper to generate Counter metrics for simple BGP notifications, nested
+        under the network-instance OpenConfig model, providing the neighbor
+        address, instance name, and peer AS number.
+        '''
+        error = msg['error']
+        if error not in self.metrics:
+            self.metrics[error] = Counter(
+                'napalm_logs_{error}'.format(error=error.lower()),
+                'Counter for {error} notifications'.format(error=error),
+                ['host', 'instance', 'neighbor', 'peer_as']
+            )
+        instance_name = list(msg['yang_message']['network-instances']['network-instance'].keys())[0]
+        instance_dict = msg['yang_message']['network-instances']['network-instance'][instance_name]
+        neigh_dict = instance_dict['protocols']['protocol']['bgp']['neighbors']['neighbor']
+        neighbor = list(neigh_dict.keys())[0]
+        self.metrics[error].labels(
+            host=msg['host'],
+            instance=instance_name,
+            neighbor=neighbor,
+            peer_as=neigh_dict[neighbor]['state']['peer_as']
+        ).inc()
+
     def __parse_bgp_no_asn(self, msg):
         '''
         Helper to generate Counter metrics for simple BGP notifications - but
@@ -333,6 +357,12 @@ class PrometheusTransport(TransportBase):
         Build metrics from BGP_MD5_INCORRECT.
         '''
         self.__parse_bgp_no_asn(msg)
+
+    def _parse_bgp_cease_prefix_limit_exceeded(self, msg):
+        '''
+        Build metrics for BGP_CEASE_PREFIX_LIMIT_EXCEEDED.
+        '''
+        self.__parse_network_instance_bgp(msg)
 
     def _parse_user_enter_config_mode(self, msg):
         '''
