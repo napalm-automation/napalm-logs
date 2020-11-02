@@ -112,7 +112,7 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'instance', 'neighbor', 'peer_as']
+                ['host', 'routing_instance', 'neighbor', 'peer_as']
             )
         instance_name = list(msg['yang_message']['network-instances']['network-instance'].keys())[0]
         instance_dict = msg['yang_message']['network-instances']['network-instance'][instance_name]
@@ -120,7 +120,7 @@ class PrometheusTransport(TransportBase):
         neighbor = list(neigh_dict.keys())[0]
         self.metrics[error].labels(
             host=msg['host'],
-            instance=instance_name,
+            routing_instance=instance_name,
             neighbor=neighbor,
             peer_as=neigh_dict[neighbor]['state']['peer_as']
         ).inc()
