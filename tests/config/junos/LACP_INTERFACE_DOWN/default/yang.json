@@ -1,0 +1,42 @@
+{
+  "os": "junos", 
+  "yang_message": {
+    "lacp": {
+      "interfaces": {
+        "interface": {
+          "ae105": {
+            "members": {
+              "member": {
+                "et-0/0/25:3": {
+                  "state": {
+                    "interface": "et-0/0/25:3"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }, 
+  "facility": 21, 
+  "error": "LACP_INTERFACE_DOWN", 
+  "yang_model": "openconfig-lacp", 
+  "host": "some-switch", 
+  "severity": 7, 
+  "timestamp": 1604473536, 
+  "ip": "127.0.0.1", 
+  "message_details": {
+    "facility": 21, 
+    "date": "2020-11-04", 
+    "processId": "12694", 
+    "message": "ae105: Interface marked down due to lacp timeout on member et-0/0/25:3", 
+    "host": "some-switch", 
+    "time": "07:05:36+00:00", 
+    "severity": 7, 
+    "hostPrefix": null, 
+    "processName": "lacpd", 
+    "tag": "LACP_INTF_DOWN", 
+    "pri": "175"
+  }
+}
