@@ -1,0 +1,12 @@
+messages:
+  - error: LACP_INTERFACE_DOWN
+    tag: LACP_INTF_DOWN
+    values:
+      interface: ([\w\-\/\:]+)
+      member: ([\w\-\/\:]+)
+    line: '{interface}: Interface marked down due to lacp timeout on member {member}'
+    model: openconfig-lacp
+    mapping:
+      variables:
+        lacp//interfaces//interface//{interface}//members//member//{member}//state//interface: member
+      static: {}

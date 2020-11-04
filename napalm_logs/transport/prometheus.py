@@ -81,6 +81,27 @@ class PrometheusTransport(TransportBase):
         state = 1 if error == 'INTERFACE_UP' else 0
         self.metrics['interface_state'].labels(**labels).set(state)
 
+    def __parse_lacp(self, msg):
+        '''
+        Helper to generate Counter metrics for LACP notifications.
+        '''
+        error = msg['error']
+        if error not in self.metrics:
+            self.metrics[error] = Counter(
+                'napalm_logs_{error}'.format(error=error.lower()),
+                'Counter for {error} notifications'.format(error=error),
+                ['host', 'interface', 'member']
+            )
+        lacp_dict = msg['yang_message']['lacp']['interfaces']['interface']
+        if_name = list(lacp_dict.keys())[0]
+        members_dict = lacp_dict[if_name]['members']['member']
+        member_name = list(members_dict.keys())[0]
+        self.metrics[error].labels(
+            host=msg['host'],
+            interface=if_name,
+            member=member_name
+        ).inc()
+
     def __parse_bgp_basic(self, msg):
         '''
         Helper to generate Counter metrics for simple BGP notifications,
@@ -271,6 +292,12 @@ class PrometheusTransport(TransportBase):
             host=msg['host'],
             interface=iface_name
         ).set(iface_dict[iface_name]['ethernet']['state']['learned-mac-addresses'])
+
+    def _parse_lacp_interface_down(self, msg):
+        '''
+        Build metrics for LACP_INTERFACE_DOWN messages.
+        '''
+        self.__parse_lacp(msg)
 
     def _parse_bfd_state_change(self, msg):
         '''
