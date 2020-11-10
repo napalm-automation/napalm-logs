@@ -1,0 +1,37 @@
+{
+  "error": "SYSTEM_ALARM_CLEARED",
+  "host": "vmx01",
+  "ip": "127.0.0.1",
+  "timestamp": 1594249453,
+  "yang_message": {
+    "hardware-state": {
+      "component": {
+        "supply": {
+          "name": "supply",
+          "class": "CHASSIS",
+          "state": {
+            "alarm-state": 4,
+            "alarm-reason": "PEM 1 Fan Failed"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "date": "Jul  8",
+    "time": "23:04:13",
+    "hostPrefix": null,
+    "host": "vmx01",
+    "processName": "alarmd",
+    "processId": "2449",
+    "tag": "Alarm cleared",
+    "pri": "28",
+    "message": "Pwr supply color=YELLOW, class=CHASSIS, reason=PEM 1 Fan Failed",
+    "facility": 3,
+    "severity": 4
+  },
+  "yang_model": "ietf-hardware",
+  "os": "junos",
+  "facility": 3,
+  "severity": 4
+}

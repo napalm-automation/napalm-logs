@@ -437,21 +437,34 @@ class PrometheusTransport(TransportBase):
         '''
         Build metrics for SYSTEM_ALARM.
         '''
-        if 'SYSTEM_ALARM' not in self.metrics:
-            self.metrics['SYSTEM_ALARM'] = Counter(
-                'napalm_logs_system_alarm',
-                'Counter for SYSTEM_ALARM notifications',
+        error = msg['error']
+        if error not in self.metrics:
+            self.metrics[error] = Counter(
+                'napalm_logs_{error}'.format(error=error.lower()),
+                'Counter for {error} notifications'.format(error=error),
+                ['host', 'component_name', 'component_class', 'alarm_state', 'alarm_reason']
+            )
+        if 'system_alarm_state' not in self.metrics:
+            self.metrics['system_alarm_state'] = Gauge(
+                'napalm_logs_system_alarm_state',
+                'State of the system alarm. 1=SET, 0=CLEARED',
                 ['host', 'component_name', 'component_class', 'alarm_state', 'alarm_reason']
             )
         component = msg['yang_message']['hardware-state']['component']
         component_name = list(component.keys())[0]
-        self.metrics['SYSTEM_ALARM'].labels(
-            host=msg['host'],
-            component_name=component_name,
-            component_class=component[component_name]['class'],
-            alarm_state=component[component_name]['state']['alarm-state'],
-            alarm_reason=component[component_name]['state']['alarm-reason']
-        ).inc()
+        labels = {
+            'host': msg['host'],
+            'component_name': component_name,
+            'component_class': component[component_name]['class'],
+            'alarm_state': component[component_name]['state']['alarm-state'],
+            'alarm_reason': component[component_name]['state']['alarm-reason']
+        }
+        self.metrics[error].labels(**labels).inc()
+        state = 1 if error == 'SYSTEM_ALARM' else 0
+        self.metrics['system_alarm_state'].labels(**labels).set(state)
+
+    def _parse_system_alarm_cleared(self, msg):
+        return self._parse_system_alarm(msg)
 
     def _parse_ospf_neighbor_up(self, msg):
         '''
