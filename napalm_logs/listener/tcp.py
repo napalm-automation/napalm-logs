@@ -95,8 +95,7 @@ class TCPListener(ListenerBase):
         except socket.timeout:
             if not self.__up:
                 return
-            log.debug('Connection %s:%d timed out', addr[1], addr[0])
-            raise ListenerException('Connection %s:%d timed out' % addr)
+            log.error('Connection %s:%d timed out', addr[1], addr[0])
         finally:
             log.debug('Closing connection with %s', addr)
             conn.close()
