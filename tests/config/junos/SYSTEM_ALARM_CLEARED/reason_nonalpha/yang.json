@@ -1,0 +1,37 @@
+{
+  "severity": 4, 
+  "timestamp": 1594249453, 
+  "os": "junos", 
+  "message_details": {
+    "processName": "alarmd", 
+    "severity": 4, 
+    "tag": "Alarm cleared", 
+    "hostPrefix": null, 
+    "time": "23:04:13", 
+    "pri": "28", 
+    "message": "RE color=YELLOW, class=CHASSIS, reason=RE 0 /var partition usage is high", 
+    "facility": 3, 
+    "host": "vmx01", 
+    "date": "Jul  8", 
+    "processId": "2449"
+  }, 
+  "yang_model": "ietf-hardware", 
+  "yang_message": {
+    "hardware-state": {
+      "component": {
+        "RE": {
+          "class": "CHASSIS", 
+          "name": "RE", 
+          "state": {
+            "alarm-state": 4, 
+            "alarm-reason": "RE 0 /var partition usage is high"
+          }
+        }
+      }
+    }
+  }, 
+  "error": "SYSTEM_ALARM_CLEARED", 
+  "facility": 3, 
+  "host": "vmx01", 
+  "ip": "127.0.0.1"
+}
