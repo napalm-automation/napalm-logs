@@ -1,0 +1,1 @@
+<28>Nov  9 01:02:40  some-switch jddosd[4223]: DDOS_PROTOCOL_VIOLATION_SET: Warning: Host-bound traffic for protocol/exception  Redirect:aggregate exceeded its allowed bandwidth at fpc 0 for 6661 times, started at 2020-11-09 01:02:39 UTC
