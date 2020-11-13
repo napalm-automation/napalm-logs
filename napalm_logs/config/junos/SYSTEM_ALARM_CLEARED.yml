@@ -4,7 +4,7 @@ messages:
     values:
       component: (FPC \d)
       color|color_to_severity: (\w+)
-      reason: ([\w ]+)
+      reason: (.*)
     line: 'FPC color={color}, class=CHASSIS, reason={component} {reason}'
     model: ietf-hardware
     mapping:
@@ -22,7 +22,7 @@ messages:
       component: (\w+)
       color|color_to_severity: (\w+)
       class: (\w+)
-      reason: ([\w ]+)
+      reason: (.*)
     line: '{component} color={color}, class={class}, reason={reason}'
     model: ietf-hardware
     mapping:
