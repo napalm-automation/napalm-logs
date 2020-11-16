@@ -466,9 +466,9 @@ class PrometheusTransport(TransportBase):
     def _parse_system_alarm_cleared(self, msg):
         return self._parse_system_alarm(msg)
 
-    def __parse_major_alarm(self, msg):
+    def __parse_minor_major_alarm(self, msg):
         '''
-        Build metrics for MAJOR_ALARM_* notifications.
+        Build metrics for MINOR_ALARM_* and MAJOR_ALARM_* notifications.
         '''
         error = msg['error']
         if error not in self.metrics:
@@ -477,10 +477,12 @@ class PrometheusTransport(TransportBase):
                 'Counter for {error} notifications'.format(error=error),
                 ['host', 'alarm_reason']
             )
-        if 'major_alarm_state' not in self.metrics:
-            self.metrics['major_alarm_state'] = Gauge(
-                'napalm_logs_major_alarm_state',
-                'State of the major system alarm. 1=SET, 0=CLEARED',
+        severity = error.split('_')[0].lower()
+        alarm_state_metric = '{}_alarm_state'.format(severity)
+        if alarm_state_metric not in self.metrics:
+            self.metrics[alarm_state_metric] = Gauge(
+                'napalm_logs_{}'.format(alarm_state_metric),
+                'State of the {} system alarm. 1=SET, 0=CLEARED'.format(severity),
                 ['host', 'alarm_reason']
             )
         labels = {
@@ -488,14 +490,20 @@ class PrometheusTransport(TransportBase):
             'alarm_reason': msg['yang_message']['alarms']['alarm']['additional-text']
         }
         self.metrics[error].labels(**labels).inc()
-        state = 1 if error == 'MAJOR_ALARM_SET' else 0
-        self.metrics['major_alarm_state'].labels(**labels).set(state)
+        state = 1 if error == '{}_ALARM_SET'.format(severity.upper()) else 0
+        self.metrics[alarm_state_metric].labels(**labels).set(state)
 
     def _parse_major_alarm_set(self, msg):
-        return self.__parse_major_alarm(msg)
+        return self.__parse_minor_major_alarm(msg)
 
     def _parse_major_alarm_cleared(self, msg):
-        return self.__parse_major_alarm(msg)
+        return self.__parse_minor_major_alarm(msg)
+
+    def _parse_minor_alarm_set(self, msg):
+        return self.__parse_minor_major_alarm(msg)
+
+    def _parse_minor_alarm_cleared(self, msg):
+        return self.__parse_minor_major_alarm(msg)
 
     def _parse_ospf_neighbor_up(self, msg):
         '''
