@@ -1,0 +1,11 @@
+messages:
+  - error: MAJOR_ALARM_SET
+    tag: craftd
+    values:
+      reason: (.*)
+    line: 'Major alarm set, {reason}'
+    model: ietf-alarm
+    mapping:
+      variables:
+        alarms//alarm//additional-text: reason
+      static: {}
