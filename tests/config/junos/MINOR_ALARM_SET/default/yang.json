@@ -1,0 +1,29 @@
+{
+  "host": "vmx01", 
+  "yang_model": "ietf-alarm", 
+  "ip": "127.0.0.1", 
+  "message_details": {
+    "host": "vmx01", 
+    "pri": "28", 
+    "time": "23:04:13", 
+    "message": "Minor alarm set, RE 0 /var partition usage is high", 
+    "severity": 4, 
+    "tag": "craftd", 
+    "hostPrefix": null, 
+    "processId": "4817", 
+    "facility": 3, 
+    "date": "Jul  8"
+  }, 
+  "yang_message": {
+    "alarms": {
+      "alarm": {
+        "additional-text": "RE 0 /var partition usage is high"
+      }
+    }
+  }, 
+  "severity": 4, 
+  "timestamp": 1594249453, 
+  "error": "MINOR_ALARM_SET", 
+  "os": "junos", 
+  "facility": 3
+}
