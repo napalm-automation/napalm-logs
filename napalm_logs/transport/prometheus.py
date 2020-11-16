@@ -466,6 +466,37 @@ class PrometheusTransport(TransportBase):
     def _parse_system_alarm_cleared(self, msg):
         return self._parse_system_alarm(msg)
 
+    def __parse_major_alarm(self, msg):
+        '''
+        Build metrics for MAJOR_ALARM_* notifications.
+        '''
+        error = msg['error']
+        if error not in self.metrics:
+            self.metrics[error] = Counter(
+                'napalm_logs_{error}'.format(error=error.lower()),
+                'Counter for {error} notifications'.format(error=error),
+                ['host', 'alarm_reason']
+            )
+        if 'major_alarm_state' not in self.metrics:
+            self.metrics['major_alarm_state'] = Gauge(
+                'napalm_logs_major_alarm_state',
+                'State of the major system alarm. 1=SET, 0=CLEARED',
+                ['host', 'alarm_reason']
+            )
+        labels = {
+            'host': msg['host'],
+            'alarm_reason': msg['yang_message']['alarms']['alarm']['additional-text']
+        }
+        self.metrics[error].labels(**labels).inc()
+        state = 1 if error == 'MAJOR_ALARM_SET' else 0
+        self.metrics['major_alarm_state'].labels(**labels).set(state)
+
+    def _parse_major_alarm_set(self, msg):
+        return self.__parse_major_alarm(msg)
+
+    def _parse_major_alarm_cleared(self, msg):
+        return self.__parse_major_alarm(msg)
+
     def _parse_ospf_neighbor_up(self, msg):
         '''
         Build metrics for OSPF_NEIGHBOR_UP.
