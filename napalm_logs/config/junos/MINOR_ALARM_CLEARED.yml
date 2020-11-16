@@ -1,0 +1,11 @@
+messages:
+  - error: MINOR_ALARM_CLEARED
+    tag: craftd
+    values:
+      reason: (.*)
+    line: 'Minor alarm cleared, {reason}'
+    model: ietf-alarm
+    mapping:
+      variables:
+        alarms//alarm//additional-text: reason
+      static: {}
