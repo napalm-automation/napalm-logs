@@ -502,6 +502,26 @@ class PrometheusTransport(TransportBase):
         '''
         self.__parse_nat_session(msg)
 
+    def _parse_ddos_protocol_violation_set(self, msg):
+        '''
+        Build metrics for DDOS_PROTOCOL_VIOLATION_SET messages.
+        '''
+        error = msg['error']
+        if error not in self.metrics:
+            self.metrics[error] = Counter(
+                'napalm_logs_{error}'.format(error=error.lower()),
+                'Counter for {error} notifications'.format(error=error),
+                ['host', 'event_type', 'entity_type', 'additional_text']
+            )
+        alarm_dict = msg['yang_message']['alarms']['alarm']
+        labels = {
+            'host': msg['host'],
+            'event_type': alarm_dict['event-type'],
+            'entity_type': alarm_dict['entity-type'],
+            'additional_text': alarm_dict['additional-text']
+        }
+        self.metrics[error].labels(**labels).inc()
+
     def start(self):
         log.debug('Starting the Prometheus publisher')
 
