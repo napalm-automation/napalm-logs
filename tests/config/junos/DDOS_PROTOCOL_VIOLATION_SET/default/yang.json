@@ -1,33 +1,33 @@
 {
-  "error": "DDOS_PROTOCOL_VIOLATION_SET",
-  "host": "some-switch",
-  "ip": "127.0.0.1",
-  "timestamp": 1604883760,
+  "timestamp": 1604883760, 
+  "severity": 4, 
+  "error": "DDOS_PROTOCOL_VIOLATION_SET", 
+  "os": "junos", 
+  "ip": "127.0.0.1", 
+  "message_details": {
+    "message": "Warning: Host-bound traffic for protocol/exception  Redirect:aggregate exceeded its allowed bandwidth at fpc 0 for 6661 times, started at 2020-11-09 01:02:39 UTC", 
+    "severity": 4, 
+    "tag": "DDOS_PROTOCOL_VIOLATION_SET", 
+    "time": "01:02:40", 
+    "facility": 3, 
+    "hostPrefix": null, 
+    "pri": "28", 
+    "processName": "jddosd", 
+    "host": "some-switch", 
+    "processId": "4223", 
+    "date": "Nov  9"
+  }, 
+  "yang_model": "ietf-alarm", 
   "yang_message": {
     "alarms": {
       "alarm": {
-        "entity-type": "Redirect",
-        "additional-text": "aggregate exceeded its allowed bandwidth at fpc 0 for 6661 times",
-        "alarm-time": "2020-11-09 01:02:39 UTC",
-        "event-type": 10
+        "event-type": 10, 
+        "additional-text": "aggregate exceeded its allowed bandwidth at fpc 0", 
+        "entity-type": "Redirect", 
+        "alarm-time": "2020-11-09 01:02:39 UTC"
       }
     }
-  },
-  "message_details": {
-    "date": "Nov  9",
-    "time": "01:02:40",
-    "hostPrefix": null,
-    "host": "some-switch",
-    "processName": "jddosd",
-    "processId": "4223",
-    "tag": "DDOS_PROTOCOL_VIOLATION_SET",
-    "pri": "28",
-    "message": "Warning: Host-bound traffic for protocol/exception  Redirect:aggregate exceeded its allowed bandwidth at fpc 0 for 6661 times, started at 2020-11-09 01:02:39 UTC",
-    "facility": 3,
-    "severity": 4
-  },
-  "yang_model": "ietf-alarm",
-  "os": "junos",
-  "facility": 3,
-  "severity": 4
+  }, 
+  "facility": 3, 
+  "host": "some-switch"
 }

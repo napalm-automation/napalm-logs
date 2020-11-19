@@ -5,7 +5,8 @@ messages:
       entityType: ([\w\-]+)
       additionalText: (.*)
       startTime: ([\w\s\-\:]+)
-    line: 'Warning: Host-bound traffic for protocol/exception  {entityType}:{additionalText}, started at {startTime}'
+      times: (\d+)
+    line: 'Warning: Host-bound traffic for protocol/exception  {entityType}:{additionalText} for {times} times, started at {startTime}'
     model: ietf-alarm
     mapping:
       variables:
