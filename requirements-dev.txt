@@ -1,10 +1,10 @@
 -r requirements.txt
-tox
-pytest
-pylama
-jinja2
-coveralls
-pytest-cov
-pytest-json
-pytest-pythonpath
-flake8-import-order
+tox==3.21.4
+black==19.10b0
+pytest==6.2.2
+pylama==7.7.1
+jinja2==2.11.3
+pytest-cov==2.11.1
+pytest-json==0.4.0
+pytest-pythonpath==0.7.3
+flake8-import-order==0.18.1
