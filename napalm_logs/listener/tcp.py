@@ -26,6 +26,7 @@ from napalm_logs.config import BUFFER_SIZE
 from napalm_logs.config import REUSE_PORT
 from napalm_logs.config import MAX_TCP_CLIENTS
 from napalm_logs.listener.base import ListenerBase
+
 # exceptions
 from napalm_logs.exceptions import BindException
 from napalm_logs.exceptions import ListenerException
@@ -39,6 +40,7 @@ class TCPListener(ListenerBase):
     '''
     TCP syslog listener class
     '''
+
     def __init__(self, address, port, **kwargs):
         if kwargs.get('address'):
             self.address = kwargs['address']
@@ -116,7 +118,9 @@ class TCPListener(ListenerBase):
                 msg = 'Received listener socket error: {}'.format(error)
                 log.error(msg, exc_info=True)
                 raise ListenerException(msg)
-            client_thread = threading.Thread(target=self._client_connection, args=(conn, addr,))
+            client_thread = threading.Thread(
+                target=self._client_connection, args=(conn, addr,)
+            )
             client_thread.start()
 
     def start(self):
@@ -137,7 +141,9 @@ class TCPListener(ListenerBase):
         try:
             self.skt.bind((self.address, int(self.port)))
         except socket.error as msg:
-            error_string = 'Unable to bind to port {} on {}: {}'.format(self.port, self.address, msg)
+            error_string = 'Unable to bind to port {} on {}: {}'.format(
+                self.port, self.address, msg
+            )
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
         log.debug('Accepting max %d parallel connections', self.max_clients)

@@ -36,11 +36,7 @@ METRICS_DIR = "/tmp/napalm_logs_metrics"
 BUFFER_EXPIRE_TIME = 5
 
 # Allowed names for the init files.
-OS_INIT_FILENAMES = (
-    '__init__',
-    'init',
-    'index'
-)
+OS_INIT_FILENAMES = ('__init__', 'init', 'index')
 # The name of the function to be invoked when extracting the parts from the
 #   raw syslog message.
 INIT_RUN_FUN = 'extract'
@@ -50,36 +46,22 @@ CONFIG_RUN_FUN = 'emit'
 
 UNKNOWN_DEVICE_NAME = 'unknown'
 
-LISTENER_OPTS = {
-}
+LISTENER_OPTS = {}
 
-LOGGER_OPTS = {
-    'send_raw': False,
-    'send_unknown': False
-}
+LOGGER_OPTS = {'send_raw': False, 'send_unknown': False}
 
-PUBLISHER_OPTS = {
-    'send_raw': False,
-    'send_unknown': False
-}
+PUBLISHER_OPTS = {'send_raw': False, 'send_unknown': False}
 
 LOGGING_LEVEL = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
     'warning': logging.WARNING,
     'error': logging.ERROR,
-    'critical': logging.CRITICAL
+    'critical': logging.CRITICAL,
 }
 
 VALID_CONFIG = {
-    'prefixes': [
-        {
-            'values': {
-                'tag': six.string_type
-            },
-            'line': six.string_type
-        }
-    ],
+    'prefixes': [{'values': {'tag': six.string_type}, 'line': six.string_type}],
     'messages': [
         {
             # 'error' should be unique and vendor agnostic.
@@ -90,12 +72,9 @@ VALID_CONFIG = {
             'values': dict,
             'line': six.string_type,
             'model': six.string_type,
-            'mapping': {
-                'variables': dict,
-                'static': dict
-            }
+            'mapping': {'variables': dict, 'static': dict},
         }
-    ]
+    ],
 }
 
 # listener

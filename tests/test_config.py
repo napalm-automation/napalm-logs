@@ -44,14 +44,16 @@ def startup_proc():
     global NL_BASE
     global NL_PROC
     log.debug('Starting up the napalm-logs process')
-    NL_BASE = NapalmLogs(disable_security=True,
-                         address=NAPALM_LOGS_TEST_ADDR,
-                         port=NAPALM_LOGS_TEST_PORT,
-                         publisher=[{'zmq': {'send_unknown': True}}],
-                         listener=[{'udp': {}}],
-                         publish_address=NAPALM_LOGS_TEST_PUB_ADDR,
-                         publish_port=NAPALM_LOGS_TEST_PUB_PORT,
-                         log_level=NAPALM_LOGS_TEST_LOG_LEVEL)
+    NL_BASE = NapalmLogs(
+        disable_security=True,
+        address=NAPALM_LOGS_TEST_ADDR,
+        port=NAPALM_LOGS_TEST_PORT,
+        publisher=[{'zmq': {'send_unknown': True}}],
+        listener=[{'udp': {}}],
+        publish_address=NAPALM_LOGS_TEST_PUB_ADDR,
+        publish_port=NAPALM_LOGS_TEST_PUB_PORT,
+        log_level=NAPALM_LOGS_TEST_LOG_LEVEL,
+    )
     NL_PROC = Process(target=NL_BASE.start_engine)
     NL_PROC.start()
 
@@ -68,9 +70,10 @@ def startup_local_client():
     global TEST_CLIENT
     context = zmq.Context()
     TEST_CLIENT = context.socket(zmq.SUB)
-    TEST_CLIENT.connect('tcp://{addr}:{port}'.format(
-        addr=NAPALM_LOGS_TEST_PUB_ADDR,
-        port=NAPALM_LOGS_TEST_PUB_PORT)
+    TEST_CLIENT.connect(
+        'tcp://{addr}:{port}'.format(
+            addr=NAPALM_LOGS_TEST_PUB_ADDR, port=NAPALM_LOGS_TEST_PUB_PORT
+        )
     )
     TEST_CLIENT.setsockopt(zmq.SUBSCRIBE, b'')
 
@@ -91,7 +94,11 @@ def generate_tests():
     test_cases = []
     cwd = os.path.dirname(__file__)
     test_path = os.path.join(cwd, 'config')
-    os_dir_list = [name for name in os.listdir(test_path) if os.path.isdir(os.path.join(test_path, name))]
+    os_dir_list = [
+        name
+        for name in os.listdir(test_path)
+        if os.path.isdir(os.path.join(test_path, name))
+    ]
     expected_oss = set(expected_os_errors.keys())
     tested_oss = set(os_dir_list)
     missing_oss = expected_oss - tested_oss
@@ -100,7 +107,11 @@ def generate_tests():
     for os_name in os_dir_list:
         # Subdir is the OS name
         os_path = os.path.join(test_path, os_name)
-        errors = [name for name in os.listdir(os_path) if os.path.isdir(os.path.join(os_path, name))]
+        errors = [
+            name
+            for name in os.listdir(os_path)
+            if os.path.isdir(os.path.join(os_path, name))
+        ]
         expected_errors = set(expected_os_errors[os_name])
         defined_errors = set(errors)
         missing_errors = expected_errors - defined_errors
@@ -108,7 +119,11 @@ def generate_tests():
             test_cases.append((os_name, '__missing__{}'.format(mising_err), ''))
         for error_name in errors:
             error_path = os.path.join(os_path, error_name)
-            cases = [name for name in os.listdir(error_path) if os.path.isdir(os.path.join(error_path, name))]
+            cases = [
+                name
+                for name in os.listdir(error_path)
+                if os.path.isdir(os.path.join(error_path, name))
+            ]
             if not cases:
                 test_cases.append((os_name, error_name, '__missing__'))
             for test_case in cases:
@@ -122,12 +137,22 @@ tests = generate_tests()
 
 @pytest.mark.parametrize("os_name,error_name,test_case", tests)
 def test_config(os_name, error_name, test_case):
-    assert not os_name.startswith('__missing__'), 'No tests defined for {}'.format(os_name.replace('__missing__', ''))
-    assert not error_name.startswith('__missing__'),\
-        'No tests defined for {}, under {}'.format(error_name.replace('__missing__', ''), os_name)
-    assert test_case != '__missing__', 'No test cases defined for {}, under {}'.format(error_name, os_name)
-    print('Testing {} for {}, under the test case "{}"'.format(
-          error_name, os_name, test_case))
+    assert not os_name.startswith('__missing__'), 'No tests defined for {}'.format(
+        os_name.replace('__missing__', '')
+    )
+    assert not error_name.startswith(
+        '__missing__'
+    ), 'No tests defined for {}, under {}'.format(
+        error_name.replace('__missing__', ''), os_name
+    )
+    assert test_case != '__missing__', 'No test cases defined for {}, under {}'.format(
+        error_name, os_name
+    )
+    print(
+        'Testing {} for {}, under the test case "{}"'.format(
+            error_name, os_name, test_case
+        )
+    )
     cwd = os.path.dirname(__file__)
     test_path = os.path.join(cwd, 'config', os_name, error_name, test_case)
     raw_message_filepath = os.path.join(test_path, 'syslog.msg')
@@ -153,7 +178,10 @@ def test_config(os_name, error_name, test_case):
     log.debug('Struct YANG message:')
     log.debug(struct_yang_message)
     log.debug('Sending the raw message to the napalm-logs daemon')
-    TEST_SKT.sendto(raw_message.strip().encode('utf-8'), (NAPALM_LOGS_TEST_ADDR, NAPALM_LOGS_TEST_PORT))
+    TEST_SKT.sendto(
+        raw_message.strip().encode('utf-8'),
+        (NAPALM_LOGS_TEST_ADDR, NAPALM_LOGS_TEST_PORT),
+    )
     zmq_msg = TEST_CLIENT.recv()
     deserialised_zmq_msg = napalm_logs.utils.unserialize(zmq_msg)
     log.debug('Received from the napalm-logs daemon:')
@@ -168,10 +196,16 @@ def test_config(os_name, error_name, test_case):
     # which means that once a year we will have to update all tests if we
     # check the timestamp.
     # We still expect both to contain a timestamp though.
-    assert struct_yang_message.pop('timestamp', False),\
-        'Yang test file does not contain a timestamp key for {} under {}'.format(error_name, os_name)
-    assert returned_yang.pop('timestamp', False),\
-        'The returned yang does not contain a timestamp key for {} under {}'.format(error_name, os_name)
+    assert struct_yang_message.pop(
+        'timestamp', False
+    ), 'Yang test file does not contain a timestamp key for {} under {}'.format(
+        error_name, os_name
+    )
+    assert returned_yang.pop(
+        'timestamp', False
+    ), 'The returned yang does not contain a timestamp key for {} under {}'.format(
+        error_name, os_name
+    )
     assert struct_yang_message == returned_yang
 
 

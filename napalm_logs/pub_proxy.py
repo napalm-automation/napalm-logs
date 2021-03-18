@@ -17,6 +17,7 @@ import zmq
 from napalm_logs.config import PUB_IPC_URL
 from napalm_logs.config import PUB_PX_IPC_URL
 from napalm_logs.proc import NapalmLogsProc
+
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
 
@@ -27,6 +28,7 @@ class NapalmLogsPublisherProxy(NapalmLogsProc):
     '''
     Internal IPC proxy sub-process class.
     '''
+
     def __init__(self, hwm):
         self.hwm = hwm
         self.__up = False
@@ -69,7 +71,9 @@ class NapalmLogsPublisherProxy(NapalmLogsProc):
         '''
         self._setup_ipc()
         # Start suicide polling thread
-        thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
+        thread = threading.Thread(
+            target=self._suicide_when_without_parent, args=(os.getppid(),)
+        )
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         try:

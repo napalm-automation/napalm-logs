@@ -15,6 +15,7 @@ class CLITransport(TransportBase):
     '''
     CLI transport class.
     '''
+
     NO_ENCRYPT = True
     # This tells the publisher to not encrypt the messages
     #   published over this channel.

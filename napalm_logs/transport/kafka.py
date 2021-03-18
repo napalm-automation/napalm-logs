@@ -11,6 +11,7 @@ import logging
 # Import third party libs
 try:
     import kafka
+
     HAS_KAFKA = True
 except ImportError:
     HAS_KAFKA = False
@@ -26,6 +27,7 @@ class KafkaTransport(TransportBase):
     '''
     Kafka transport class.
     '''
+
     def __init__(self, address, port, **kwargs):
         if kwargs.get('address'):
             address = kwargs['address']
@@ -41,7 +43,9 @@ class KafkaTransport(TransportBase):
 
     def start(self):
         try:
-            self.producer = kafka.KafkaProducer(bootstrap_servers=self.bootstrap_servers)
+            self.producer = kafka.KafkaProducer(
+                bootstrap_servers=self.bootstrap_servers
+            )
         except kafka.errors.NoBrokersAvailable as err:
             log.error(err, exc_info=True)
             raise NapalmLogsException(err)

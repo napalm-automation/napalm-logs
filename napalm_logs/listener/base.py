@@ -8,6 +8,7 @@ class ListenerBase:
     '''
     The base class for the listener.
     '''
+
     def __init__(self, address, port, **kwargs):
         pass
 

@@ -16,6 +16,7 @@ class MemoryBuffer(object):
     '''
     Memory buffer class.
     '''
+
     def __init__(self, expire_time, **kwargs):
         self.expire_time = expire_time
         self.expire_time_delta = datetime.timedelta(0, expire_time, 0)
@@ -23,10 +24,7 @@ class MemoryBuffer(object):
         self._cache = {}
 
     def __setitem__(self, key, val):
-        self._cache[key] = {
-            'data': val,
-            'timestamp': datetime.datetime.utcnow()
-        }
+        self._cache[key] = {'data': val, 'timestamp': datetime.datetime.utcnow()}
 
     def __contains__(self, key):
         return True if key in self._cache else False

@@ -18,22 +18,21 @@ import zmq
 import napalm_logs.utils
 
 server_address = '127.0.0.1'  # --publish-address
-server_port = 49017           # --publish-port
-auth_address = '127.0.0.1'    # --auth-address
-auth_port = 49018             # --auth-port
+server_port = 49017  # --publish-port
+auth_address = '127.0.0.1'  # --auth-address
+auth_port = 49018  # --auth-port
 
 certificate = '/var/cache/napalm-logs.crt'  # --certificate
 
 # Using zmq
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
-socket.connect('tcp://{address}:{port}'.format(address=server_address,
-                                               port=server_port))
+socket.connect(
+    'tcp://{address}:{port}'.format(address=server_address, port=server_port)
+)
 socket.setsockopt(zmq.SUBSCRIBE, '')
 
-auth = napalm_logs.utils.ClientAuth(certificate,
-                                    address=auth_address,
-                                    port=auth_port)
+auth = napalm_logs.utils.ClientAuth(certificate, address=auth_address, port=auth_port)
 
 while True:
     raw_object = socket.recv()

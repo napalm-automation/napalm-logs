@@ -21,7 +21,7 @@ ALERTA_SEVERITY = {
     7: 'trace',
     8: 'indeterminate',
     9: 'normal',
-    10: 'unknown'
+    10: 'unknown',
 }
 
 
@@ -29,6 +29,7 @@ class AlertaTransport(HTTPTransport):
     '''
     Alerta publisher class.
     '''
+
     def __init__(self, address, port, **kwargs):
         super().__init__(address, port, **kwargs)
         if not self.address.endswith('/alert') and not self.address.endswith('/alert/'):
@@ -47,7 +48,7 @@ class AlertaTransport(HTTPTransport):
             self.pairs = {
                 'INTERFACE_UP': 'INTERFACE_DOWN',
                 'OSPF_NEIGHBOR_UP': 'OSPF_NEIGHBOR_DOWN',
-                'ISIS_NEIGHBOR_UP': 'ISIS_NEIGHBOR_DOWN'
+                'ISIS_NEIGHBOR_UP': 'ISIS_NEIGHBOR_DOWN',
             }
 
     def publish(self, obj):
@@ -69,16 +70,18 @@ class AlertaTransport(HTTPTransport):
             alerta_data['environment'] = self.environment
         alerta_data['severity'] = ALERTA_SEVERITY.get(data['severity'], 'unknown')
         if self.backend == 'tornado':
-            self.tornado_client.fetch(self.address,
-                                      callback=self._handle_tornado_response,
-                                      method=self.method,
-                                      headers=self.headers,
-                                      auth_username=self.username,
-                                      auth_password=self.password,
-                                      body=str(alerta_data),
-                                      validate_cert=self.verify_ssl,
-                                      allow_nonstandard_methods=True,
-                                      decompress_response=False)
+            self.tornado_client.fetch(
+                self.address,
+                callback=self._handle_tornado_response,
+                method=self.method,
+                headers=self.headers,
+                auth_username=self.username,
+                auth_password=self.password,
+                body=str(alerta_data),
+                validate_cert=self.verify_ssl,
+                allow_nonstandard_methods=True,
+                decompress_response=False,
+            )
         elif self.backend == 'requests':
             # Queue the publish object async
             self._publish_queue.put_nowait(alerta_data)

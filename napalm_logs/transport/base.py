@@ -8,6 +8,7 @@ class TransportBase:
     '''
     The base class for the transport.
     '''
+
     def __init__(self, address, port, **kwargs):
         pass
 

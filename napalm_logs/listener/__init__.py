@@ -11,6 +11,7 @@ import logging
 # Import napalm-logs pkgs
 # Exceptions
 from napalm_logs.exceptions import InvalidListenerException
+
 # Listener classes
 from napalm_logs.listener.tcp import TCPListener
 from napalm_logs.listener.udp import UDPListener
@@ -25,7 +26,7 @@ log = logging.getLogger(__file__)
 LISTENER_LOOKUP = {
     'tcp': TCPListener,
     'udp': UDPListener,
-    '*': UDPListener  # default listener
+    '*': UDPListener,  # default listener
 }
 
 if HAS_KAFKA:
@@ -46,11 +47,11 @@ def get_listener(name):
         log.debug('Using %s as listener', name)
         return LISTENER_LOOKUP[name]
     except KeyError:
-        msg = 'Listener {} is not available. Are the dependencies installed?'.format(name)
+        msg = 'Listener {} is not available. Are the dependencies installed?'.format(
+            name
+        )
         log.error(msg, exc_info=True)
         raise InvalidListenerException(msg)
 
 
-__all__ = (
-    'get_listener',
-)
+__all__ = ('get_listener',)
