@@ -16,13 +16,14 @@ import napalm_logs.utils
 import json
 
 server_address = '127.0.0.1'  # --publish-address
-server_port = 49017           # --publish-port
+server_port = 49017  # --publish-port
 
 # Using zmq
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
-socket.connect('tcp://{address}:{port}'.format(address=server_address,
-                                               port=server_port))
+socket.connect(
+    'tcp://{address}:{port}'.format(address=server_address, port=server_port)
+)
 socket.setsockopt(zmq.SUBSCRIBE, b'')
 
 while True:

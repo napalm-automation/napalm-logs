@@ -22,6 +22,7 @@ class PrometheusTransport(TransportBase):
     '''
     Prom transport class.
     '''
+
     def __init__(self, address, port, **kwargs):
         self.metrics = {}
 
@@ -35,7 +36,7 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host']
+                ['host'],
             )
         self.metrics[error].labels(host=msg['host']).inc()
 
@@ -49,11 +50,10 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'user']
+                ['host', 'user'],
             )
         self.metrics[error].labels(
-            host=msg['host'],
-            user=list(msg['yang_message']['users']['user'].keys())[0]
+            host=msg['host'], user=list(msg['yang_message']['users']['user'].keys())[0]
         ).inc()
 
     def __parse_interface_basic(self, msg):
@@ -65,17 +65,17 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'interface']
+                ['host', 'interface'],
             )
         if 'interface_state' not in self.metrics:
             self.metrics['interface_state'] = Gauge(
                 'napalm_logs_interface_state',
                 'State of this interface. 0=DOWN, 1=UP',
-                ['host', 'interface']
+                ['host', 'interface'],
             )
         labels = {
             'host': msg['host'],
-            'interface': list(msg['yang_message']['interfaces']['interface'].keys())[0]
+            'interface': list(msg['yang_message']['interfaces']['interface'].keys())[0],
         }
         self.metrics[error].labels(**labels).inc()
         state = 1 if error == 'INTERFACE_UP' else 0
@@ -90,16 +90,14 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'interface', 'member']
+                ['host', 'interface', 'member'],
             )
         lacp_dict = msg['yang_message']['lacp']['interfaces']['interface']
         if_name = list(lacp_dict.keys())[0]
         members_dict = lacp_dict[if_name]['members']['member']
         member_name = list(members_dict.keys())[0]
         self.metrics[error].labels(
-            host=msg['host'],
-            interface=if_name,
-            member=member_name
+            host=msg['host'], interface=if_name, member=member_name
         ).inc()
 
     def __parse_bgp_basic(self, msg):
@@ -112,14 +110,14 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'neighbor', 'peer_as']
+                ['host', 'neighbor', 'peer_as'],
             )
         neigh_dict = msg['yang_message']['bgp']['neighbors']['neighbor']
         neighbor = list(neigh_dict.keys())[0]
         self.metrics[error].labels(
             host=msg['host'],
             neighbor=neighbor,
-            peer_as=neigh_dict[neighbor]['state']['peer_as']
+            peer_as=neigh_dict[neighbor]['state']['peer_as'],
         ).inc()
 
     def __parse_network_instance_bgp(self, msg):
@@ -133,17 +131,23 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'routing_instance', 'neighbor', 'peer_as']
+                ['host', 'routing_instance', 'neighbor', 'peer_as'],
             )
-        instance_name = list(msg['yang_message']['network-instances']['network-instance'].keys())[0]
-        instance_dict = msg['yang_message']['network-instances']['network-instance'][instance_name]
-        neigh_dict = instance_dict['protocols']['protocol']['bgp']['neighbors']['neighbor']
+        instance_name = list(
+            msg['yang_message']['network-instances']['network-instance'].keys()
+        )[0]
+        instance_dict = msg['yang_message']['network-instances']['network-instance'][
+            instance_name
+        ]
+        neigh_dict = instance_dict['protocols']['protocol']['bgp']['neighbors'][
+            'neighbor'
+        ]
         neighbor = list(neigh_dict.keys())[0]
         self.metrics[error].labels(
             host=msg['host'],
             routing_instance=instance_name,
             neighbor=neighbor,
-            peer_as=neigh_dict[neighbor]['state']['peer_as']
+            peer_as=neigh_dict[neighbor]['state']['peer_as'],
         ).inc()
 
     def __parse_bgp_no_asn(self, msg):
@@ -156,14 +160,11 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'neighbor']
+                ['host', 'neighbor'],
             )
         neigh_dict = msg['yang_message']['bgp']['neighbors']['neighbor']
         neighbor = list(neigh_dict.keys())[0]
-        self.metrics[error].labels(
-            host=msg['host'],
-            neighbor=neighbor,
-        ).inc()
+        self.metrics[error].labels(host=msg['host'], neighbor=neighbor,).inc()
 
     def __parse_ospf_neighbor(self, msg):
         error = msg['error']
@@ -171,16 +172,17 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'area', 'neighbor', 'interface']
+                ['host', 'area', 'neighbor', 'interface'],
             )
         if 'ospf_neighbor' not in self.metrics:
             self.metrics['ospf_neighbor'] = Gauge(
                 'napalm_logs_ospf_neighbor_state',
                 'State of the OSPF neighbor. 0=DOWN, 1=UP',
-                ['host', 'area', 'neighbor', 'interface']
+                ['host', 'area', 'neighbor', 'interface'],
             )
         area_dict = msg['yang_message']['network-instances']['network-instance'][
-            'global']['protocols']['protocol']['ospf']['ospfv2']['areas']['area']
+            'global'
+        ]['protocols']['protocol']['ospf']['ospfv2']['areas']['area']
         area_id = list(area_dict.keys())[0]
         iface_dict = area_dict[area_id]['interfaces']['interface']
         iface_name = list(iface_dict.keys())[0]
@@ -189,7 +191,7 @@ class PrometheusTransport(TransportBase):
             'host': msg['host'],
             'area': area_id,
             'neighbor': neighbor,
-            'interface': iface_name
+            'interface': iface_name,
         }
         self.metrics[error].labels(**labels).inc()
         state = 1 if error == 'OSPF_NEIGHBOR_UP' else 0
@@ -201,16 +203,17 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'interface', 'level', 'neighbor']
+                ['host', 'interface', 'level', 'neighbor'],
             )
         if 'isis_neighbor' not in self.metrics:
             self.metrics['isis_neighbor'] = Gauge(
                 'napalm_logs_isis_neighbor_state',
                 'State of the ISIS neighbor. 0=DOWN, 1=UP',
-                ['host', 'interface', 'level', 'neighbor']
+                ['host', 'interface', 'level', 'neighbor'],
             )
         iface_dict = msg['yang_message']['network-instances']['network-instance'][
-            'global']['protocols']['protocol']['isis']['interfaces']['interface']
+            'global'
+        ]['protocols']['protocol']['isis']['interfaces']['interface']
         iface_name = list(iface_dict.keys())[0]
         level_dict = iface_dict[iface_name]['levels']['level']
         level = list(level_dict.keys())[0]
@@ -219,7 +222,7 @@ class PrometheusTransport(TransportBase):
             'host': msg['host'],
             'interface': iface_name,
             'level': level,
-            'neighbor': neighbor
+            'neighbor': neighbor,
         }
         self.metrics[error].labels(**labels).inc()
         state = 1 if error == 'ISIS_NEIGHBOR_UP' else 0
@@ -228,20 +231,24 @@ class PrometheusTransport(TransportBase):
     def __parse_nat_session(self, msg):
         error = msg['error']
         labels = [
-            'service_name', 'source_address', 'source_port',
-            'destination_address', 'destination_port', 'nat_destination_address',
-            'nat_destination_port', 'nat_source_address', 'nat_source_port'
+            'service_name',
+            'source_address',
+            'source_port',
+            'destination_address',
+            'destination_port',
+            'nat_destination_address',
+            'nat_destination_port',
+            'nat_source_address',
+            'nat_source_port',
         ]
         if error not in self.metrics:
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host'] + labels
+                ['host'] + labels,
             )
         event = list(msg['yang_message']['security']['flow'].keys())[0]
-        label_values = {
-            'host': msg['host']
-        }
+        label_values = {'host': msg['host']}
         for label in labels:
             label_values[label] = msg['yang_message']['security']['flow'][event][label]
         self.metrics[error].labels(**label_values).inc()
@@ -266,14 +273,14 @@ class PrometheusTransport(TransportBase):
             self.metrics['INTERFACE_DUPLEX_MODE'] = Counter(
                 'napalm_logs_interface_duplex_mode',
                 'Counter for INTERFACE_DUPLEX_MODE notifications',
-                ['host', 'interface', 'duplex_mode']
+                ['host', 'interface', 'duplex_mode'],
             )
         iface_dict = msg['yang_message']['interfaces']['interface']
         iface_name = list(iface_dict.keys())[0]
         self.metrics['INTERFACE_DUPLEX_MODE'].labels(
             host=msg['host'],
             interface=iface_name,
-            duplex_mode=iface_dict[iface_name]['ethernet']['state']['duplex_mode']
+            duplex_mode=iface_dict[iface_name]['ethernet']['state']['duplex_mode'],
         )
 
     def _parse_interface_mac_limit_reached(self, msg):
@@ -284,13 +291,12 @@ class PrometheusTransport(TransportBase):
             self.metrics['INTERFACE_MAC_LIMIT_REACHED'] = Gauge(
                 'napalm_logs_interface_mac_limit_reached',
                 'Counter for INTERFACE_MAC_LIMIT_REACHED notifications',
-                ['host', 'interface']
+                ['host', 'interface'],
             )
         iface_dict = msg['yang_message']['interfaces']['interface']
         iface_name = list(iface_dict.keys())[0]
         self.metrics['INTERFACE_MAC_LIMIT_REACHED'].labels(
-            host=msg['host'],
-            interface=iface_name
+            host=msg['host'], interface=iface_name
         ).set(iface_dict[iface_name]['ethernet']['state']['learned-mac-addresses'])
 
     def _parse_lacp_interface_down(self, msg):
@@ -307,13 +313,13 @@ class PrometheusTransport(TransportBase):
             self.metrics['BFD_STATE_CHANGE'] = Counter(
                 'napalm_logs_bfd_state_change',
                 'Counter for BFD_STATE_CHANGE notifications',
-                ['host', 'interface', 'session_state']
+                ['host', 'interface', 'session_state'],
             )
         iface_dict = msg['yang_message']['bfd']['interfaces']['interface']
         self.metrics['BFD_STATE_CHANGE'].labels(
             host=msg['host'],
             interface=iface_dict['id'],
-            session_state=iface_dict['peers']['peer']['state']['session-state']
+            session_state=iface_dict['peers']['peer']['state']['session-state'],
         ).inc()
 
     def _parse_ntp_server_unreachable(self, msg):
@@ -324,11 +330,13 @@ class PrometheusTransport(TransportBase):
             self.metrics['NTP_SERVER_UNREACHABLE'] = Counter(
                 'napalm_logs_ntp_server_unreachable',
                 'Counter for NTP_SERVER_UNREACHABLE notifications',
-                ['host', 'ntp_server']
+                ['host', 'ntp_server'],
             )
         self.metrics['NTP_SERVER_UNREACHABLE'].labels(
             host=msg['host'],
-            ntp_server=list(msg['yang_message']['system']['ntp']['servers']['server'].keys())[0]
+            ntp_server=list(
+                msg['yang_message']['system']['ntp']['servers']['server'].keys()
+            )[0],
         ).inc()
 
     def _parse_bgp_prefix_limit_exceeded(self, msg):
@@ -442,13 +450,25 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'component_name', 'component_class', 'alarm_state', 'alarm_reason']
+                [
+                    'host',
+                    'component_name',
+                    'component_class',
+                    'alarm_state',
+                    'alarm_reason',
+                ],
             )
         if 'system_alarm_state' not in self.metrics:
             self.metrics['system_alarm_state'] = Gauge(
                 'napalm_logs_system_alarm_state',
                 'State of the system alarm. 1=SET, 0=CLEARED',
-                ['host', 'component_name', 'component_class', 'alarm_state', 'alarm_reason']
+                [
+                    'host',
+                    'component_name',
+                    'component_class',
+                    'alarm_state',
+                    'alarm_reason',
+                ],
             )
         component = msg['yang_message']['hardware-state']['component']
         component_name = list(component.keys())[0]
@@ -457,7 +477,7 @@ class PrometheusTransport(TransportBase):
             'component_name': component_name,
             'component_class': component[component_name]['class'],
             'alarm_state': component[component_name]['state']['alarm-state'],
-            'alarm_reason': component[component_name]['state']['alarm-reason']
+            'alarm_reason': component[component_name]['state']['alarm-reason'],
         }
         self.metrics[error].labels(**labels).inc()
         state = 1 if error == 'SYSTEM_ALARM' else 0
@@ -475,7 +495,7 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'alarm_reason']
+                ['host', 'alarm_reason'],
             )
         severity = error.split('_')[0].lower()
         alarm_state_metric = '{}_alarm_state'.format(severity)
@@ -483,11 +503,11 @@ class PrometheusTransport(TransportBase):
             self.metrics[alarm_state_metric] = Gauge(
                 'napalm_logs_{}'.format(alarm_state_metric),
                 'State of the {} system alarm. 1=SET, 0=CLEARED'.format(severity),
-                ['host', 'alarm_reason']
+                ['host', 'alarm_reason'],
             )
         labels = {
             'host': msg['host'],
-            'alarm_reason': msg['yang_message']['alarms']['alarm']['additional-text']
+            'alarm_reason': msg['yang_message']['alarms']['alarm']['additional-text'],
         }
         self.metrics[error].labels(**labels).inc()
         state = 1 if error == '{}_ALARM_SET'.format(severity.upper()) else 0
@@ -550,14 +570,14 @@ class PrometheusTransport(TransportBase):
             self.metrics[error] = Counter(
                 'napalm_logs_{error}'.format(error=error.lower()),
                 'Counter for {error} notifications'.format(error=error),
-                ['host', 'event_type', 'entity_type', 'additional_text']
+                ['host', 'event_type', 'entity_type', 'additional_text'],
             )
         alarm_dict = msg['yang_message']['alarms']['alarm']
         labels = {
             'host': msg['host'],
             'event_type': alarm_dict['event-type'],
             'entity_type': alarm_dict['entity-type'],
-            'additional_text': alarm_dict['additional-text']
+            'additional_text': alarm_dict['additional-text'],
         }
         self.metrics[error].labels(**labels).inc()
 

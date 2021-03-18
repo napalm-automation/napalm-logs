@@ -17,6 +17,7 @@ class NapalmLogsProc:
     '''
     Sub-process base class.
     '''
+
     def _suicide_when_without_parent(self, parent_pid):
         '''
         Kill this process when the parent died.

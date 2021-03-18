@@ -26,6 +26,7 @@ import napalm_logs.ext.six as six
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.config import PUB_PX_IPC_URL
 from napalm_logs.config import DEV_IPC_URL
+
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
 
@@ -36,10 +37,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
     '''
     Device sub-process class.
     '''
-    def __init__(self,
-                 name,
-                 opts,
-                 config):
+
+    def __init__(self, name, opts, config):
         self._name = name
         log.debug('Starting process for %s', self._name)
         self._config = config
@@ -97,13 +96,15 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             model = message_dict['model']
             match_on = message_dict.get('match_on', 'tag')
             if '__python_fun__' in message_dict:
-                self.compiled_messages.append({
-                    'error': error,
-                    'tag': tag,
-                    'match_on': match_on,
-                    'model': model,
-                    '__python_fun__': message_dict['__python_fun__']
-                })
+                self.compiled_messages.append(
+                    {
+                        'error': error,
+                        'tag': tag,
+                        'match_on': match_on,
+                        'model': model,
+                        '__python_fun__': message_dict['__python_fun__'],
+                    }
+                )
                 continue
             values = message_dict['values']
             line = message_dict['line']
@@ -134,7 +135,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     'values': values,
                     'replace': replace,
                     'model': model,
-                    'mapping': mapping
+                    'mapping': mapping,
                 }
             )
         log.debug('Compiled messages:')
@@ -161,7 +162,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 return {
                     'model': message['model'],
                     'error': message['error'],
-                    '__python_fun__': message['__python_fun__']
+                    '__python_fun__': message['__python_fun__'],
                 }
             error_present = True
             match = message['line'].search(msg_dict['message'])
@@ -173,20 +174,30 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'model': message['model'],
                 'mapping': message['mapping'],
                 'replace': message['replace'],
-                'error': message['error']
+                'error': message['error'],
             }
             for key in values.keys():
                 # Check if the value needs to be replaced
                 if key in message['replace']:
-                    result = napalm_logs.utils.cast(match.group(positions.get(key)), message['replace'][key])
+                    result = napalm_logs.utils.cast(
+                        match.group(positions.get(key)), message['replace'][key]
+                    )
                 else:
                     result = match.group(positions.get(key))
                 ret[key] = result
             return ret
         if error_present is True:
-            log.info('Configured regex did not match for os: %s tag %s', self._name, msg_dict.get('tag', ''))
+            log.info(
+                'Configured regex did not match for os: %s tag %s',
+                self._name,
+                msg_dict.get('tag', ''),
+            )
         else:
-            log.info('Syslog message not configured for os: %s tag %s', self._name, msg_dict.get('tag', ''))
+            log.info(
+                'Syslog message not configured for os: %s tag %s',
+                self._name,
+                msg_dict.get('tag', ''),
+            )
 
     def _emit(self, **kwargs):
         '''
@@ -196,9 +207,13 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         oc_dict = {}
         for mapping, result_key in kwargs['mapping']['variables'].items():
             result = kwargs[result_key]
-            oc_dict = napalm_logs.utils.setval(mapping.format(**kwargs), result, oc_dict)
+            oc_dict = napalm_logs.utils.setval(
+                mapping.format(**kwargs), result, oc_dict
+            )
         for mapping, result in kwargs['mapping']['static'].items():
-            oc_dict = napalm_logs.utils.setval(mapping.format(**kwargs), result, oc_dict)
+            oc_dict = napalm_logs.utils.setval(
+                mapping.format(**kwargs), result, oc_dict
+            )
 
         return oc_dict
 
@@ -226,32 +241,34 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         napalm_logs_device_messages_received = Counter(
             'napalm_logs_device_messages_received',
             "Count of messages received by the device process",
-            ['device_os']
+            ['device_os'],
         )
         napalm_logs_device_raw_published_messages = Counter(
             'napalm_logs_device_raw_published_messages',
             "Count of raw type published messages",
-            ['device_os']
+            ['device_os'],
         )
         napalm_logs_device_published_messages = Counter(
             'napalm_logs_device_published_messages',
             "Count of published messages",
-            ['device_os']
+            ['device_os'],
         )
         napalm_logs_device_oc_object_failed = Counter(
             'napalm_logs_device_oc_object_failed',
             "Counter of failed OpenConfig object generations",
-            ['device_os']
+            ['device_os'],
         )
         if self.opts.get('metrics_include_attributes', True):
             napalm_logs_device_published_messages_attrs = Counter(
                 'napalm_logs_device_published_messages_attrs',
                 "Counter of published messages, with more granular selection",
-                ['device_os', 'host', 'error']
+                ['device_os', 'host', 'error'],
             )
         self._setup_ipc()
         # Start suicide polling thread
-        thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
+        thread = threading.Thread(
+            target=self._suicide_when_without_parent, args=(os.getppid(),)
+        )
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
@@ -267,17 +284,21 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     return
                 else:
                     raise NapalmLogsExit(error)
-            log.debug('%s: dequeued %s, received from %s', self._name, msg_dict, address)
+            log.debug(
+                '%s: dequeued %s, received from %s', self._name, msg_dict, address
+            )
             napalm_logs_device_messages_received.labels(device_os=self._name).inc()
             host = msg_dict.get('host')
             prefix_id = msg_dict.pop('__prefix_id__')
             if 'timestamp' in msg_dict:
                 timestamp = msg_dict.pop('timestamp')
             else:
-                timestamp = self._format_time(msg_dict.get('time', ''),
-                                              msg_dict.get('date', ''),
-                                              msg_dict.get('timeZone', 'UTC'),
-                                              prefix_id)
+                timestamp = self._format_time(
+                    msg_dict.get('time', ''),
+                    msg_dict.get('date', ''),
+                    msg_dict.get('timeZone', 'UTC'),
+                    prefix_id,
+                )
             facility = msg_dict.get('facility')
             severity = msg_dict.get('severity')
 
@@ -294,22 +315,28 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     'error': 'RAW',
                     'model_name': 'raw',
                     'facility': facility,
-                    'severity': severity
+                    'severity': severity,
                 }
                 log.debug('Queueing to be published:')
                 log.debug(to_publish)
                 # self.pub_pipe.send(to_publish)
                 self.pub.send(umsgpack.packb(to_publish))
-                napalm_logs_device_raw_published_messages.labels(device_os=self._name).inc()
+                napalm_logs_device_raw_published_messages.labels(
+                    device_os=self._name
+                ).inc()
                 continue
             try:
                 if '__python_fun__' in kwargs:
-                    log.debug('Using the Python parser to determine the YANG-equivalent object')
+                    log.debug(
+                        'Using the Python parser to determine the YANG-equivalent object'
+                    )
                     yang_obj = kwargs['__python_fun__'](msg_dict)
                 else:
                     yang_obj = self._emit(**kwargs)
             except Exception:
-                log.exception('Unexpected error when generating the OC object.', exc_info=True)
+                log.exception(
+                    'Unexpected error when generating the OC object.', exc_info=True
+                )
                 napalm_logs_device_oc_object_failed.labels(device_os=self._name).inc()
                 continue
             log.debug('Generated OC object:')
@@ -326,7 +353,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'yang_model': model_name,
                 'os': self._name,
                 'facility': facility,
-                'severity': severity
+                'severity': severity,
             }
             log.debug('Queueing to be published:')
             log.debug(to_publish)
@@ -338,7 +365,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 napalm_logs_device_published_messages_attrs.labels(
                     device_os=self._name,
                     error=to_publish['error'],
-                    host=to_publish['host']
+                    host=to_publish['host'],
                 ).inc()
 
     def stop(self):

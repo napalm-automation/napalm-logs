@@ -40,17 +40,15 @@ __yang_model__ = OPEN_CONFIG_NO_MODEL
 
 log = logging.getLogger(__file__)
 
-_RGX_PARTS = [
-    ('user', r'(\w+)'),
-    ('uid', r'(\d+)'),
-    ('sshPid', r'(\d+)')
-]
+_RGX_PARTS = [('user', r'(\w+)'), ('uid', r'(\d+)'), ('sshPid', r'(\d+)')]
 _RGX_PARTS = OrderedDict(_RGX_PARTS)
 
 _RGX = (
     r'pam_unix\(dcos_sshd:session\): session opened for user '
     r'{0[user]} by \(uid={0[uid]}\) - dcos_sshd\[{0[sshPid]}\]'
-).format(_RGX_PARTS)  # ATTENTION to escape the parans
+).format(
+    _RGX_PARTS
+)  # ATTENTION to escape the parans
 
 
 def emit(msg_dict):

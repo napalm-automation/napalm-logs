@@ -25,6 +25,7 @@ from napalm_logs.config import DEV_IPC_URL
 from napalm_logs.config import PUB_PX_IPC_URL
 from napalm_logs.config import UNKNOWN_DEVICE_NAME
 from napalm_logs.proc import NapalmLogsProc
+
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
 
@@ -35,11 +36,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
     '''
     Server sub-process class.
     '''
-    def __init__(self,
-                 opts,
-                 config,
-                 started_os_proc,
-                 buffer=None):
+
+    def __init__(self, opts, config, started_os_proc, buffer=None):
         self.opts = opts
         self.config = config
         self.started_os_proc = started_os_proc
@@ -116,10 +114,12 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 values = prefix.get('values', {})
                 line = prefix.get('line', '')
                 if prefix.get('__python_fun__'):
-                    self.compiled_prefixes[dev_os].append({
-                        '__python_fun__': prefix['__python_fun__'],
-                        '__python_mod__': prefix['__python_mod__']
-                    })
+                    self.compiled_prefixes[dev_os].append(
+                        {
+                            '__python_fun__': prefix['__python_fun__'],
+                            '__python_mod__': prefix['__python_mod__'],
+                        }
+                    )
                     continue  # if python profiler defined for this prefix,
                     # no need to go further, but jump to the next prefix
                 # Add 'pri' and 'message' to the line, and values
@@ -138,12 +138,14 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 escaped = re.escape(line).replace(r'\{', '{').replace(r'\}', '}')
                 # Replace a whitespace with \s+
                 escaped = escaped.replace(r'\ ', r'\s+')
-                self.compiled_prefixes[dev_os].append({
-                    'prefix': re.compile(escaped.format(**values)),
-                    'prefix_positions': sorted_position,
-                    'raw_prefix': escaped.format(**values),
-                    'values': values
-                })
+                self.compiled_prefixes[dev_os].append(
+                    {
+                        'prefix': re.compile(escaped.format(**values)),
+                        'prefix_positions': sorted_position,
+                        'raw_prefix': escaped.format(**values),
+                        'values': values,
+                    }
+                )
         # log.debug('Compiled prefixes')
         # log.debug(self.compiled_prefixes)
 
@@ -158,12 +160,19 @@ class NapalmLogsServerProc(NapalmLogsProc):
             prefix_id += 1
             match = None
             if '__python_fun__' in prefix:
-                log.debug('Trying to match using the %s custom python profiler', prefix['__python_mod__'])
+                log.debug(
+                    'Trying to match using the %s custom python profiler',
+                    prefix['__python_mod__'],
+                )
                 try:
                     match = prefix['__python_fun__'](msg)
                 except Exception:
-                    log.error('Exception while parsing %s with the %s python profiler',
-                              msg, prefix['__python_mod__'], exc_info=True)
+                    log.error(
+                        'Exception while parsing %s with the %s python profiler',
+                        msg,
+                        prefix['__python_mod__'],
+                        exc_info=True,
+                    )
             else:
                 log.debug('Matching using YAML-defined profiler:')
                 log.debug(prefix['raw_prefix'])
@@ -172,7 +181,11 @@ class NapalmLogsServerProc(NapalmLogsProc):
                 log.debug('Match not found')
                 continue
             if '__python_fun__' in prefix:
-                log.debug('%s matched using the custom python profiler %s', msg, prefix['__python_mod__'])
+                log.debug(
+                    '%s matched using the custom python profiler %s',
+                    msg,
+                    prefix['__python_mod__'],
+                )
                 msg_dict = match  # the output as-is from the custom function
             else:
                 positions = prefix.get('prefix_positions', {})
@@ -187,7 +200,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
             # The pri has to be an int as it is retrived using regex '\<(\d+)\>'
             if 'pri' in msg_dict:
                 msg_dict['facility'] = int(int(msg_dict['pri']) / 8)
-                msg_dict['severity'] = int(int(msg_dict['pri']) - (msg_dict['facility'] * 8))
+                msg_dict['severity'] = int(
+                    int(msg_dict['pri']) - (msg_dict['facility'] * 8)
+                )
             return msg_dict
 
     def _identify_os(self, msg):
@@ -223,47 +238,49 @@ class NapalmLogsServerProc(NapalmLogsProc):
         # metric counters
         napalm_logs_server_messages_received = Counter(
             "napalm_logs_server_messages_received",
-            "Count of messages received from listener processes"
+            "Count of messages received from listener processes",
         )
         napalm_logs_server_skipped_buffered_messages = Counter(
             'napalm_logs_server_skipped_buffered_messages',
             'Count of messages skipped as they were already buffered',
-            ['device_os']
+            ['device_os'],
         )
         napalm_logs_server_messages_with_identified_os = Counter(
             "napalm_logs_server_messages_with_identified_os",
             "Count of messages with positive os identification",
-            ['device_os']
+            ['device_os'],
         )
         napalm_logs_server_messages_without_identified_os = Counter(
             "napalm_logs_server_messages_without_identified_os",
-            "Count of messages with negative os identification"
+            "Count of messages with negative os identification",
         )
         napalm_logs_server_messages_failed_device_queuing = Counter(
             "napalm_logs_server_messages_failed_device_queuing",
             "Count of messages per device os that fail to be queued to a device process",
-            ['device_os']
+            ['device_os'],
         )
         napalm_logs_server_messages_device_queued = Counter(
             "napalm_logs_server_messages_device_queued",
             "Count of messages queued to device processes",
-            ['device_os']
+            ['device_os'],
         )
         napalm_logs_server_messages_unknown_queued = Counter(
             "napalm_logs_server_messages_unknown_queued",
-            "Count of messages queued as unknown"
+            "Count of messages queued as unknown",
         )
         if self.opts.get('metrics_include_attributes', True):
             napalm_logs_server_messages_attrs = Counter(
                 "napalm_logs_server_messages_attrs",
                 "Count of messages from the server process with their details",
-                ['device_os', 'host', 'tag']
+                ['device_os', 'host', 'tag'],
             )
         self._setup_ipc()
         # Start suicide polling thread
         cleanup = threading.Thread(target=self._cleanup_buffer)
         cleanup.start()
-        thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
+        thread = threading.Thread(
+            target=self._suicide_when_without_parent, args=(os.getppid(),)
+        )
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
@@ -296,40 +313,65 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     log.debug('Queueing message to %s', dev_os)
                     if six.PY3:
                         dev_os = bytes(dev_os, 'utf-8')
-                    napalm_logs_server_messages_with_identified_os.labels(device_os=dev_os.decode()).inc()
+                    napalm_logs_server_messages_with_identified_os.labels(
+                        device_os=dev_os.decode()
+                    ).inc()
                     if self._buffer:
-                        message = '{dev_os}/{host}/{msg}'.format(dev_os=dev_os.decode(),
-                                                                 host=msg_dict['host'],
-                                                                 msg=msg_dict['message'])
+                        message = '{dev_os}/{host}/{msg}'.format(
+                            dev_os=dev_os.decode(),
+                            host=msg_dict['host'],
+                            msg=msg_dict['message'],
+                        )
                         if six.PY3:
-                            message_key = base64.b64encode(bytes(message, 'utf-8')).decode()
+                            message_key = base64.b64encode(
+                                bytes(message, 'utf-8')
+                            ).decode()
                         else:
                             message_key = base64.b64encode(message)
                         if self._buffer[message_key]:
-                            log.info('"%s" seems to be already buffered, skipping', msg_dict['message'])
-                            napalm_logs_server_skipped_buffered_messages.labels(device_os=dev_os.decode()).inc()
+                            log.info(
+                                '"%s" seems to be already buffered, skipping',
+                                msg_dict['message'],
+                            )
+                            napalm_logs_server_skipped_buffered_messages.labels(
+                                device_os=dev_os.decode()
+                            ).inc()
                             continue
-                        log.debug('"%s" is not buffered yet, added', msg_dict['message'])
+                        log.debug(
+                            '"%s" is not buffered yet, added', msg_dict['message']
+                        )
                         self._buffer[message_key] = 1
-                    self.pub.send_multipart([dev_os,
-                                             umsgpack.packb((msg_dict, address))])
-                    napalm_logs_server_messages_device_queued.labels(device_os=dev_os.decode()).inc()
+                    self.pub.send_multipart(
+                        [dev_os, umsgpack.packb((msg_dict, address))]
+                    )
+                    napalm_logs_server_messages_device_queued.labels(
+                        device_os=dev_os.decode()
+                    ).inc()
                     if self.opts.get('metrics_server_include_attributes', True):
                         napalm_logs_server_messages_attrs.labels(
                             device_os=dev_os.decode(),
                             host=msg_dict['host'],
-                            tag=msg_dict['tag']
+                            tag=msg_dict['tag'],
                         ).inc()
 
                 elif dev_os and dev_os not in self.started_os_proc:
                     # Identified the OS, but the corresponding process does not seem to be started.
-                    log.info('Unable to queue the message to %s. Is the sub-process started?', dev_os)
-                    napalm_logs_server_messages_with_identified_os.labels(device_os=dev_os.decode()).inc()
-                    napalm_logs_server_messages_failed_device_queuing.labels(device_os=dev_os.decode()).inc()
+                    log.info(
+                        'Unable to queue the message to %s. Is the sub-process started?',
+                        dev_os,
+                    )
+                    napalm_logs_server_messages_with_identified_os.labels(
+                        device_os=dev_os.decode()
+                    ).inc()
+                    napalm_logs_server_messages_failed_device_queuing.labels(
+                        device_os=dev_os.decode()
+                    ).inc()
 
                 elif not dev_os and self.opts['_server_send_unknown']:
                     # OS not identified, but the user requested to publish the message as-is
-                    log.debug('Unable to identify the OS, sending directly to the publishers')
+                    log.debug(
+                        'Unable to identify the OS, sending directly to the publishers'
+                    )
                     to_publish = {
                         'ip': address,
                         'host': 'unknown',
@@ -337,7 +379,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                         'message_details': msg_dict,
                         'os': UNKNOWN_DEVICE_NAME,
                         'error': 'UNKNOWN',
-                        'model_name': 'unknown'
+                        'model_name': 'unknown',
                     }
                     self.publisher_pub.send(umsgpack.packb(to_publish))
                     napalm_logs_server_messages_unknown_queued.inc()

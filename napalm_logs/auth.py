@@ -24,6 +24,7 @@ from napalm_logs.config import AUTH_KEEP_ALIVE
 from napalm_logs.config import AUTH_KEEP_ALIVE_ACK
 from napalm_logs.exceptions import BindException
 from napalm_logs.exceptions import SSLMismatchException
+
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
 
@@ -54,13 +55,16 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         |                               |
         | <------------ ACK ----------- |
     '''
-    def __init__(self,
-                 certificate,
-                 keyfile,
-                 private_key,
-                 signature_hex,
-                 auth_address=AUTH_ADDRESS,
-                 auth_port=AUTH_PORT):
+
+    def __init__(
+        self,
+        certificate,
+        keyfile,
+        private_key,
+        signature_hex,
+        auth_address=AUTH_ADDRESS,
+        auth_port=AUTH_PORT,
+    ):
         self.certificate = certificate
         self.keyfile = keyfile
         self.__key = private_key
@@ -124,10 +128,13 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         '''
         Checks that the provided cert and key are valid and usable
         '''
-        log.debug('Verifying the %s certificate, keyfile: %s',
-                  self.certificate, self.keyfile)
+        log.debug(
+            'Verifying the %s certificate, keyfile: %s', self.certificate, self.keyfile
+        )
         try:
-            ssl.create_default_context().load_cert_chain(self.certificate, keyfile=self.keyfile)
+            ssl.create_default_context().load_cert_chain(
+                self.certificate, keyfile=self.keyfile
+            )
         except ssl.SSLError:
             error_string = 'SSL certificate and key do not match'
             log.error(error_string)
@@ -149,7 +156,9 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         try:
             self.socket.bind((self.auth_address, self.auth_port))
         except socket.error as msg:
-            error_string = 'Unable to bind (auth) to port {} on {}: {}'.format(self.auth_port, self.auth_address, msg)
+            error_string = 'Unable to bind (auth) to port {} on {}: {}'.format(
+                self.auth_port, self.auth_address, msg
+            )
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
 
@@ -162,19 +171,26 @@ class NapalmLogsAuthProc(NapalmLogsProc):
         log.debug('Starting the auth process')
         self.verify_cert()
         self._create_skt()
-        log.debug('The auth process can receive at most %d parallel connections', AUTH_MAX_CONN)
+        log.debug(
+            'The auth process can receive at most %d parallel connections',
+            AUTH_MAX_CONN,
+        )
         self.socket.listen(AUTH_MAX_CONN)
-        thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
+        thread = threading.Thread(
+            target=self._suicide_when_without_parent, args=(os.getppid(),)
+        )
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
         while self.__up:
             try:
                 (clientsocket, address) = self.socket.accept()
-                wrapped_auth_skt = ssl.wrap_socket(clientsocket,
-                                                   server_side=True,
-                                                   certfile=self.certificate,
-                                                   keyfile=self.keyfile)
+                wrapped_auth_skt = ssl.wrap_socket(
+                    clientsocket,
+                    server_side=True,
+                    certfile=self.certificate,
+                    keyfile=self.keyfile,
+                )
             except ssl.SSLError:
                 log.exception('SSL error', exc_info=True)
                 continue
@@ -187,8 +203,9 @@ class NapalmLogsAuthProc(NapalmLogsProc):
                     raise NapalmLogsExit(msg)
             log.info('%s connected', address)
             log.debug('Starting the handshake')
-            client_thread = threading.Thread(target=self._handshake,
-                                             args=(wrapped_auth_skt, address))
+            client_thread = threading.Thread(
+                target=self._handshake, args=(wrapped_auth_skt, address)
+            )
             client_thread.start()
 
     def stop(self):
