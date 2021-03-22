@@ -1,0 +1,17 @@
+messages:
+  - error: DDOS_PROTOCOL_VIOLATION_SET
+    tag: DDOS_PROTOCOL_VIOLATION_SET
+    values:
+      entityType: ([\w\-]+)
+      additionalText: (.*)
+      startTime: ([\w\s\-\:]+)
+      times: (\d+)
+    line: 'Warning: Host-bound traffic for protocol/exception  {entityType}:{additionalText} for {times} times, started at {startTime}'
+    model: ietf-alarm
+    mapping:
+      variables:
+        alarms//alarm//entity-type: entityType
+        alarms//alarm//additional-text: additionalText
+        alarms//alarm//alarm-time: startTime
+      static:
+        alarms//alarm//event-type: 10  # security-service-or-mechanism-violation

@@ -74,6 +74,7 @@ Available publishers and their options
    kafka
    log
    zmq
+   prometheus
 
 Globally available options
 --------------------------

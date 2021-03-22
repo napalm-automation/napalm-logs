@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 import logging
 import threading
 import json
+
 try:
     import Queue as queue
 except ImportError:
@@ -17,6 +18,7 @@ except ImportError:
 # Import third party libs
 try:
     import requests
+
     HAS_REQUESTS = True
 except ImportError:
     HAS_REQUESTS = False
@@ -24,6 +26,7 @@ except ImportError:
 try:
     import tornado
     import tornado.httpclient
+
     HAS_TORNADO = True
 except ImportError:
     HAS_TORNADO = False
@@ -40,6 +43,7 @@ class HTTPTransport(TransportBase):
     '''
     HTTP transport class.
     '''
+
     NO_ENCRYPT = True
     # This tells the publisher to not encrypt the messages
     #   published over this channel.
@@ -76,12 +80,18 @@ class HTTPTransport(TransportBase):
         if self.backend not in ('requests', 'tornado'):
             raise TransportException('Invalid HTTP backend: %s', self.backend)
         if self.backend == 'requests' and not HAS_REQUESTS:
-            raise TransportException('Trying to use Requests as backend, but it is not installed')
+            raise TransportException(
+                'Trying to use Requests as backend, but it is not installed'
+            )
         if self.backend == 'tornado' and not HAS_TORNADO:
-            raise TransportException('Trying to use Tornado as backend, but it is not installed')
+            raise TransportException(
+                'Trying to use Tornado as backend, but it is not installed'
+            )
         # Prepare the tornado backend
         if self.backend == 'tornado':
-            self.tornado_client = tornado.httpclient.AsyncHTTPClient(max_clients=self.max_clients)
+            self.tornado_client = tornado.httpclient.AsyncHTTPClient(
+                max_clients=self.max_clients
+            )
         elif self.backend == 'requests':
             # When using requests, we start a threaded pool
             #   with the size specified using max_clients.
@@ -103,16 +113,18 @@ class HTTPTransport(TransportBase):
     def publish(self, obj):
         data = napalm_logs.utils.unserialize(obj)
         if self.backend == 'tornado':
-            self.tornado_client.fetch(self.address,
-                                      callback=self._handle_tornado_response,
-                                      method=self.method,
-                                      headers=self.headers,
-                                      auth_username=self.username,
-                                      auth_password=self.password,
-                                      body=str(data),
-                                      validate_cert=self.verify_ssl,
-                                      allow_nonstandard_methods=True,
-                                      decompress_response=False)
+            self.tornado_client.fetch(
+                self.address,
+                callback=self._handle_tornado_response,
+                method=self.method,
+                headers=self.headers,
+                auth_username=self.username,
+                auth_password=self.password,
+                body=str(data),
+                validate_cert=self.verify_ssl,
+                allow_nonstandard_methods=True,
+                decompress_response=False,
+            )
         elif self.backend == 'requests':
             # Queue the publish object async
             self._publish_queue.put_nowait(data)
@@ -136,10 +148,7 @@ class HTTPTransport(TransportBase):
             session.verify = self.verify_ssl
             try:
                 result = session.request(
-                    self.method,
-                    self.address,
-                    params=self.params,
-                    data=json.dumps(data)
+                    self.method, self.address, params=self.params, data=json.dumps(data)
                 )
                 if not result.ok:
                     log.error('Unable to publish to %s', self.address)

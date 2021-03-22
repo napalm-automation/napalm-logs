@@ -10,6 +10,7 @@ import logging
 
 try:
     import redis
+
     HAS_REDIS = True
 except ImportError:
     HAS_REDIS = False
@@ -22,6 +23,7 @@ class RedisBuffer(object):
     '''
     Memory buffer class.
     '''
+
     def __init__(self, expire_time, **kwargs):
         self.expire_time = expire_time
         # expire_time is assumed to be in seconds

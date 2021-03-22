@@ -1,0 +1,29 @@
+{
+  "error": "MAJOR_ALARM_SET",
+  "host": "vmx01",
+  "ip": "127.0.0.1",
+  "timestamp": 1594249453,
+  "yang_message": {
+    "alarms": {
+      "alarm": {
+        "additional-text": "Host 0 me0 : Ethernet Link Down"
+      }
+    }
+  },
+  "message_details": {
+    "date": "Jul  8",
+    "time": "23:04:13",
+    "hostPrefix": null,
+    "host": "vmx01",
+    "tag": "craftd",
+    "processId": "4817",
+    "pri": "28",
+    "message": "Major alarm set, Host 0 me0 : Ethernet Link Down",
+    "facility": 3,
+    "severity": 4
+  },
+  "yang_model": "ietf-alarm",
+  "os": "junos",
+  "facility": 3,
+  "severity": 4
+}

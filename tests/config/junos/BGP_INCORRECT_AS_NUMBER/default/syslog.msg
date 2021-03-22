@@ -1,0 +1,1 @@
+<172>2020-03-31T08:41:59+00:00 some-switch rpd[4936]: bgp_pp_recv:4609: NOTIFICATION sent to 10.37.96.6+44759 (proto): code 2 (Open Message Error) subcode 2 (bad peer AS number), Reason: no group for 10.37.96.6+44759 (proto) from AS 4292019902 found (peer as mismatch) in master(ae1.0), dropping him

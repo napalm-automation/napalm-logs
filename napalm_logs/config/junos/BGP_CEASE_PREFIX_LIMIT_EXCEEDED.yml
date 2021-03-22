@@ -1,0 +1,39 @@
+messages:
+  - error: BGP_CEASE_PREFIX_LIMIT_EXCEEDED
+    tag: BGP_CEASE_PREFIX_LIMIT_EXCEEDED
+    values:
+      peer: (\d+\.\d+\.\d+\.\d+)
+      asn: (\d+)
+      limit|int: (\d+)
+      current|int: (\d+)
+      table: (\w+)
+      type: (\w+)
+      peeringType: (\w+)
+      vrf: (\w+)
+    line: '{peer} ({peeringType} AS {asn}): Shutting down peer due to exceeding configured maximum prefix-limit({limit}) for {table}-{type} nlri: {current} (instance {vrf})'
+    model: openconfig-network-instance
+    mapping:
+      variables:
+        network-instances//network-instance//{vrf}//protocols//protocol//bgp//neighbors//neighbor//{peer}//state//peer_as: asn
+        network-instances//network-instance//{vrf}//protocols//protocol//bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//state//prefixes//received: current
+        network-instances//network-instance//{vrf}//protocols//protocol//bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//ipv4_{type}//prefix_limit//state//max_prefixes: limit
+      static: {}
+  - error: BGP_CEASE_PREFIX_LIMIT_EXCEEDED
+    tag: BGP_CEASE_PREFIX_LIMIT_EXCEEDED
+    values:
+      peer: ([\w\d:]+)
+      asn: (\d+)
+      limit|int: (\d+)
+      current|int: (\d+)
+      table: (\w+)
+      type: (\w+)
+      peeringType: (\w+)
+      vrf: (\w+)
+    line: '{peer} ({peeringType} AS {asn}): Shutting down peer due to exceeding configured maximum prefix-limit({limit}) for {table}-{type} nlri: {current} (instance {vrf})'
+    model: openconfig-network-instance
+    mapping:
+      variables:
+        network-instances//network-instance//{vrf}//protocols//protocol//bgp//neighbors//neighbor//{peer}//state//peer_as: asn
+        network-instances//network-instance//{vrf}//protocols//protocol//bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//state//prefixes//received: current
+        network-instances//network-instance//{vrf}//protocols//protocol//bgp//neighbors//neighbor//{peer}//afi_safis//afi_safi//{table}//ipv6_{type}//prefix_limit//state//max_prefixes: limit
+      static: {}

@@ -19,6 +19,7 @@ class LogTransport(TransportBase):
     '''
     Log transport class.
     '''
+
     def __init__(self, address, port, **kwargs):
         if kwargs.get('address'):
             self.address = kwargs['address']

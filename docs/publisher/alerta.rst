@@ -50,8 +50,29 @@ Configuration examples:
 Available options
 ^^^^^^^^^^^^^^^^^
 
-The options are generally inherited from the :ref:`publisher-http` Publisher, 
-with the following notes:
+.. _publisher-alerta-pairs:
+
+``pairs``
+---------
+
+.. versionadded:: 0.10.0
+
+Hash that defines the remapping of a specific *napalm-logs* notification to a
+pair notification that will close the previous alert. For example, 
+an ``INTERFACE_UP`` alert would close an existing ``INTERFACE_DOWN`` alert, 
+instead of creating an alert for ``INTERFACE_UP``, and so on.
+
+``pair`` defaults to:
+
+.. code-block:: yaml
+
+    pairs:
+      INTERFACE_UP: INTERFACE_DOWN
+      OSPF_NEIGHBOR_UP: OSPF_NEIGHBOR_DOWN
+      ISIS_NEIGHBOR_UP: ISIS_NEIGHBOR_DOWN
+
+The next options are generally inherited from the :ref:`publisher-http`
+Publisher, with the following notes:
 
 .. _publisher-alerta-address:
 

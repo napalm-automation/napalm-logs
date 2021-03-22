@@ -4,7 +4,16 @@
 # Matching white space in `values`
 #
 prefixes:
+  # jlaunchd doesn't have proper tags. Override the match to use jlaunchd as the tag instead.
   - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\w+ +\d+)
+      time: (\d\d:\d\d:\d\d)
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      tag: (jlaunchd)
+    line: '{date} {time} {hostPrefix}{host} {tag}: '
+  - time_format: '%b %d %H:%M:%S'
     values:
       date: (\w+\s+\d+)
       time: (\d\d:\d\d:\d\d)
@@ -49,3 +58,59 @@ prefixes:
       # Some logs have data which can be inside brackets or parenthesis
       additionalData: (?:(?:\[|\()(.+)(?:\]|\)))?
     line: '{date} {time} {hostPrefix}{host} fpc{fpcId} fpc{fpcId2} dcpfe: {tag}{additionalData}:'
+
+  # Same structures as above, but to match the ISO8601 date-time format.
+    # jlaunchd doesn't have proper tags. Override the match to use jlaunchd as the tag instead.
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\d{4}-\d{2}-\d{2})
+      time: (\d{2}:\d{2}:\d{2}[\.\d{3}]?[\+|-]\d{2}:\d{2})
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      tag: (jlaunchd)
+    line: '{date}T{time} {hostPrefix}{host} {tag}: '
+  - time_format: '%b %d %H:%M:%S'
+    values:
+      date: (\d{4}-\d{2}-\d{2})
+      time: (\d{2}:\d{2}:\d{2}[\.\d{3}]?[\+|-]\d{2}:\d{2})
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      processName: /?(\w+)
+      # Most log lines have a process ID, however some do not
+      processId: \[?(\d+)?\]?
+      tag: ([\w\s]+)
+    line: '{date}T{time} {hostPrefix}{host} {processName}{processId}: {tag}:'
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\d{4}-\d{2}-\d{2})
+      time: (\d{2}:\d{2}:\d{2}[\.\d{3}]?[\+|-]\d{2}:\d{2})
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      tag: (\w+)
+      # Most log lines have a process ID, however some do not
+      processId: (\d+)
+    line: '{date}T{time} {hostPrefix}{host} {tag}[{processId}]:'
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\d{4}-\d{2}-\d{2})
+      time: (\d{2}:\d{2}:\d{2}[\.\d{3}]?[\+|-]\d{2}:\d{2})
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      fpcId: (\d+)
+      tag: (\w+)
+      # Some logs have data which can be inside brackets or parenthesis
+      additionalData: (?:(?:\[|\()(.+)(?:\]|\)))?
+    line: '{date}T{time} {hostPrefix}{host} fpc{fpcId} {tag}{additionalData}:'
+  # The following matches dcpfe specific logs
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\d{4}-\d{2}-\d{2})
+      time: (\d{2}:\d{2}:\d{2}[\.\d{3}]?[\+|-]\d{2}:\d{2})
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      fpcId: (\d+)
+      fpcId2: (\d+)
+      tag: (\w+)
+      # Some logs have data which can be inside brackets or parenthesis
+      additionalData: (?:(?:\[|\()(.+)(?:\]|\)))?
+    line: '{date}T{time} {hostPrefix}{host} fpc{fpcId} fpc{fpcId2} dcpfe: {tag}{additionalData}:'

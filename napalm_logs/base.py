@@ -27,6 +27,7 @@ from prometheus_client import start_http_server, CollectorRegistry, multiprocess
 import napalm_logs.utils
 import napalm_logs.config as CONFIG
 import napalm_logs.buffer
+
 # processes
 from napalm_logs.auth import NapalmLogsAuthProc
 from napalm_logs.device import NapalmLogsDeviceProc
@@ -34,6 +35,7 @@ from napalm_logs.server import NapalmLogsServerProc
 from napalm_logs.publisher import NapalmLogsPublisherProc
 from napalm_logs.listener_proc import NapalmLogsListenerProc
 from napalm_logs.pub_proxy import NapalmLogsPublisherProxy
+
 # exceptions
 from napalm_logs.exceptions import ConfigurationException
 
@@ -41,34 +43,37 @@ log = logging.getLogger(__name__)
 
 
 class NapalmLogs:
-    def __init__(self,
-                 address='0.0.0.0',
-                 port=514,
-                 listener='udp',
-                 publisher='zmq',
-                 publish_address='0.0.0.0',
-                 publish_port=49017,
-                 auth_address='0.0.0.0',
-                 auth_port=49018,
-                 metrics_enabled=False,
-                 metrics_address='0.0.0.0',
-                 metrics_port='9215',
-                 metrics_dir='/tmp/napalm_logs_metrics',
-                 certificate=None,
-                 keyfile=None,
-                 disable_security=False,
-                 config_path=None,
-                 config_dict=None,
-                 extension_config_path=None,
-                 extension_config_dict=None,
-                 log_level='warning',
-                 log_format='%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s',
-                 device_blacklist=[],
-                 device_whitelist=[],
-                 hwm=None,
-                 device_worker_processes=1,
-                 serializer='msgpack',
-                 buffer=None):
+    def __init__(
+        self,
+        address='0.0.0.0',
+        port=514,
+        listener='udp',
+        publisher='zmq',
+        publish_address='0.0.0.0',
+        publish_port=49017,
+        auth_address='0.0.0.0',
+        auth_port=49018,
+        metrics_enabled=False,
+        metrics_address='0.0.0.0',
+        metrics_port='9215',
+        metrics_dir='/tmp/napalm_logs_metrics',
+        certificate=None,
+        keyfile=None,
+        disable_security=False,
+        config_path=None,
+        config_dict=None,
+        extension_config_path=None,
+        extension_config_dict=None,
+        log_level='warning',
+        log_format='%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message)s',
+        device_blacklist=[],
+        device_whitelist=[],
+        hwm=None,
+        device_worker_processes=1,
+        serializer='msgpack',
+        buffer=None,
+        opts=None,
+    ):
         '''
         Init the napalm-logs engine.
 
@@ -107,7 +112,7 @@ class NapalmLogs:
         self.hwm = hwm
         self._buffer_cfg = buffer
         self._buffer = None
-        self.opts = {}
+        self.opts = opts if opts else {}
         # Setup the environment
         self._setup_log()
         self._build_config()
@@ -171,9 +176,7 @@ class NapalmLogs:
             registry = CollectorRegistry()
             multiprocess.MultiProcessCollector(registry)
             start_http_server(
-                port=self.metrics_port,
-                addr=self.metrics_address,
-                registry=registry
+                port=self.metrics_port, addr=self.metrics_address, registry=registry
             )
 
     def _setup_log(self):
@@ -181,8 +184,7 @@ class NapalmLogs:
         Setup the log object.
         '''
         logging_level = CONFIG.LOGGING_LEVEL.get(self.log_level.lower())
-        logging.basicConfig(format=self.log_format,
-                            level=logging_level)
+        logging.basicConfig(format=self.log_format, level=logging_level)
 
     def _post_preparation(self):
         '''
@@ -216,7 +218,9 @@ class NapalmLogs:
                 error_blacklist.remove('UNKNOWN')
             if 'send_raw' in pub_opts and 'RAW' in error_blacklist:
                 error_blacklist.remove('RAW')
-            self.opts['_server_send_unknown'] |= 'UNKNOWN' in error_whitelist or 'UNKNOWN' not in error_blacklist
+            self.opts['_server_send_unknown'] |= (
+                'UNKNOWN' in error_whitelist or 'UNKNOWN' not in error_blacklist
+            )
             pub[pub_name]['error_whitelist'] = error_whitelist
             pub[pub_name]['error_blacklist'] = error_blacklist
 
@@ -226,9 +230,9 @@ class NapalmLogs:
         depending on the whitelist-blacklist logic
         configured by the user.
         '''
-        return napalm_logs.ext.check_whitelist_blacklist(os_name,
-                                                         whitelist=self.device_whitelist,
-                                                         blacklist=self.device_blacklist)
+        return napalm_logs.ext.check_whitelist_blacklist(
+            os_name, whitelist=self.device_whitelist, blacklist=self.device_blacklist
+        )
 
     @staticmethod
     def _extract_yaml_docstring(stream):
@@ -244,9 +248,7 @@ class NapalmLogs:
             if not line_strip:
                 continue
             if line_strip.startswith('#'):
-                comment_lines.append(
-                    line_strip.replace('#', '', 1).strip()
-                )
+                comment_lines.append(line_strip.replace('#', '', 1).strip())
             else:
                 break
         return ' '.join(comment_lines)
@@ -260,8 +262,7 @@ class NapalmLogs:
         log.debug('Reading configuration from %s', path)
         if not os.path.isdir(path):
             msg = (
-                'Unable to read from {path}: '
-                'the directory does not exist!'
+                'Unable to read from {path}: ' 'the directory does not exist!'
             ).format(path=path)
             log.error(msg)
             raise IOError(msg)
@@ -287,13 +288,15 @@ class NapalmLogs:
                 log.debug('Ignoring %s', os_name)
                 continue
             if not self._whitelist_blacklist(os_name):
-                log.debug('Not building config for %s (whitelist-blacklist logic)', os_name)
+                log.debug(
+                    'Not building config for %s (whitelist-blacklist logic)', os_name
+                )
                 # Ignore devices that are not in the whitelist (if defined),
                 #   or those operating systems that are on the blacklist.
                 # This way we can prevent starting unwanted sub-processes.
                 continue
             log.debug('Building config for %s:', os_name)
-            log.debug('='*40)
+            log.debug('=' * 40)
             if os_name not in config:
                 config[os_name] = {}
             files = os.listdir(os_dir)
@@ -308,7 +311,7 @@ class NapalmLogs:
                     try:
                         log.debug('Loading %s as YAML', file_)
                         with open(filepath, 'r') as fstream:
-                            cfg = yaml.load(fstream)
+                            cfg = yaml.load(fstream, Loader=yaml.FullLoader)
                             # Reposition at the top and read the comments.
                             if file_name not in CONFIG.OS_INIT_FILENAMES:
                                 # If the file name is not a profile init.
@@ -335,34 +338,51 @@ class NapalmLogs:
                         # Sample init file:
                         # def extract(message):
                         #     return {'tag': 'A_TAG', 'host': 'hostname'}
-                        if hasattr(mod, CONFIG.INIT_RUN_FUN) and\
-                           hasattr(getattr(mod, CONFIG.INIT_RUN_FUN), '__call__'):
+                        if hasattr(mod, CONFIG.INIT_RUN_FUN) and hasattr(
+                            getattr(mod, CONFIG.INIT_RUN_FUN), '__call__'
+                        ):
                             # if extract is defined and is callable
                             if 'prefixes' not in config[os_name]:
                                 config[os_name]['prefixes'] = []
-                            config[os_name]['prefixes'].append({
-                                'values': {'tag': ''},
-                                'line': '',
-                                '__python_fun__': getattr(mod, CONFIG.INIT_RUN_FUN),
-                                '__python_mod__': filepath  # Will be used for debugging
-                            })
-                            log.info('Adding the prefix function defined under %s to %s',
-                                     filepath, os_name)
+                            config[os_name]['prefixes'].append(
+                                {
+                                    'values': {'tag': ''},
+                                    'line': '',
+                                    '__python_fun__': getattr(mod, CONFIG.INIT_RUN_FUN),
+                                    '__python_mod__': filepath,  # Will be used for debugging
+                                }
+                            )
+                            log.info(
+                                'Adding the prefix function defined under %s to %s',
+                                filepath,
+                                os_name,
+                            )
                         elif file_name != '__init__':
                             # If __init__.py does not have the extractor function, no problem.
-                            log.warning('%s does not have the "%s" function defined. Ignoring.',
-                                        filepath, CONFIG.INIT_RUN_FUN)
+                            log.warning(
+                                '%s does not have the "%s" function defined. Ignoring.',
+                                filepath,
+                                CONFIG.INIT_RUN_FUN,
+                            )
                     else:
                         # Other python files require the `emit` function.
                         if hasattr(mod, '__tag__'):
                             mod_tag = getattr(mod, '__tag__')
                         else:
-                            log.info('%s does not have __tag__, defaulting the tag to %s', filepath, file_name)
+                            log.info(
+                                '%s does not have __tag__, defaulting the tag to %s',
+                                filepath,
+                                file_name,
+                            )
                             mod_tag = file_name
                         if hasattr(mod, '__error__'):
                             mod_err = getattr(mod, '__error__')
                         else:
-                            log.info('%s does not have __error__, defaulting the error to %s', filepath, file_name)
+                            log.info(
+                                '%s does not have __error__, defaulting the error to %s',
+                                filepath,
+                                file_name,
+                            )
                             mod_err = file_name
                         if hasattr(mod, '__match_on__'):
                             err_match = getattr(mod, '__match_on__')
@@ -372,33 +392,48 @@ class NapalmLogs:
                         if hasattr(mod, '__yang_model__'):
                             model = getattr(mod, '__yang_model__')
                         log.debug('Mathing on %s', err_match)
-                        if hasattr(mod, CONFIG.CONFIG_RUN_FUN) and\
-                           hasattr(getattr(mod, CONFIG.CONFIG_RUN_FUN), '__call__'):
-                            log.debug('Adding %s with tag:%s, error:%s, matching on:%s',
-                                      file_, mod_tag, mod_err, err_match)
+                        if hasattr(mod, CONFIG.CONFIG_RUN_FUN) and hasattr(
+                            getattr(mod, CONFIG.CONFIG_RUN_FUN), '__call__'
+                        ):
+                            log.debug(
+                                'Adding %s with tag:%s, error:%s, matching on:%s',
+                                file_,
+                                mod_tag,
+                                mod_err,
+                                err_match,
+                            )
                             # the structure below must correspond to the VALID_CONFIG structure enforcement
                             if 'messages' not in config[os_name]:
                                 config[os_name]['messages'] = []
-                            config[os_name]['messages'].append({
-                                'tag': mod_tag,
-                                'error': mod_err,
-                                'match_on': err_match,
-                                '__doc__': mod.__doc__,
-                                '__python_fun__': getattr(mod, CONFIG.CONFIG_RUN_FUN),
-                                '__python_mod__': filepath,  # Will be used for debugging
-                                'line': '',
-                                'model': model,
-                                'values': {},
-                                'mapping': {'variables': {}, 'static': {}}
-                            })
+                            config[os_name]['messages'].append(
+                                {
+                                    'tag': mod_tag,
+                                    'error': mod_err,
+                                    'match_on': err_match,
+                                    '__doc__': mod.__doc__,
+                                    '__python_fun__': getattr(
+                                        mod, CONFIG.CONFIG_RUN_FUN
+                                    ),
+                                    '__python_mod__': filepath,  # Will be used for debugging
+                                    'line': '',
+                                    'model': model,
+                                    'values': {},
+                                    'mapping': {'variables': {}, 'static': {}},
+                                }
+                            )
                         else:
-                            log.warning('%s does not have the "%s" function defined. Ignoring.',
-                                        filepath, CONFIG.CONFIG_RUN_FUN)
+                            log.warning(
+                                '%s does not have the "%s" function defined. Ignoring.',
+                                filepath,
+                                CONFIG.CONFIG_RUN_FUN,
+                            )
                 else:
                     log.info('Ignoring %s (extension not allowed)', filepath)
-            log.debug('-'*40)
+            log.debug('-' * 40)
         if not config:
-            msg = 'Could not find proper configuration files under {path}'.format(path=path)
+            msg = 'Could not find proper configuration files under {path}'.format(
+                path=path
+            )
             log.error(msg)
             raise IOError(msg)
         log.debug('Complete config:')
@@ -412,23 +447,22 @@ class NapalmLogs:
         raise ConfigurationException(error_string)
 
     def _compare_values(self, value, config, dev_os, key_path):
-        if 'line' not in value or\
-           'values' not in value or\
-           '__python_fun__' not in value:  # Check looks good when using a Python-defined profile.
+        if (
+            'line' not in value
+            or 'values' not in value
+            or '__python_fun__' not in value
+        ):  # Check looks good when using a Python-defined profile.
             return
         from_line = re.findall(r'\{(\w+)\}', config['line'])
         if set(from_line) == set(config['values']):
             return
         if config.get('error'):
             error = 'The "values" do not match variables in "line" for {}:{} in {}'.format(
-                ':'.join(key_path),
-                config.get('error'),
-                dev_os
+                ':'.join(key_path), config.get('error'), dev_os
             )
         else:
             error = 'The "values" do not match variables in "line" for {} in {}'.format(
-                ':'.join(key_path),
-                dev_os
+                ':'.join(key_path), dev_os
             )
         self._raise_config_exception(error)
 
@@ -436,15 +470,22 @@ class NapalmLogs:
         key_path.append(key)
         if config.get(key, False) is False:
             self._raise_config_exception(
-                'Unable to find key "{}" for {}'.format(':'.join(key_path), dev_os))
+                'Unable to find key "{}" for {}'.format(':'.join(key_path), dev_os)
+            )
         if isinstance(value, type):
             if not isinstance(config[key], value):
                 self._raise_config_exception(
-                    'Key "{}" for {} should be {}'.format(':'.join(key_path), dev_os, value))
+                    'Key "{}" for {} should be {}'.format(
+                        ':'.join(key_path), dev_os, value
+                    )
+                )
         elif isinstance(value, dict):
             if not isinstance(config[key], dict):
                 self._raise_config_exception(
-                    'Key "{}" for {} should be of type <dict>'.format(':'.join(key_path), dev_os))
+                    'Key "{}" for {} should be of type <dict>'.format(
+                        ':'.join(key_path), dev_os
+                    )
+                )
             self._verify_config_dict(value, config[key], dev_os, key_path)
             # As we have already checked that the config below this point is correct, we know that "line" and "values"
             # exists in the config if they are present in the valid config
@@ -452,7 +493,10 @@ class NapalmLogs:
         elif isinstance(value, list):
             if not isinstance(config[key], list):
                 self._raise_config_exception(
-                    'Key "{}" for {} should be of type <list>'.format(':'.join(key_path), dev_os))
+                    'Key "{}" for {} should be of type <list>'.format(
+                        ':'.join(key_path), dev_os
+                    )
+                )
             for item in config[key]:
                 self._verify_config_dict(value[0], item, dev_os, key_path)
                 self._compare_values(value[0], item, dev_os, key_path)
@@ -491,20 +535,26 @@ class NapalmLogs:
                 # No custom config path requested
                 # Read the native config files
                 self.config_path = os.path.join(
-                    os.path.dirname(os.path.realpath(__file__)),
-                    'config'
+                    os.path.dirname(os.path.realpath(__file__)), 'config'
                 )
             log.info('Reading the configuration from %s', self.config_path)
             self.config_dict = self._load_config(self.config_path)
-        if not self.extension_config_dict and\
-           self.extension_config_path and\
-           os.path.normpath(self.extension_config_path) != os.path.normpath(self.config_path):  # same path?
+        if (
+            not self.extension_config_dict
+            and self.extension_config_path
+            and os.path.normpath(self.extension_config_path)
+            != os.path.normpath(self.config_path)
+        ):  # same path?
             # When extension config is not sent as dict
             # But `extension_config_path` is specified
-            log.info('Reading extension configuration from %s', self.extension_config_path)
+            log.info(
+                'Reading extension configuration from %s', self.extension_config_path
+            )
             self.extension_config_dict = self._load_config(self.extension_config_path)
         if self.extension_config_dict:
-            napalm_logs.utils.dictupdate(self.config_dict, self.extension_config_dict)  # deep merge
+            napalm_logs.utils.dictupdate(
+                self.config_dict, self.extension_config_dict
+            )  # deep merge
 
     def _start_auth_proc(self):
         '''
@@ -514,46 +564,46 @@ class NapalmLogs:
         verify_key = self.__signing_key.verify_key
         sgn_verify_hex = verify_key.encode(encoder=nacl.encoding.HexEncoder)
         log.debug('Starting the authenticator subprocess')
-        auth = NapalmLogsAuthProc(self.certificate,
-                                  self.keyfile,
-                                  self.__priv_key,
-                                  sgn_verify_hex,
-                                  self.auth_address,
-                                  self.auth_port)
+        auth = NapalmLogsAuthProc(
+            self.certificate,
+            self.keyfile,
+            self.__priv_key,
+            sgn_verify_hex,
+            self.auth_address,
+            self.auth_port,
+        )
         proc = Process(target=auth.start)
         proc.start()
         proc.description = 'Auth process'
         log.debug('Started auth process as %s with PID %s', proc._name, proc.pid)
         return proc
 
-    def _start_lst_proc(self,
-                        listener_type,
-                        listener_opts):
+    def _start_lst_proc(self, listener_type, listener_opts):
         '''
         Start the listener process.
         '''
         log.debug('Starting the listener process for %s', listener_type)
-        listener = NapalmLogsListenerProc(self.opts,
-                                          self.address,
-                                          self.port,
-                                          listener_type,
-                                          listener_opts=listener_opts)
+        listener = NapalmLogsListenerProc(
+            self.opts,
+            self.address,
+            self.port,
+            listener_type,
+            listener_opts=listener_opts,
+        )
         proc = Process(target=listener.start)
         proc.start()
         proc.description = 'Listener process'
         log.debug('Started listener process as %s with PID %s', proc._name, proc.pid)
         return proc
 
-    def _start_srv_proc(self,
-                        started_os_proc):
+    def _start_srv_proc(self, started_os_proc):
         '''
         Start the server process.
         '''
         log.debug('Starting the server process')
-        server = NapalmLogsServerProc(self.opts,
-                                      self.config_dict,
-                                      started_os_proc,
-                                      buffer=self._buffer)
+        server = NapalmLogsServerProc(
+            self.opts, self.config_dict, started_os_proc, buffer=self._buffer
+        )
         proc = Process(target=server.start)
         proc.start()
         proc.description = 'Server process'
@@ -570,44 +620,44 @@ class NapalmLogs:
         log.debug('Started pub proxy as %s with PID %s', proc._name, proc.pid)
         return proc
 
-    def _start_pub_proc(self,
-                        publisher_type,
-                        publisher_opts,
-                        pub_id):
+    def _start_pub_proc(self, publisher_type, publisher_opts, pub_id):
         '''
         Start the publisher process.
         '''
         log.debug('Starting the publisher process for %s', publisher_type)
-        publisher = NapalmLogsPublisherProc(self.opts,
-                                            self.publish_address,
-                                            self.publish_port,
-                                            publisher_type,
-                                            self.serializer,
-                                            self.__priv_key,
-                                            self.__signing_key,
-                                            publisher_opts,
-                                            disable_security=self.disable_security,
-                                            pub_id=pub_id)
+        publisher = NapalmLogsPublisherProc(
+            self.opts,
+            self.publish_address,
+            self.publish_port,
+            publisher_type,
+            self.serializer,
+            self.__priv_key,
+            self.__signing_key,
+            publisher_opts,
+            disable_security=self.disable_security,
+            pub_id=pub_id,
+        )
         proc = Process(target=publisher.start)
         proc.start()
         proc.description = 'Publisher process'
         log.debug('Started publisher process as %s with PID %s', proc._name, proc.pid)
         return proc
 
-    def _start_dev_proc(self,
-                        device_os,
-                        device_config):
+    def _start_dev_proc(self, device_os, device_config):
         '''
         Start the device worker process.
         '''
         log.info('Starting the child process for %s', device_os)
-        dos = NapalmLogsDeviceProc(device_os,
-                                   self.opts,
-                                   device_config)
+        dos = NapalmLogsDeviceProc(device_os, self.opts, device_config)
         os_proc = Process(target=dos.start)
         os_proc.start()
         os_proc.description = '%s device process' % device_os
-        log.debug('Started process %s for %s, having PID %s', os_proc._name, device_os, os_proc.pid)
+        log.debug(
+            'Started process %s for %s, having PID %s',
+            os_proc._name,
+            device_os,
+            os_proc.pid,
+        )
         return os_proc
 
     def start_engine(self):
@@ -615,7 +665,9 @@ class NapalmLogs:
         Start the child processes (one per device OS)
         '''
         if self.disable_security is True:
-            log.warning('***Not starting the authenticator process due to disable_security being set to True***')
+            log.warning(
+                '***Not starting the authenticator process due to disable_security being set to True***'
+            )
         else:
             log.debug('Generating the private key')
             self.__priv_key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
@@ -630,9 +682,7 @@ class NapalmLogs:
         pub_id = 0
         for pub in self.publisher:
             publisher_type, publisher_opts = list(pub.items())[0]
-            proc = self._start_pub_proc(publisher_type,
-                                        publisher_opts,
-                                        pub_id)
+            proc = self._start_pub_proc(publisher_type, publisher_opts, pub_id)
             self._processes.append(proc)
             pub_id += 1
         # device process start
@@ -640,23 +690,27 @@ class NapalmLogs:
         started_os_proc = []
         for device_os, device_config in self.config_dict.items():
             if not self._whitelist_blacklist(device_os):
-                log.debug('Not starting process for %s (whitelist-blacklist logic)', device_os)
+                log.debug(
+                    'Not starting process for %s (whitelist-blacklist logic)', device_os
+                )
                 # Ignore devices that are not in the whitelist (if defined),
                 #   or those operating systems that are on the blacklist.
                 # This way we can prevent starting unwanted sub-processes.
                 continue
-            log.debug('Will start %d worker process(es) for %s', self.device_worker_processes, device_os)
+            log.debug(
+                'Will start %d worker process(es) for %s',
+                self.device_worker_processes,
+                device_os,
+            )
             for proc_index in range(self.device_worker_processes):
-                self._processes.append(self._start_dev_proc(device_os,
-                                                            device_config))
+                self._processes.append(self._start_dev_proc(device_os, device_config))
             started_os_proc.append(device_os)
         # start the server process
         self._processes.append(self._start_srv_proc(started_os_proc))
         # start listener process
         for lst in self.listener:
             listener_type, listener_opts = list(lst.items())[0]
-            proc = self._start_lst_proc(listener_type,
-                                        listener_opts)
+            proc = self._start_lst_proc(listener_type, listener_opts)
             self._processes.append(proc)
         thread = threading.Thread(target=self._check_children)
         thread.start()
@@ -670,7 +724,9 @@ class NapalmLogs:
             for process in self._processes:
                 if process.is_alive() is True:
                     continue
-                log.debug('%s is dead. Stopping the napalm-logs engine.', process.description)
+                log.debug(
+                    '%s is dead. Stopping the napalm-logs engine.', process.description
+                )
                 self.stop_engine()
 
     def stop_engine(self):

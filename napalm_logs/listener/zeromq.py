@@ -12,6 +12,7 @@ import logging
 # Import third party libs
 try:
     import zmq
+
     HAS_ZMQ = True
 except ImportError:
     HAS_ZMQ = False
@@ -27,6 +28,7 @@ class ZMQListener(ListenerBase):
     '''
     ZMQ listener class.
     '''
+
     def __init__(self, address, port, **kwargs):
         if kwargs.get('address'):
             address = kwargs['address']
@@ -46,15 +48,15 @@ class ZMQListener(ListenerBase):
         '''
         Startup the zmq consumer.
         '''
-        zmq_uri = '{protocol}://{address}:{port}'.format(
-                       protocol=self.protocol,
-                       address=self.address,
-                       port=self.port
-                   ) if self.port else\
-                   '{protocol}://{address}'.format(  # noqa
-                       protocol=self.protocol,
-                       address=self.address
-                   )
+        zmq_uri = (
+            '{protocol}://{address}:{port}'.format(
+                protocol=self.protocol, address=self.address, port=self.port
+            )
+            if self.port
+            else '{protocol}://{address}'.format(  # noqa
+                protocol=self.protocol, address=self.address
+            )
+        )
         log.debug('ZMQ URI: %s', zmq_uri)
         self.ctx = zmq.Context()
         if hasattr(zmq, self.type):

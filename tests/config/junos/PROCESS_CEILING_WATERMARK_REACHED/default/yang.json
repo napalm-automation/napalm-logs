@@ -1,0 +1,28 @@
+{
+    "host": "vmx01",
+    "yang_message": {
+        "process": {
+            "ceiling": {
+                "watermark": "high"
+            }
+        }
+    },
+    "message_details": {
+        "facility": 4,
+        "hostPrefix": null,
+        "pri": "32",
+        "host": "vmx01",
+        "tag": "jlaunchd",
+        "time": "20:21:27",
+        "date": "Oct 24",
+        "message": "System reaching processes ceiling high watermark: Contact to system administrator to clean up unnecessary processes or increase maxproc ceiling. Further process fork request may be denied.",
+        "severity": 0
+    },
+    "timestamp": 1603570887,
+    "error": "PROCESS_CEILING_WATERMARK_REACHED",
+    "ip": "127.0.0.1",
+    "facility": 4,
+    "os": "junos",
+    "yang_model": "NO_MODEL",
+    "severity": 0
+}

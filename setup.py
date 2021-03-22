@@ -16,7 +16,7 @@ with open("requirements.txt", "r") as fs:
 
 setup(
     name='napalm-logs',
-    version='0.9.0',
+    version='0.10.0',
     packages=find_packages(),
     author='Mircea Ulinic',
     author_email='mircea.ulinic@gmail.com',
@@ -35,7 +35,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Operating System :: POSIX :: Linux',
         'Operating System :: MacOS',
-        'Intended Audience :: Developers'
+        'Intended Audience :: Developers',
     ],
     url='https://github.com/napalm-automation/napalm-logs',
     license="Apache License 2.0",
@@ -43,8 +43,6 @@ setup(
     include_package_data=True,
     install_requires=reqs,
     entry_points={
-        'console_scripts': [
-            'napalm-logs=napalm_logs.scripts.cli:napalm_logs_engine'
-        ],
-    }
+        'console_scripts': ['napalm-logs=napalm_logs.scripts.cli:napalm_logs_engine'],
+    },
 )

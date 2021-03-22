@@ -27,7 +27,7 @@ SERIALIZER_LOOKUP = {
     'str': str,
     'yaml': yaml.safe_dump,
     'pprint': pprint.pformat,
-    '*': umsgpack.packb  # default serializer
+    '*': umsgpack.packb,  # default serializer
 }
 
 
@@ -44,6 +44,4 @@ def get_serializer(name):
         raise InvalidSerializerException(msg)
 
 
-__all__ = (
-    'get_listener',
-)
+__all__ = ('get_listener',)

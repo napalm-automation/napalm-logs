@@ -1,0 +1,114 @@
+.. _release-0.10.0:
+
+==================================
+Release 0.10.0 - Codename Nokogiri
+==================================
+
+New Publisher Interface: Prometheus
+-----------------------------------
+
+Expose napalm-logs notifications as Prometheus metrics. In order to enable this 
+Publisher, besides listing it under the ``publisher`` configuration (or 
+``--publisher prometheus`` CLI), you will also need to enable the metrics by 
+setting the :ref:`configuration-options-enable-metrics` option to `true`. See 
+also: :ref:`metrics`.
+
+Once the metrics and the Prometheus Publish are enabled, you'll be able to 
+scrape metrics such as:
+
+.. code-block:: text
+
+  # HELP napalm_logs_interface_down_total Multiprocess metric
+  # TYPE napalm_logs_interface_down_total counter
+  napalm_logs_interface_down_total{host="test-switch1",interface="FastEthernet0/2"} 1.0
+  napalm_logs_interface_down_total{host="NetAuto_CSRv-03",interface="GigabitEthernet2"} 2.0
+  napalm_logs_interface_down_total{host="router1",interface="GigabitEthernet2"} 1.0
+  # HELP napalm_logs_user_exit_config_mode_total Multiprocess metric
+  # TYPE napalm_logs_user_exit_config_mode_total counter
+  napalm_logs_user_exit_config_mode_total{host="test-ztp",user="admin"} 2.0
+  napalm_logs_user_exit_config_mode_total{host="test-ztp",user="console"} 1.0
+  # HELP napalm_logs_forward_traffic_total Multiprocess metric
+  # TYPE napalm_logs_forward_traffic_total counter
+  napalm_logs_forward_traffic_total{host="fw01"} 1.0
+  # HELP napalm_logs_local_traffic_total Multiprocess metric
+  # TYPE napalm_logs_local_traffic_total counter
+  napalm_logs_local_traffic_total{host="fw01"} 1.0
+  # HELP napalm_logs_user_write_config_total Multiprocess metric
+  # TYPE napalm_logs_user_write_config_total counter
+  napalm_logs_user_write_config_total{host="GeorgeSwitch",user="admin"} 1.0
+  # HELP napalm_logs_bfd_state_change_total Multiprocess metric
+  # TYPE napalm_logs_bfd_state_change_total counter
+  napalm_logs_bfd_state_change_total{host="HOSTNAME",interface="Ethernet50/1",session_state="DOWN"} 1.0
+  napalm_logs_bfd_state_change_total{host="HOSTNAME",interface="Ethernet50/1",session_state="UP"} 2.0
+  # HELP napalm_logs_isis_neighbor_down_total Multiprocess metric
+  # TYPE napalm_logs_isis_neighbor_down_total counter
+  napalm_logs_isis_neighbor_down_total{host="HOSTNAME",interface="et7",level="L1",neighbor="1920.0000.2006"} 1.0
+  # HELP napalm_logs_isis_neighbor_up_total Multiprocess metric
+  # TYPE napalm_logs_isis_neighbor_up_total counter
+  napalm_logs_isis_neighbor_up_total{host="HOSTNAME",interface="et7",level="L1",neighbor="1920.0000.2006"} 1.0
+  # HELP napalm_logs_user_login_total Multiprocess metric
+  # TYPE napalm_logs_user_login_total counter
+  napalm_logs_user_login_total{host="sw01.pdx01",user="luke"} 1.0
+  # HELP napalm_logs_interface_duplex_mode_total Multiprocess metric
+  # TYPE napalm_logs_interface_duplex_mode_total counter
+  napalm_logs_interface_duplex_mode_total{duplex_mode="FULL",host="nexus-switch",interface="Ethernet1/33"} 0.0
+  # HELP napalm_logs_stp_block_bpduguard_total Multiprocess metric
+  # TYPE napalm_logs_stp_block_bpduguard_total counter
+  napalm_logs_stp_block_bpduguard_total{host="switch01"} 1.0
+  # HELP napalm_logs_listener_logs_ingested_total Multiprocess metric
+  # TYPE napalm_logs_listener_logs_ingested_total counter
+  # HELP napalm_logs_bgp_neighbor_state_changed_total Multiprocess metric
+  # TYPE napalm_logs_bgp_neighbor_state_changed_total counter
+  napalm_logs_bgp_neighbor_state_changed_total{host="HOSTNAME",neighbor="192.0.2.2",peer_as="12345"} 2.0
+  napalm_logs_bgp_neighbor_state_changed_total{host="some-switch",neighbor="192.0.2.2",peer_as="12345"} 1.0
+  # HELP napalm_logs_bgp_prefix_limit_exceeded_total Multiprocess metric
+  # TYPE napalm_logs_bgp_prefix_limit_exceeded_total counter
+  napalm_logs_bgp_prefix_limit_exceeded_total{host="edge01",neighbor="194.53.172.97",peer_as="2611"} 1.0
+
+For more details, see :ref:`publisher-prometheus`.
+
+Improvements
+------------
+
+The :ref:`listener-tcp` now accepts two additional parameters, 
+:ref:`listener-tcp-framing`, and :ref:`listener-tcp-frame-delimiter`. Using 
+these two arguments you can optimise the communication between the syslog 
+server and napalm-logs, by using increased sized windows and sending multiple 
+syslog messages at once (see :ref:`listener-tcp-buffer-size`).
+
+ISO8601 date-time format is now supported by the Junos and Arista parsers.
+
+Improved global date-time parsing: `ec59dd8 
+<https://github.com/napalm-automation/napalm-logs/commit/ec59dd84bede1a5a8656f6949637dace2fb93211>`_ 
+and `e2785c9 
+<https://github.com/napalm-automation/napalm-logs/commit/e2785c93e67ba378b84eb3fbf63caf9f9933749a>`_ 
+(obsoleted by `47605f9 
+<https://github.com/napalm-automation/napalm-logs/commit/47605f9>`_). With 
+these changes, `dateutil` library is now a dependency.
+
+The :ref:`publisher-alerta` added in the previous release, 
+:ref:`release-0.9.0`, now provides a new option, :ref:`publisher-alerta-pairs`.
+
+New Structured Messages
+-----------------------
+
+There are several new structured messages added for Junos:
+
+- :ref:`BGP_INCORRECT_AS_NUMBER`
+- :ref:`BGP_CONNECTION_REJECTED`
+- :ref:`BGP_CONNECTION_RESET`
+- :ref:`BGP_CEASE_PREFIX_LIMIT_EXCEEDED`
+- :ref:`PROCESS_CEILING_WATERMARK_REACHED`
+- :ref:`LACP_INTERFACE_DOWN`
+- :ref:`SYSTEM_ALARM_CLEARED` (as a counter-part of the existing 
+  :ref:`SYSTEM_ALARM`)
+- :ref:`DDOS_PROTOCOL_VIOLATION_SET`
+- :ref:`MAJOR_ALARM_SET` and :ref:`MAJOR_ALARM_CLEARED`, as well as 
+  :ref:`MINOR_ALARM_SET` and :ref:`MINOR_ALARM_CLEARED` notification pairs.
+
+Internal Changes and Documentation
+----------------------------------
+
+The CI has been switched to using GitHub Actions, and this together with the 
+new documentation for :ref:`local_testing` added by `@Ichabond 
+<https://github.com/Ichabond>`_ should improve the contributing experience.

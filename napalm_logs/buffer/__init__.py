@@ -21,7 +21,7 @@ BUFFER_LOOKUP = {
     'mem': MemoryBuffer,
     'memory': MemoryBuffer,
     'cache': MemoryBuffer,
-    'redis': RedisBuffer
+    'redis': RedisBuffer,
 }
 
 
@@ -38,6 +38,4 @@ def get_interface(name):
         raise InvalidBufferException(msg)
 
 
-__all__ = (
-    'get_interface',
-)
+__all__ = ('get_interface',)

@@ -1,9 +1,6 @@
+-r ../requirements.txt
 jinja2
-pyzmq
-pyyaml
-pynacl
 u-msgpack-python
 sphinx
 sphinx-rtd-theme
 sphinxcontrib-napoleon
-prometheus_client

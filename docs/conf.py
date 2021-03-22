@@ -47,7 +47,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages'
+    'sphinx.ext.githubpages',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -110,7 +110,7 @@ html_theme_options = {
     'github_user': 'napalm-automation',
     'github_repo': 'napalm-logs',
     'github_banner': True,
-    'show_related': False
+    'show_related': False,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -155,15 +155,12 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
-
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -173,8 +170,13 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'napalm-logs.tex', u'napalm-logs Documentation',
-     u'Mircea Ulinic', 'manual'),
+    (
+        master_doc,
+        'napalm-logs.tex',
+        u'napalm-logs Documentation',
+        u'Mircea Ulinic',
+        'manual',
+    ),
 ]
 
 
@@ -182,10 +184,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'napalm-logs', u'napalm-logs Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, 'napalm-logs', u'napalm-logs Documentation', [author], 1)]
 
 
 # -- Options for Texinfo output -------------------------------------------
@@ -194,11 +193,18 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'napalm-logs', u'napalm-logs Documentation',
-     author, 'napalm-logs',
-     ('napalm-logs is a Python library that listens to syslog messages from network devices and returns strucuted data'
-      'following the OpenConfig or IETF YANG models'),
-     'Miscellaneous'),
+    (
+        master_doc,
+        'napalm-logs',
+        u'napalm-logs Documentation',
+        author,
+        'napalm-logs',
+        (
+            'napalm-logs is a Python library that listens to syslog messages from network devices and returns strucuted data'
+            'following the OpenConfig or IETF YANG models'
+        ),
+        'Miscellaneous',
+    ),
 ]
 
 # -- Options for Epub output ----------------------------------------------
@@ -247,13 +253,10 @@ def gen_messages_rst():
         for message in os_cfg['messages']:
             error_name = message['error']
             if error_name not in defined_errors:
-                defined_errors[error_name] = {
-                    'doc': '',
-                    'os': [],
-                    'model': ''
-                }
-            if not defined_errors[error_name]['doc'] or\
-               len(defined_errors[error_name]['doc']) < len(message['__doc__']):
+                defined_errors[error_name] = {'doc': '', 'os': [], 'model': ''}
+            if not defined_errors[error_name]['doc'] or len(
+                defined_errors[error_name]['doc']
+            ) < len(message['__doc__']):
                 defined_errors[error_name]['doc'] = message['__doc__']
             if not defined_errors[error_name]['model']:
                 defined_errors[error_name]['model'] = message['model']
@@ -265,8 +268,14 @@ def gen_messages_rst():
     for error_name, error_details in defined_errors.items():
         os_name = error_details['os'][0]  # Picking up the first OS in the list.
         error_path = os.path.join(test_root_path, os_name, error_name)
-        test_cases = [name for name in os.listdir(error_path) if os.path.isdir(os.path.join(error_path, name))]
-        test_case_name = 'default' if 'default' in test_cases else test_cases[0]  # Picking up a test case.
+        test_cases = [
+            name
+            for name in os.listdir(error_path)
+            if os.path.isdir(os.path.join(error_path, name))
+        ]
+        test_case_name = (
+            'default' if 'default' in test_cases else test_cases[0]
+        )  # Picking up a test case.
         test_case_path = os.path.join(error_path, test_case_name)
         raw_message_filepath = os.path.join(test_case_path, 'syslog.msg')
         log.debug('Looking for %s', raw_message_filepath)
@@ -283,16 +292,20 @@ def gen_messages_rst():
         log.debug('Read YANG text:')
         log.debug(yang_message)
         struct_yang_message = json.loads(yang_message)
-        indented_yang_message = json.dumps(struct_yang_message, indent=4, sort_keys=True)
+        indented_yang_message = json.dumps(
+            struct_yang_message, indent=4, sort_keys=True
+        )
         log.debug('Struct YANG message:')
         log.debug(struct_yang_message)
         msg_template = env.get_template('message_template.jinja')
-        rendered_template = msg_template.render(error_name=error_name,
-                                                error_doc=error_details['doc'],
-                                                error_yang=error_details['model'],
-                                                error_os_list=list(set(error_details['os'])),
-                                                error_txt_example=raw_message.strip(),
-                                                error_json_example=indented_yang_message.replace('\n}', '\n  }'))
+        rendered_template = msg_template.render(
+            error_name=error_name,
+            error_doc=error_details['doc'],
+            error_yang=error_details['model'],
+            error_os_list=list(set(error_details['os'])),
+            error_txt_example=raw_message.strip(),
+            error_json_example=indented_yang_message.replace('\n}', '\n  }'),
+        )
         message_rst_path = 'messages/{error_name}.rst'.format(error_name=error_name)
         with open(message_rst_path, 'w') as rst_fh:
             rst_fh.write(rendered_template)

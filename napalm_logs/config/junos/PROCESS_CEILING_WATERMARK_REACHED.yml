@@ -1,0 +1,13 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: PROCESS_CEILING_WATERMARK_REACHED
+    tag: jlaunchd
+    values:
+      severity: (\w+)
+    line: 'System reaching processes ceiling {severity} watermark: Contact to system administrator to clean up unnecessary processes or increase maxproc ceiling.'
+    model: NO_MODEL
+    mapping:
+      variables:
+        process//ceiling//watermark: severity
+      static: {}

@@ -52,7 +52,7 @@ class OptionParser(optparse.OptionParser, object):
             '-v',
             action='store_true',
             dest='version',
-            help='Show version number and exit.'
+            help='Show version number and exit.',
         )
 
     def add_option_group(self, *args, **kwargs):
@@ -65,9 +65,7 @@ class OptionParser(optparse.OptionParser, object):
         if 'args_stdin' in options.__dict__ and options.args_stdin is True:
             new_inargs = sys.stdin.readlines()
             new_inargs = [arg.rstrip('\r\n') for arg in new_inargs]
-            new_options, new_args = optparse.OptionParser.parse_args(
-                self,
-                new_inargs)
+            new_options, new_args = optparse.OptionParser.parse_args(self, new_inargs)
             options.__dict__.update(new_options.__dict__)
             args.extend(new_args)
         self.options, self.args = options, args
@@ -79,123 +77,142 @@ class OptionParser(optparse.OptionParser, object):
 class NLOptionParser(OptionParser, object):
     def prepare(self):
         self.add_option(
-            '-c', '--config-file',
+            '-c',
+            '--config-file',
             dest='config_file',
-            help=('Config file absolute path. Default: {0}'.format(defaults.CONFIG_FILE))
+            help=(
+                'Config file absolute path. Default: {0}'.format(defaults.CONFIG_FILE)
+            ),
         )
         self.add_option(
-            '-a', '--address',
+            '-a',
+            '--address',
             dest='address',
-            help=('Listener address. Default: {0}'.format(defaults.ADDRESS))
+            help=('Listener address. Default: {0}'.format(defaults.ADDRESS)),
         )
         self.add_option(
-            '--config-path',
-            dest='config_path',
-            help=('Device config path.')
+            '--config-path', dest='config_path', help=('Device config path.')
         )
         self.add_option(
             '--extension-config-path',
             dest='extension_config_path',
-            help=('Extension config path.')
+            help=('Extension config path.'),
         )
         self.add_option(
-            '-p', '--port',
+            '-p',
+            '--port',
             dest='port',
             type=int,
-            help=('Listener bind port. Default: {0}'.format(defaults.PORT))
+            help=('Listener bind port. Default: {0}'.format(defaults.PORT)),
         )
         self.add_option(
             '--listener',
             dest='listener',
-            help=('Listener type. Default: {0}'.format(defaults.LISTENER))
+            help=('Listener type. Default: {0}'.format(defaults.LISTENER)),
         )
         self.add_option(
-            '-s', '--serializer',
+            '-s',
+            '--serializer',
             dest='serializer',
-            help=('Serializer type. Default: {0}'.format(defaults.SERIALIZER))
+            help=('Serializer type. Default: {0}'.format(defaults.SERIALIZER)),
         )
         self.add_option(
             '--publisher',
             dest='publisher',
-            help=('Publish transport. Default: {0}'.format(defaults.PUBLISHER))
+            help=('Publish transport. Default: {0}'.format(defaults.PUBLISHER)),
         )
         self.add_option(
             '--publish-address',
             dest='publish_address',
-            help=('Publisher bind address. Default: {0}'.format(defaults.PUBLISH_ADDRESS))
+            help=(
+                'Publisher bind address. Default: {0}'.format(defaults.PUBLISH_ADDRESS)
+            ),
         )
         self.add_option(
             '--publish-port',
             dest='publish_port',
             type=int,
-            help=('Publisher bind port. Default: {0}'.format(defaults.PUBLISH_PORT))
+            help=('Publisher bind port. Default: {0}'.format(defaults.PUBLISH_PORT)),
         )
         self.add_option(
             '--auth-address',
             dest='auth_address',
-            help=('Authenticator bind address. Default: {0}'.format(defaults.AUTH_ADDRESS))
+            help=(
+                'Authenticator bind address. Default: {0}'.format(defaults.AUTH_ADDRESS)
+            ),
         )
         self.add_option(
             '--auth-port',
             dest='auth_port',
             type=int,
-            help=('Authenticator bind port. Default: {0}'.format(defaults.AUTH_PORT))
+            help=('Authenticator bind port. Default: {0}'.format(defaults.AUTH_PORT)),
         )
         self.add_option(
             '--enable-metrics',
             dest='metrics_enabled',
             action="store_true",
             default=False,
-            help=('Enable metrics collection and exporting (Prometheus metrics).')
+            help=('Enable metrics collection and exporting (Prometheus metrics).'),
         )
         self.add_option(
             '--metrics-address',
             dest='metrics_address',
-            help=('Prometheus metrics HTTP server listener address. Default: {0}'.format(defaults.METRICS_ADDRESS))
+            help=(
+                'Prometheus metrics HTTP server listener address. Default: {0}'.format(
+                    defaults.METRICS_ADDRESS
+                )
+            ),
         )
         self.add_option(
             '--metrics-port',
             dest='metrics_port',
             type=int,
-            help=('Prometheus metrics HTTP server listener bind port. Default: {0}'.format(defaults.METRICS_PORT))
+            help=(
+                'Prometheus metrics HTTP server listener bind port. Default: {0}'.format(
+                    defaults.METRICS_PORT
+                )
+            ),
         )
         self.add_option(
             '--metrics-dir',
             dest='metrics_dir',
-            help=('Directory to store metrics in. Must be writable by the processes. '
-                  'Default: {0}'.format(defaults.METRICS_DIR))
+            help=(
+                'Directory to store metrics in. Must be writable by the processes. '
+                'Default: {0}'.format(defaults.METRICS_DIR)
+            ),
         )
         self.add_option(
             '--certificate',
             dest='certificate',
-            help=('Absolute path to the SSL certificate used for client authentication.')
+            help=(
+                'Absolute path to the SSL certificate used for client authentication.'
+            ),
         )
         self.add_option(
-            '--keyfile',
-            dest='keyfile',
-            help=('Absolute path to the SSL keyfile')
+            '--keyfile', dest='keyfile', help=('Absolute path to the SSL keyfile')
         )
         self.add_option(
             '--disable-security',
             dest='disable_security',
             action="store_true",
             default=False,
-            help=('Disable encryption and data signing when publishing.')
+            help=('Disable encryption and data signing when publishing.'),
         )
         self.add_option(
-            '-l', '--log-level',
+            '-l',
+            '--log-level',
             dest='log_level',
-            help=('Logging level. Default: {0}'.format(defaults.LOG_LEVEL))
+            help=('Logging level. Default: {0}'.format(defaults.LOG_LEVEL)),
         )
         self.add_option(
             '--log-file',
             dest='log_file',
-            help=('Logging file. Default: {0}'.format(defaults.LOG_FILE))
+            help=('Logging file. Default: {0}'.format(defaults.LOG_FILE)),
         )
         self.add_option(
             '--log-format',
             dest='log_format',
-            help=('Logging format. Default: {0}'.format(defaults.LOG_FORMAT))
+            help=('Logging format. Default: {0}'.format(defaults.LOG_FORMAT)),
         )
         self.add_option(
             '--hwm',
@@ -207,14 +224,16 @@ class NLOptionParser(OptionParser, object):
                 'and it tunes the capacity of the napalm-logs engine. '
                 'For high performance, this number can be increased, but implies'
                 'higher memory consumption. '
-                'Default: {0}'.format(defaults.ZMQ_INTERNAL_HWM))
+                'Default: {0}'.format(defaults.ZMQ_INTERNAL_HWM)
+            ),
         )
         self.add_option(
-            '-w', '--device-worker-processes',
+            '-w',
+            '--device-worker-processes',
             dest='device_worker_processes',
             type=int,
             help='Number of worker processes per device. Default: 1.',
-            default=1
+            default=1,
         )
 
     def convert_env_dict(self, d):
@@ -223,7 +242,10 @@ class NLOptionParser(OptionParser, object):
                 if not v.startswith('${') or not v.endswith('}'):
                     continue
                 if not os.environ.get(v[2:-1]):
-                    log.error('No env variable found for %s, please check your config file', v[2:-1])
+                    log.error(
+                        'No env variable found for %s, please check your config file',
+                        v[2:-1],
+                    )
                     sys.exit(1)
                 d[k] = os.environ[v[2:-1]]
             if isinstance(v, dict):
@@ -231,25 +253,28 @@ class NLOptionParser(OptionParser, object):
             if isinstance(v, list):
                 self.convert_env_list(v)
 
-    def convert_env_list(self, l):
-        for n, v in enumerate(l):
-            if isinstance(v, six.string_type):
-                if not v.startswith('${') or not v.endswith('}'):
+    def convert_env_list(self, lst):
+        for name, value in enumerate(lst):
+            if isinstance(value, six.string_type):
+                if not value.startswith('${') or not value.endswith('}'):
                     continue
-                if not os.environ.get(v[2:-1]):
-                    log.error('No env variable found for %s, please check your config file', v[2:-1])
+                if not os.environ.get(value[2:-1]):
+                    log.error(
+                        'No env variable found for %s, please check your config file',
+                        value[2:-1],
+                    )
                     sys.exit(1)
-                l[n] = os.environ[v[2:-1]]
-            if isinstance(v, dict):
-                self.convert_env_dict(v)
-            if isinstance(v, list):
-                self.convert_env_list(v)
+                lst[name] = os.environ[value[2:-1]]
+            if isinstance(value, dict):
+                self.convert_env_dict(value)
+            if isinstance(value, list):
+                self.convert_env_list(value)
 
     def read_config_file(self, filepath):
         config = {}
         try:
             with open(filepath, 'r') as fstream:
-                config = yaml.load(fstream)
+                config = yaml.load(fstream, Loader=yaml.FullLoader)
         except (IOError, yaml.YAMLError):
             log.info('Unable to read from %s', filepath)
         # Convert any env variables
@@ -264,9 +289,15 @@ class NLOptionParser(OptionParser, object):
             sys.exit(1)
         config_file_path = self.options.config_file or defaults.CONFIG_FILE
         file_cfg = self.read_config_file(config_file_path)
-        log_file = self.options.log_file or file_cfg.get('log_file') or defaults.LOG_FILE
-        log_lvl = self.options.log_level or file_cfg.get('log_level') or defaults.LOG_LEVEL
-        log_fmt = self.options.log_format or file_cfg.get('log_format') or defaults.LOG_FORMAT
+        log_file = (
+            self.options.log_file or file_cfg.get('log_file') or defaults.LOG_FILE
+        )
+        log_lvl = (
+            self.options.log_level or file_cfg.get('log_level') or defaults.LOG_LEVEL
+        )
+        log_fmt = (
+            self.options.log_format or file_cfg.get('log_format') or defaults.LOG_FORMAT
+        )
         if log_file.lower() not in defaults.LOG_FILE_CLI_OPTIONS:
             log_file_dir = os.path.dirname(log_file)
             if not os.path.isdir(log_file_dir):
@@ -277,12 +308,18 @@ class NLOptionParser(OptionParser, object):
                     log.error('Unable to create %s', log_file_dir, exc_info=True)
                     sys.exit(0)
             log.removeHandler(screen_handler)  # remove printing to the screen
-            logging.basicConfig(filename=log_file,
-                                level=defaults.LOGGING_LEVEL.get(log_lvl.lower(), 'warning'),
-                                format=log_fmt)  # log to filecm
+            logging.basicConfig(
+                filename=log_file,
+                level=defaults.LOGGING_LEVEL.get(log_lvl.lower(), 'warning'),
+                format=log_fmt,
+            )  # log to filecm
         cert = self.options.certificate or file_cfg.get('certificate')
-        disable_security = self.options.disable_security or file_cfg.get('disable_security', False)
-        metrics_enabled = self.options.metrics_enabled or file_cfg.get('metrics_enabled', False)
+        disable_security = self.options.disable_security or file_cfg.get(
+            'disable_security', False
+        )
+        metrics_enabled = self.options.metrics_enabled or file_cfg.get(
+            'metrics_enabled', False
+        )
         if not cert and disable_security is False:
             log.error('certfile must be specified for server-side operations')
             raise ValueError('Please specify a valid SSL certificate.')
@@ -339,41 +376,57 @@ class NLOptionParser(OptionParser, object):
             hwm = file_cfg['hwm']
 
         cfg = {
-            'address': self.options.address or file_cfg.get('address') or defaults.ADDRESS,
+            'address': self.options.address
+            or file_cfg.get('address')
+            or defaults.ADDRESS,
             'port': self.options.port or file_cfg.get('port') or defaults.PORT,
             'listener': listener,
             'publisher': publisher,
-            'publish_address': self.options.publish_address or file_cfg.get('publish_address') or
-                               defaults.PUBLISH_ADDRESS,  # noqa
-            'publish_port': self.options.publish_port or file_cfg.get('publish_port') or
-                            defaults.PUBLISH_PORT,  # noqa
-            'auth_address': self.options.auth_address or file_cfg.get('auth_address') or
-                            defaults.AUTH_ADDRESS,  # noqa
-            'auth_port': self.options.auth_port or file_cfg.get('auth_port') or
-                         defaults.AUTH_PORT,
+            'publish_address': self.options.publish_address
+            or file_cfg.get('publish_address')
+            or defaults.PUBLISH_ADDRESS,  # noqa
+            'publish_port': self.options.publish_port
+            or file_cfg.get('publish_port')
+            or defaults.PUBLISH_PORT,  # noqa
+            'auth_address': self.options.auth_address
+            or file_cfg.get('auth_address')
+            or defaults.AUTH_ADDRESS,  # noqa
+            'auth_port': self.options.auth_port
+            or file_cfg.get('auth_port')
+            or defaults.AUTH_PORT,
             'metrics_enabled': metrics_enabled,
-            'metrics_address': self.options.metrics_address or file_cfg.get('metrics_address') or
-                               defaults.METRICS_ADDRESS,
-            'metrics_port': self.options.metrics_port or file_cfg.get('metrics_port') or
-                               defaults.METRICS_PORT,
-            'metrics_dir': self.options.metrics_dir or file_cfg.get('metrics_dir') or
-                               defaults.METRICS_DIR,
+            'metrics_address': self.options.metrics_address
+            or file_cfg.get('metrics_address')
+            or defaults.METRICS_ADDRESS,
+            'metrics_port': self.options.metrics_port
+            or file_cfg.get('metrics_port')
+            or defaults.METRICS_PORT,
+            'metrics_dir': self.options.metrics_dir
+            or file_cfg.get('metrics_dir')
+            or defaults.METRICS_DIR,
             'certificate': cert,
             'keyfile': self.options.keyfile or file_cfg.get('keyfile'),
             'disable_security': disable_security,
             'config_path': self.options.config_path or file_cfg.get('config_path'),
-            'extension_config_path': self.options.extension_config_path or file_cfg.get('extension_config_path'),
+            'extension_config_path': self.options.extension_config_path
+            or file_cfg.get('extension_config_path'),
             'log_level': log_lvl,
             'log_format': log_fmt,
             'device_whitelist': device_whitelist,
             'device_blacklist': device_blacklist,
             'hwm': hwm,
-            'device_worker_processes': self.options.device_worker_processes or\
-                                       file_cfg.get('device_worker_processes') or 1,
-            'serializer': self.options.serializer or file_cfg.get('serializer') or
-                          defaults.SERIALIZER,
-            'buffer': buffer_cfg
+            'device_worker_processes': self.options.device_worker_processes
+            or file_cfg.get('device_worker_processes')
+            or 1,
+            'serializer': self.options.serializer
+            or file_cfg.get('serializer')
+            or defaults.SERIALIZER,
+            'buffer': buffer_cfg,
+            'opts': {},
         }
+        for opt, val in file_cfg.items():
+            if opt not in cfg:
+                cfg['opts'][opt] = val
         return cfg
 
 

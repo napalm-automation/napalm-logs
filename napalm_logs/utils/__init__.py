@@ -39,12 +39,15 @@ class ClientAuth:
     '''
     Client auth class.
     '''
-    def __init__(self,
-                 certificate,
-                 address=defaults.AUTH_ADDRESS,
-                 port=defaults.AUTH_PORT,
-                 timeout=defaults.AUTH_TIMEOUT,
-                 max_try=defaults.AUTH_MAX_TRY):
+
+    def __init__(
+        self,
+        certificate,
+        address=defaults.AUTH_ADDRESS,
+        port=defaults.AUTH_PORT,
+        timeout=defaults.AUTH_TIMEOUT,
+        max_try=defaults.AUTH_MAX_TRY,
+    ):
         self.certificate = certificate
         self.address = address
         self.port = port
@@ -85,8 +88,11 @@ class ClientAuth:
             msg = self.ssl_skt.recv(len(defaults.AUTH_KEEP_ALIVE_ACK))
             log.debug('Received %s from the keep-alive server', msg)
             if msg != defaults.AUTH_KEEP_ALIVE_ACK:
-                log.error('Received %s instead of %s form the auth keep-alive server',
-                          msg, defaults.AUTH_KEEP_ALIVE_ACK)
+                log.error(
+                    'Received %s instead of %s form the auth keep-alive server',
+                    msg,
+                    defaults.AUTH_KEEP_ALIVE_ACK,
+                )
                 log.error('Re-init the SSL socket.')
                 self.reconnect()
             time.sleep(defaults.AUTH_KEEP_ALIVE_INTERVAL)
@@ -112,16 +118,20 @@ class ClientAuth:
         then do the handshake using the napalm-logs
         auth algorithm.
         '''
-        log.debug('Authenticate to %s:%d, using the certificate %s',
-                  self.address, self.port, self.certificate)
+        log.debug(
+            'Authenticate to %s:%d, using the certificate %s',
+            self.address,
+            self.port,
+            self.certificate,
+        )
         if ':' in self.address:
             skt_ver = socket.AF_INET6
         else:
             skt_ver = socket.AF_INET
         skt = socket.socket(skt_ver, socket.SOCK_STREAM)
-        self.ssl_skt = ssl.wrap_socket(skt,
-                                       ca_certs=self.certificate,
-                                       cert_reqs=ssl.CERT_REQUIRED)
+        self.ssl_skt = ssl.wrap_socket(
+            skt, ca_certs=self.certificate, cert_reqs=ssl.CERT_REQUIRED
+        )
         try:
             self.ssl_skt.connect((self.address, self.port))
             self.auth_try_id = 0
@@ -132,8 +142,12 @@ class ClientAuth:
                 log.error('Trying to authenticate again in %d seconds', self.timeout)
                 time.sleep(self.timeout)
                 self.authenticate()
-            log.critical('Giving up, unable to authenticate to %s:%d using the certificate %s',
-                         self.address, self.port, self.certificate)
+            log.critical(
+                'Giving up, unable to authenticate to %s:%d using the certificate %s',
+                self.address,
+                self.port,
+                self.certificate,
+            )
             raise ClientConnectException(err)
 
         # Explicit INIT
@@ -147,7 +161,9 @@ class ClientAuth:
         # Send back explicit ACK
         self.ssl_skt.write(defaults.MAGIC_ACK)
         self.priv_key = nacl.secret.SecretBox(private_key)
-        self.verify_key = nacl.signing.VerifyKey(verify_key_hex, encoder=nacl.encoding.HexEncoder)
+        self.verify_key = nacl.signing.VerifyKey(
+            verify_key_hex, encoder=nacl.encoding.HexEncoder
+        )
 
     def decrypt(self, binary):
         '''
@@ -182,10 +198,11 @@ def cast(var, function):
         try:
             return locate(function)(var)
         except ValueError:
-            log.error('Unable to use function %s on value %s', function, var, exc_info=True)
+            log.error(
+                'Unable to use function %s on value %s', function, var, exc_info=True
+            )
     # If the function is str function
-    if hasattr(str, function) and\
-            hasattr(getattr(str, function), '__call__'):
+    if hasattr(str, function) and hasattr(getattr(str, function), '__call__'):
         return getattr(str, function)(var)
     glob = globals()
     # If the function is defined in this module
@@ -196,8 +213,7 @@ def cast(var, function):
 
 
 def color_to_severity(var):
-    colour_dict = {'RED': 3,
-                   'YELLOW': 4}
+    colour_dict = {'RED': 3, 'YELLOW': 4}
     return colour_dict.get(var, var)
 
 
@@ -205,10 +221,12 @@ def bgp_state_convert(state):
     """
     Given a matched BGP state, map it to a vendor agnostic version.
     """
-    state_dict = {'OpenSent': 'OPEN_SENT',
-                  'OpenConfirm': 'OPEN_CONFIRM',
-                  'Up': 'ESTABLISHED',
-                  'Down': 'ACTIVE'}
+    state_dict = {
+        'OpenSent': 'OPEN_SENT',
+        'OpenConfirm': 'OPEN_CONFIRM',
+        'Up': 'ESTABLISHED',
+        'Down': 'ACTIVE',
+    }
     return state_dict.get(state, state.upper())
 
 
@@ -246,7 +264,9 @@ def extract(rgx, msg, mapping, time_format=None):
         log.debug(ret)
     if time_format:
         try:
-            parsed_time = datetime.strptime(time_format[0].format(**ret), time_format[1])
+            parsed_time = datetime.strptime(
+                time_format[0].format(**ret), time_format[1]
+            )
         except ValueError as error:
             log.error('Unable to convert date and time into a timestamp: %s', error)
         ret['timestamp'] = int((parsed_time - datetime(1970, 1, 1)).total_seconds())
@@ -324,8 +344,9 @@ def dictupdate(dest, upd):
     Merges upd recursively into dest.
     '''
     recursive_update = True
-    if (not isinstance(dest, collections.Mapping)) \
-            or (not isinstance(upd, collections.Mapping)):
+    if (not isinstance(dest, collections.Mapping)) or (
+        not isinstance(upd, collections.Mapping)
+    ):
         raise TypeError('Cannot update using non-dict types in dictupdate.update()')
     updkeys = list(upd.keys())
     if not set(list(dest.keys())) & set(updkeys):
@@ -337,12 +358,12 @@ def dictupdate(dest, upd):
                 dest_subkey = dest.get(key, None)
             except AttributeError:
                 dest_subkey = None
-            if isinstance(dest_subkey, collections.Mapping) \
-                    and isinstance(val, collections.Mapping):
+            if isinstance(dest_subkey, collections.Mapping) and isinstance(
+                val, collections.Mapping
+            ):
                 ret = dictupdate(dest_subkey, val)
                 dest[key] = ret
-            elif isinstance(dest_subkey, list) \
-                    and isinstance(val, list):
+            elif isinstance(dest_subkey, list) and isinstance(val, list):
                 merged = copy.deepcopy(dest_subkey)
                 merged.extend([x for x in val if x not in merged])
                 dest[key] = merged

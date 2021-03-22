@@ -24,6 +24,7 @@ from napalm_logs.config import SERIALIZER
 from napalm_logs.proc import NapalmLogsProc
 from napalm_logs.transport import get_transport
 from napalm_logs.serializer import get_serializer
+
 # exceptions
 from napalm_logs.exceptions import NapalmLogsExit
 
@@ -34,17 +35,20 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
     '''
     publisher sub-process class.
     '''
-    def __init__(self,
-                 opts,
-                 address,
-                 port,
-                 transport_type,
-                 serializer,
-                 private_key,
-                 signing_key,
-                 publisher_opts,
-                 disable_security=False,
-                 pub_id=None):
+
+    def __init__(
+        self,
+        opts,
+        address,
+        port,
+        transport_type,
+        serializer,
+        private_key,
+        signing_key,
+        publisher_opts,
+        disable_security=False,
+        pub_id=None,
+    ):
         self.__up = False
         self.opts = opts
         self.pub_id = pub_id
@@ -75,7 +79,11 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         on the right transport.
         '''
         self.ctx = zmq.Context()
-        log.debug('Setting up the %s publisher subscriber #%d', self._transport_type, self.pub_id)
+        log.debug(
+            'Setting up the %s publisher subscriber #%d',
+            self._transport_type,
+            self.pub_id,
+        )
         self.sub = self.ctx.socket(zmq.SUB)
         self.sub.connect(PUB_IPC_URL)
         self.sub.setsockopt(zmq.SUBSCRIBE, b'')
@@ -91,20 +99,28 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         Setup the transport.
         '''
         if 'RAW' in self.error_whitelist:
-            log.info('%s %d will publish partially parsed messages', self._transport_type, self.pub_id)
+            log.info(
+                '%s %d will publish partially parsed messages',
+                self._transport_type,
+                self.pub_id,
+            )
         if 'UNKNOWN' in self.error_whitelist:
-            log.info('%s %d will publish unknown messages', self._transport_type, self.pub_id)
+            log.info(
+                '%s %d will publish unknown messages', self._transport_type, self.pub_id
+            )
         transport_class = get_transport(self._transport_type)
-        log.debug('Serializing the object for %s using %s',
-                  self._transport_type,
-                  self.serializer)
+        log.debug(
+            'Serializing the object for %s using %s',
+            self._transport_type,
+            self.serializer,
+        )
         self.serializer_fun = get_serializer(self.serializer)
-        self.transport = transport_class(self.address,
-                                         self.port,
-                                         **self.publisher_opts)
+        self.transport = transport_class(self.address, self.port, **self.publisher_opts)
         self.__transport_encrypt = True
-        if hasattr(self.transport, 'NO_ENCRYPT') and\
-           getattr(self.transport, 'NO_ENCRYPT') is True:
+        if (
+            hasattr(self.transport, 'NO_ENCRYPT')
+            and getattr(self.transport, 'NO_ENCRYPT') is True
+        ):
             self.__transport_encrypt = False
 
     def _prepare(self, serialized_obj):
@@ -137,21 +153,23 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         napalm_logs_publisher_received_messages = Counter(
             'napalm_logs_publisher_received_messages',
             "Count of messages received by the publisher",
-            ['publisher_type', 'address', 'port']
+            ['publisher_type', 'address', 'port'],
         )
         napalm_logs_publisher_whitelist_blacklist_check_fail = Counter(
             'napalm_logs_publisher_whitelist_blacklist_check_fail',
             "Count of messages which fail the whitelist/blacklist check",
-            ['publisher_type', 'address', 'port']
+            ['publisher_type', 'address', 'port'],
         )
         napalm_logs_publisher_messages_published = Counter(
             'napalm_logs_publisher_messages_published',
             "Count of published messages",
-            ['publisher_type', 'address', 'port']
+            ['publisher_type', 'address', 'port'],
         )
         self._setup_ipc()
         # Start suicide polling thread
-        thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
+        thread = threading.Thread(
+            target=self._suicide_when_without_parent, args=(os.getppid(),)
+        )
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.transport.start()
@@ -173,21 +191,25 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
             napalm_logs_publisher_received_messages.labels(
                 publisher_type=self._transport_type,
                 address=self.address,
-                port=self.port
+                port=self.port,
             ).inc()
-            if not napalm_logs.ext.check_whitelist_blacklist(obj['error'],
-                                                             whitelist=self.error_whitelist,
-                                                             blacklist=self.error_blacklist):
+            if not napalm_logs.ext.check_whitelist_blacklist(
+                obj['error'],
+                whitelist=self.error_whitelist,
+                blacklist=self.error_blacklist,
+            ):
                 # Apply the whitelist / blacklist logic
                 # If it doesn't match, jump over.
-                log.debug('This error type is %s. Skipping for %s #%d',
-                          obj['error'],
-                          self._transport_type,
-                          self.pub_id)
+                log.debug(
+                    'This error type is %s. Skipping for %s #%d',
+                    obj['error'],
+                    self._transport_type,
+                    self.pub_id,
+                )
                 napalm_logs_publisher_whitelist_blacklist_check_fail.labels(
                     publisher_type=self._transport_type,
                     address=self.address,
-                    port=self.port
+                    port=self.port,
                 ).inc()
                 continue
             serialized_obj = self._serialize(obj, bin_obj)
@@ -199,11 +221,15 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
             napalm_logs_publisher_messages_published.labels(
                 publisher_type=self._transport_type,
                 address=self.address,
-                port=self.port
+                port=self.port,
             ).inc()
 
     def stop(self):
-        log.info('Stopping publisher process %s (publisher #%d)', self._transport_type, self.pub_id)
+        log.info(
+            'Stopping publisher process %s (publisher #%d)',
+            self._transport_type,
+            self.pub_id,
+        )
         self.__up = False
         self.sub.close()
         self.ctx.term()

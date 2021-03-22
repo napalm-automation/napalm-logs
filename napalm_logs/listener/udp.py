@@ -16,6 +16,7 @@ import logging
 from napalm_logs.config import BUFFER_SIZE
 from napalm_logs.config import REUSE_PORT
 from napalm_logs.listener.base import ListenerBase
+
 # exceptions
 from napalm_logs.exceptions import BindException
 from napalm_logs.exceptions import ListenerException
@@ -27,6 +28,7 @@ class UDPListener(ListenerBase):
     '''
     UDP syslog listener class.
     '''
+
     def __init__(self, address, port, **kwargs):
         if kwargs.get('address'):
             self.address = kwargs['address']
@@ -57,7 +59,9 @@ class UDPListener(ListenerBase):
         try:
             self.skt.bind((self.address, int(self.port)))
         except socket.error as msg:
-            error_string = 'Unable to bind to port {} on {}: {}'.format(self.port, self.address, msg)
+            error_string = 'Unable to bind to port {} on {}: {}'.format(
+                self.port, self.address, msg
+            )
             log.error(error_string, exc_info=True)
             raise BindException(error_string)
 

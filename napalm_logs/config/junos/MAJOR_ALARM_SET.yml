@@ -1,0 +1,17 @@
+# This message is dedicated to the major alarms, as a specific subset of the
+# SYSTEM_ALARM. While providing fewer details than the SYSTEM_ALARM notifications
+# it is a more reliable source of the alarm status, as SYSTEM_ALARM through the
+# color scheme YELLOW / RED doesn't accurately provide the severity of the alarm
+# (i.e., some major alarms are marked as YELLOW, while some minor alarms can be
+# marked as YELLOW as well - and vice-versa).
+messages:
+  - error: MAJOR_ALARM_SET
+    tag: craftd
+    values:
+      reason: (.*)
+    line: 'Major alarm set, {reason}'
+    model: ietf-alarm
+    mapping:
+      variables:
+        alarms//alarm//additional-text: reason
+      static: {}

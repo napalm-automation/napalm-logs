@@ -1,0 +1,34 @@
+messages:
+  - error: SYSTEM_ALARM_CLEARED
+    tag: Alarm cleared
+    values:
+      component: (FPC \d)
+      color|color_to_severity: (\w+)
+      reason: (.*)
+    line: 'FPC color={color}, class=CHASSIS, reason={component} {reason}'
+    model: ietf-hardware
+    mapping:
+      variables:
+        hardware-state//component//{component}//name: component
+        hardware-state//component//{component}//state//alarm-state: color
+        hardware-state//component//{component}//state//alarm-reason: reason
+      static:
+        hardware-state//component//{component}//class: CHASSIS
+# The following is a general catch all for system alarms, if you would like to
+# add more specif matches please do so above this comment
+  - error: SYSTEM_ALARM_CLEARED
+    tag: Alarm cleared
+    values:
+      component: (\w+)
+      color|color_to_severity: (\w+)
+      class: (\w+)
+      reason: (.*)
+    line: '{component} color={color}, class={class}, reason={reason}'
+    model: ietf-hardware
+    mapping:
+      variables:
+        hardware-state//component//{component}//name: component
+        hardware-state//component//{component}//class: class
+        hardware-state//component//{component}//state//alarm-state: color
+        hardware-state//component//{component}//state//alarm-reason: reason
+      static: {}

@@ -7,9 +7,9 @@ COPY ./ /var/cache/napalm-logs/
 RUN apk add --no-cache \
     libffi \
     libffi-dev \
-    python-dev \
+    python3-dev \
     build-base \
-    && pip --no-cache-dir install cffi /var/cache/napalm-logs/ \
+    && pip --no-cache-dir install cffi pyzmq==19.0.2 /var/cache/napalm-logs/ \
     && rm -rf /var/cache/napalm-logs/
 
 CMD napalm-logs --config-file /etc/napalm/logs

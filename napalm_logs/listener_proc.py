@@ -29,13 +29,16 @@ class NapalmLogsListenerProc(NapalmLogsProc):
     '''
     publisher sub-process class.
     '''
-    def __init__(self,
-                 opts,
-                 address,
-                 port,
-                 listener_type,
-                 # pipe,
-                 listener_opts=None):
+
+    def __init__(
+        self,
+        opts,
+        address,
+        port,
+        listener_type,
+        # pipe,
+        listener_opts=None,
+    ):
         self.__up = False
         self.opts = opts
         self.address = address
@@ -55,9 +58,7 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         listener_class = get_listener(self._listener_type)
         self.address = self.listener_opts.pop('address', self.address)
         self.port = self.listener_opts.pop('port', self.port)
-        self.listener = listener_class(self.address,
-                                       self.port,
-                                       **self.listener_opts)
+        self.listener = listener_class(self.address, self.port, **self.listener_opts)
 
     def _setup_ipc(self):
         '''
@@ -95,7 +96,9 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         self._setup_listener()
         self.listener.start()
         # Start suicide polling thread
-        thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
+        thread = threading.Thread(
+            target=self._suicide_when_without_parent, args=(os.getppid(),)
+        )
         thread.start()
         signal.signal(signal.SIGTERM, self._exit_gracefully)
         self.__up = True
@@ -109,13 +112,22 @@ class NapalmLogsListenerProc(NapalmLogsProc):
                 else:
                     log.error(lerr, exc_info=True)
                     raise NapalmLogsExit(lerr)
-            log.debug('Received %s from %s. Queueing to the server.', log_message, log_source)
+            log.debug(
+                'Received %s from %s. Queueing to the server.', log_message, log_source
+            )
             if not log_message:
-                log.info('Empty message received from %s. Not queueing to the server.', log_source)
+                log.info(
+                    'Empty message received from %s. Not queueing to the server.',
+                    log_source,
+                )
                 continue
-            c_logs_ingested.labels(listener_type=self._listener_type, address=self.address, port=self.port).inc()
+            c_logs_ingested.labels(
+                listener_type=self._listener_type, address=self.address, port=self.port
+            ).inc()
             self.pub.send(umsgpack.packb((log_message, log_source)))
-            c_messages_published.labels(listener_type=self._listener_type, address=self.address, port=self.port).inc()
+            c_messages_published.labels(
+                listener_type=self._listener_type, address=self.address, port=self.port
+            ).inc()
 
     def stop(self):
         log.info('Stopping the listener process')
