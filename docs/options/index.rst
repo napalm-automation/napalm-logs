@@ -690,3 +690,38 @@ Example:
 
   device_blacklist:
     - eos
+
+.. _configuration-options-sentry-dsn:
+
+``sentry_dsn``
+--------------
+
+.. versionadded:: 0.11.0
+
+The Sentry DSN to identify the project to send traces to.
+
+Example:
+
+.. code-block:: yaml
+
+  sentry_dsn: https://187deccf24d5ea7dc:f3e690bd3a03fb@sentry.example.com/777
+
+.. _configuration-options-sentry-opts:
+
+``sentry_opts``
+---------------
+
+.. versionadded:: 0.11.0
+
+Dictionary of Sentry options to customise the behaviour of traces reports. See
+https://docs.sentry.io/platforms/python/configuration/options/ for more 
+details. By default, ``traces_sample_rate`` is set to 1.0 (100%).
+
+Example:
+
+.. code-block:: yaml
+
+  sentry_opts:
+    traces_sample_rate: 0.5
+    sample_rate: 0.1
+    max_breadcrumbs: 30
