@@ -16,6 +16,12 @@ import threading
 from multiprocessing import Process
 
 # Import third party libs
+try:
+    import sentry_sdk
+
+    HAS_SENTRY = True
+except ImportError:
+    HAS_SENTRY = False
 # crypto
 import nacl.utils
 import nacl.secret
@@ -84,6 +90,18 @@ class NapalmLogs:
                                  objects. Default: 0.0.0.0.
         :param publish_port: Publish port. Default: 49017.
         '''
+        self.opts = opts if opts else {}
+        sentry_dsn = self.opts.get('sentry_dsn') or os.getenv('SENTRY_DSN')
+        if sentry_dsn:
+            if HAS_SENTRY:
+                sentry_sdk.init(
+                    sentry_dsn,
+                    **self.opts.get('sentry_opts', {'traces_sample_rate': 1.0})
+                )
+            else:
+                log.warning(
+                    'Sentry DSN provided, but the sentry_sdk library is not installed'
+                )
         self.address = address
         self.port = port
         self.listener = listener
@@ -112,7 +130,6 @@ class NapalmLogs:
         self.hwm = hwm
         self._buffer_cfg = buffer
         self._buffer = None
-        self.opts = opts if opts else {}
         # Setup the environment
         self._setup_log()
         self._build_config()
