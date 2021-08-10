@@ -1,0 +1,19 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: INTERFACE_UP
+    tag: SNMP_TRAP_LINK_UP
+    values:
+      snmpID: (\d+)
+      adminStatusString|upper: (\w+)
+      adminStatusValue: (\d)
+      operStatusString|upper: (\w+)
+      operStatusValue: (\d)
+      interface: ([\w\-\/\:]+)
+    line: 'ifIndex {snmpID}, ifAdminStatus {adminStatusString}({adminStatusValue}), ifOperStatus {operStatusString}({operStatusValue}), ifName {interface}'
+    model: openconfig-interfaces
+    mapping:
+      variables:
+        interfaces//interface//{interface}//state//admin_status: adminStatusString
+        interfaces//interface//{interface}//state//oper_status: operStatusString
+      static: {}

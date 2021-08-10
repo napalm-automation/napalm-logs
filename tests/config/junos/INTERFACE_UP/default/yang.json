@@ -1,0 +1,35 @@
+{
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "xe-0/0/0": {
+          "state": {
+            "oper_status": "UP",
+            "admin_status": "UP"
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "processId": "2424",
+    "severity": 4,
+    "facility": 3,
+    "hostPrefix": null,
+    "pri": "28",
+    "processName": "mib2d",
+    "host": "vmx01",
+    "tag": "SNMP_TRAP_LINK_UP",
+    "time": "21:45:59",
+    "date": "Jul 20",
+    "message": "ifIndex 502, ifAdminStatus up(1), ifOperStatus up(1), ifName xe-0/0/0"
+  },
+  "timestamp": 1500587159,
+  "facility": 3,
+  "ip": "127.0.0.1",
+  "host": "vmx01",
+  "yang_model": "openconfig-interfaces",
+  "error": "INTERFACE_UP",
+  "os": "junos",
+  "severity": 4
+}
