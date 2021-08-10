@@ -1,0 +1,22 @@
+{
+  "error": "FAILED_ALLOCATING_PACKET_BUFFER",
+  "host": "some-switch",
+  "ip": "127.0.0.1",
+  "timestamp": 1639094401,
+  "yang_message": {},
+  "message_details": {
+    "date": "Dec 10",
+    "time": "00:00:01",
+    "hostPrefix": null,
+    "host": "some-switch",
+    "tag": "fpc0",
+    "pri": "7",
+    "message": "(buf alloc) failed allocating packet buffer",
+    "facility": 0,
+    "severity": 7
+  },
+  "yang_model": "NO_MODEL",
+  "os": "junos",
+  "facility": 0,
+  "severity": 7
+}
