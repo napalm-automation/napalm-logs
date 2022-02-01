@@ -9,7 +9,7 @@ prefixes:
       date: (\w+ +\d+)
       time: (\d\d:\d\d:\d\d)
       host: ([^ ]+)
-      processName: (\w+)
+      processName: ([\w-]+)
       tag: ([\w-]+)
     line: '{date} {time} {host} {processName}: %{tag}'
   # ISO8601 date-time format
@@ -17,6 +17,6 @@ prefixes:
       date: (\d{4}-\d{2}-\d{2})
       time: (\d{2}:\d{2}:\d{2}[\.\d{3}]?[\+|-]\d{2}:\d{2})
       host: ([^ ]+)
-      processName: (\w+)
+      processName: ([\w-]+)
       tag: ([\w-]+)
     line: '{date}T{time} {host} {processName}: %{tag}'
