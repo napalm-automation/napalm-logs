@@ -1,0 +1,33 @@
+{
+"yang_message": {
+    "system": {
+        "processes": {
+            "process": {
+                "name": "Bgp",
+                "state": "started",
+                "pid": 6186,
+                "uptime": 0
+            }
+        }
+    }
+},
+"message_details": {
+  "severity": 6,
+  "facility": 20,
+  "pri": "166",
+  "processName": "ProcMgr-worker",
+  "host": "device01",
+  "tag": "PROCMGR-6-PROCESS_STARTED",
+  "time": "02:50:31",
+  "date": "Jan 24",
+  "message": ": 'Bgp' starting with PID=6186 (PPID=2030) -- execing '/usr/bin/Bgp'"
+},
+"facility": 20,
+"ip": "127.0.0.1",
+"error": "PROCESS_STARTED",
+"host": "device01",
+"yang_model": "NO_MODEL",
+"timestamp": 1642992631,
+"os": "eos",
+"severity": 6
+}

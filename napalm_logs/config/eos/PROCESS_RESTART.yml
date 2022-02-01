@@ -1,0 +1,17 @@
+# This message is sent when an agent process is restarting
+#Jan 24 02:50:31 HOSTNAME ProcMgr-worker: %PROCMGR-6-PROCESS_RESTART: Restarting 'Bgp' immediately (it had PID=32058)
+messages:
+  # 'error' should be unique and vendor agnostic.
+  - error: PROCESS_RESTART
+    tag: PROCMGR-6-PROCESS_RESTART
+    values:
+      agent: ([\w-]+)
+      pid|int: (\d+)
+    line: ": Restarting '{agent}' immediately (it had PID={pid})"
+    model: NO_MODEL
+    mapping:
+      variables:
+        system//processes//process//name: agent
+        system//processes//process//pid: pid
+      static:
+        system//processes//process//state: restarting

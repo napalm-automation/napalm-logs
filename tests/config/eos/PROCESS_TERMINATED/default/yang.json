@@ -1,0 +1,32 @@
+{
+"yang_message": {
+    "system": {
+        "processes": {
+            "process": {
+                "name": "Tmp75-system",
+                "state": "terminated",
+                "pid": 6170
+            }
+        }
+    }
+},
+"message_details": {
+  "severity": 6,
+  "facility": 20,
+  "pri": "166",
+  "processName": "ProcMgr-worker",
+  "host": "device01",
+  "tag": "PROCMGR-6-PROCESS_TERMINATED",
+  "time": "02:50:31",
+  "date": "Jan 24",
+  "message": ": 'Tmp75-system' (PID=6170, status=9) has terminated."
+},
+"facility": 20,
+"ip": "127.0.0.1",
+"error": "PROCESS_TERMINATED",
+"host": "device01",
+"yang_model": "NO_MODEL",
+"timestamp": 1642992631,
+"os": "eos",
+"severity": 6
+}
