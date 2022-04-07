@@ -144,6 +144,8 @@ class NapalmLogsServerProc(NapalmLogsProc):
                         'prefix_positions': sorted_position,
                         'raw_prefix': escaped.format(**values),
                         'values': values,
+                        'state': prefix.get('state'),
+                        'state_tag': prefix.get('state_tag'),
                     }
                 )
         # log.debug('Compiled prefixes')
