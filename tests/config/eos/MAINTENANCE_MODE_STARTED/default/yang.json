@@ -1,0 +1,29 @@
+{
+  "error": "MAINTENANCE_MODE_STARTED",
+  "host": "some-switch",
+  "ip": "127.0.0.1",
+  "timestamp": 1646070861,
+  "yang_message": {
+    "notification-messages": {
+      "notification-message": {
+        "message-text": "maintenance started"
+      }
+    }
+  },
+  "message_details": {
+    "date": "Feb 28",
+    "time": "17:54:21",
+    "host": "some-switch",
+    "processName": "MaintenanceMode",
+    "tag": "MMODE-5-MAINT_UNIT_STATE_CHANGE",
+    "pri": "100",
+    "message": ": Maintenance unit state changed for unit MAINT-UNIT. Old State maintenanceModeEnter, New State underMaintenance",
+    "facility": 12,
+    "severity": 4
+  },
+  "yang_model": "ietf-notification-messages",
+  "os": "eos",
+  "facility": 12,
+  "severity": 4,
+  "state": 1
+}

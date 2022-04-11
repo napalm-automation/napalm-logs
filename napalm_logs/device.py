@@ -136,6 +136,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                     'replace': replace,
                     'model': model,
                     'mapping': mapping,
+                    'state': message_dict.get('state'),
+                    'state_tag': message_dict.get('state_tag'),
                 }
             )
         log.debug('Compiled messages:')
@@ -175,6 +177,8 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'mapping': message['mapping'],
                 'replace': message['replace'],
                 'error': message['error'],
+                '_state': message['state'],
+                '_state_tag': message['state_tag'],
             }
             for key in values.keys():
                 # Check if the value needs to be replaced
@@ -355,6 +359,10 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 'facility': facility,
                 'severity': severity,
             }
+            if kwargs.get('_state') is not None:
+                to_publish['state'] = kwargs['_state']
+                if kwargs.get('_state_tag'):
+                    to_publish['state_tag'] = kwargs['_state_tag']
             log.debug('Queueing to be published:')
             log.debug(to_publish)
             # self.pub_pipe.send(to_publish)

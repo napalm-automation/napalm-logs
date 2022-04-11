@@ -40,6 +40,17 @@ class PrometheusTransport(TransportBase):
             )
         self.metrics[error].labels(host=msg['host']).inc()
 
+        if msg.get('state') is not None:
+            base = error.split('_')[:-1]
+            metric = msg.get('state_tag', '_'.join(base + ['state']).lower())
+            if metric not in self.metrics:
+                self.metrics[metric] = Gauge(
+                    'napalm_logs_{}'.format(metric),
+                    'State for {} type notifications'.format('_'.join(base)),
+                    ['host'],
+                )
+            self.metrics[metric].labels(host=msg['host']).set(msg['state'])
+
     def __parse_user_action(self, msg):
         '''
         Helper to generate Counter metrics that provide the host label, together

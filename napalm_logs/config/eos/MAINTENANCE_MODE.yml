@@ -1,0 +1,23 @@
+messages:
+
+  - error: MAINTENANCE_MODE_STARTED
+    tag: MMODE-5-MAINT_UNIT_STATE_CHANGE
+    state: 1
+    values: {}
+    line: ': Maintenance unit state changed for unit MAINT-UNIT. Old State maintenanceModeEnter, New State underMaintenance'
+    model: ietf-notification-messages
+    mapping:
+      variables: {}
+      static:
+        notification-messages//notification-message//message-text: "maintenance started"
+
+  - error: MAINTENANCE_MODE_ENDED
+    tag: MMODE-5-MAINT_UNIT_STATE_CHANGE
+    state: 0
+    values: {}
+    line: ': Maintenance unit state changed for unit MAINT-UNIT. Old State maintenanceModeExit, New State active'
+    model: ietf-notification-messages
+    mapping:
+      variables: {}
+      static:
+        notification-messages//notification-message//message-text: "maintenance ended"
