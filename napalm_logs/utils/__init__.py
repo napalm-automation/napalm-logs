@@ -13,7 +13,7 @@ import time
 import socket
 import logging
 import threading
-import collections
+import collections.abc
 from pydoc import locate
 from datetime import datetime
 
@@ -344,8 +344,8 @@ def dictupdate(dest, upd):
     Merges upd recursively into dest.
     '''
     recursive_update = True
-    if (not isinstance(dest, collections.Mapping)) or (
-        not isinstance(upd, collections.Mapping)
+    if (not isinstance(dest, collections.abc.Mapping)) or (
+        not isinstance(upd, collections.abc.Mapping)
     ):
         raise TypeError('Cannot update using non-dict types in dictupdate.update()')
     updkeys = list(upd.keys())
@@ -358,8 +358,8 @@ def dictupdate(dest, upd):
                 dest_subkey = dest.get(key, None)
             except AttributeError:
                 dest_subkey = None
-            if isinstance(dest_subkey, collections.Mapping) and isinstance(
-                val, collections.Mapping
+            if isinstance(dest_subkey, collections.abc.Mapping) and isinstance(
+                val, collections.abc.Mapping
             ):
                 ret = dictupdate(dest_subkey, val)
                 dest[key] = ret
