@@ -1,0 +1,18 @@
+# This message is sent when an agent process starts
+#Jan 24 02:50:31 HOSTNAME ProcMgr-worker: %PROCMGR-6-PROCESS_STARTED: 'Bgp' starting with PID=6186 (PPID=2030) -- execing '/usr/bin/Bgp'
+messages:
+  # 'error' should be unique and vendor agnostic.
+  - error: PROCESS_STARTED
+    tag: PROCMGR-6-PROCESS_STARTED
+    values:
+      agent: ([\w-]+)
+      pid|int: (\d+)
+    line: ": '{agent}' starting with PID={pid} (PPID=2030) -- execing '/usr/bin/Bgp'"
+    model: NO_MODEL
+    mapping:
+      variables:
+        system//processes//process//name: agent
+        system//processes//process//pid: pid
+      static:
+        system//processes//process//state: started
+        system//processes//process//uptime: 0
