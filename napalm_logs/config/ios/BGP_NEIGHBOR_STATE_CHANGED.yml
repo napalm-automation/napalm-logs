@@ -1,0 +1,59 @@
+messages:
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    # <189>Jan 20 10:00:00 router1 %BGP-5-ADJCHANGE: neighbor 1.2.3.4 vpn vrf BLUE Up 
+    tag: BGP-5-ADJCHANGE
+    values:
+      instance: ([\w-]+)
+      peer: ([\w\d:\.]+)
+    line: 'neighbor {peer} vpn vrf {instance} Up'
+    model: openconfig-bgp
+    mapping:
+      variables: {}
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: ESTABLISHED
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    # <189>Jan 20 10:00:00 router1 %BGP-5-ADJCHANGE: neighbor 1.2.3.4 active vpn vrf BLUE Down BGP Notification received
+    # <189>Jan 20 10:00:00 router1 %BGP-5-ADJCHANGE: neighbor 1.2.3.4 passive vpn vrf BLUE Down AFI/SAFI not supported
+    # <189>Jan 20 10:00:00 router1 %BGP-5-ADJCHANGE: neighbor 1.2.3.4 vpn vrf BLUE Down Admin. shutdown
+    # <189>Jan 20 10:00:00 router1 %BGP-5-ADJCHANGE: neighbor 1.2.3.4 vpn vrf BLUE Down BGP Notification sent
+    # <189>Jan 20 10:00:00 router1 %BGP-5-ADJCHANGE: neighbor 1.2.3.4 vpn vrf BLUE Down Interface flap
+    tag: BGP-5-ADJCHANGE
+    values:
+      instance: ([\w-]+)
+      peer: ([\w\d:\.]+)
+      reason: (.*)
+      placeholder: ( active| passive)?
+    line: 'neighbor {peer}{placeholder} vpn vrf {instance} Down {reason}'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//session-state-change-event: reason
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: IDLE
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    # <189>Jan 20 10:00:00 router1 %BGP-5-ADJCHANGE: neighbor 1.2.3.4 Up 
+    tag: BGP-5-ADJCHANGE
+    values:
+      peer: ([\w\d:\.]+)
+    line: 'neighbor {peer} Up'
+    model: openconfig-bgp
+    mapping:
+      variables: {}
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: ESTABLISHED
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    # <189>Jan 20 10:00:00 router1 %BGP-5-ADJCHANGE: neighbor 1.2.3.4 Down Admin. shutdown
+    # <189>Jan 20 10:00:00 router1 %BGP-5-ADJCHANGE: neighbor 1.2.3.4 Down Interface flap
+    # <189>Jan 20 10:00:00 router1 %BGP-5-ADJCHANGE: neighbor 1.2.3.4 Down Neighbor deleted
+    tag: BGP-5-ADJCHANGE
+    values:
+      peer: ([\w\d:\.]+)
+      placeholder: ( active| passive)?
+      reason: (.*)
+    line: 'neighbor {peer}{placeholder} Down {reason}'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//session-state-change-event: reason
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: IDLE

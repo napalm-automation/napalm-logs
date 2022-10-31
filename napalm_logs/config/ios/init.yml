@@ -24,3 +24,12 @@ prefixes:
       timeZone: \s?(\w+)?
       tag: ([\w-]+)
     line: '{messageId}: {host}: {date} {time}.{milliseconds}{timeZone}: %{tag}: '
+  - time_format: "%b %d %H:%M:%S"
+    # IOS-XE format
+    values:
+      host: ([^ ]+)
+      date: \*?(\w+\s+\d+)
+      time: (\d\d:\d\d:\d\d)
+      timeZone: \s?(\w+)?
+      tag: ([\w-]+)
+    line: '{date} {time}{timeZone} {host} %{tag}: '

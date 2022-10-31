@@ -1,0 +1,1 @@
+<189>Jan 20 10:00:00 router1 %BGP-5-ADJCHANGE: neighbor 1.2.3.4 passive vpn vrf BLUE Down AFI/SAFI not supported
