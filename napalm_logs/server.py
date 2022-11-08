@@ -19,7 +19,6 @@ import umsgpack
 from prometheus_client import Counter
 
 # Import napalm-logs pkgs
-import napalm_logs.ext.six as six
 from napalm_logs.config import LST_IPC_URL
 from napalm_logs.config import DEV_IPC_URL
 from napalm_logs.config import PUB_PX_IPC_URL
@@ -284,10 +283,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     log.error(error, exc_info=True)
                     raise NapalmLogsExit(error)
             if isinstance(msg, bytes):
-                if six.PY3:
-                    msg = str(msg, "utf-8")
-                else:
-                    msg = msg.encode("utf-8")
+                msg = str(msg, "utf-8")
             log.debug("[%s] Dequeued message from %s: %s", address, msg, time.time())
             napalm_logs_server_messages_received.inc()
             os_list = self._identify_os(msg)
@@ -298,8 +294,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     # Then send the message in the right queue
                     log.debug("Identified OS: %s", dev_os)
                     log.debug("Queueing message to %s", dev_os)
-                    if six.PY3:
-                        dev_os = bytes(dev_os, "utf-8")
+                    dev_os = bytes(dev_os, "utf-8")
                     napalm_logs_server_messages_with_identified_os.labels(
                         device_os=dev_os.decode()
                     ).inc()
@@ -309,12 +304,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                             host=msg_dict["host"],
                             msg=msg_dict["message"],
                         )
-                        if six.PY3:
-                            message_key = base64.b64encode(
-                                bytes(message, "utf-8")
-                            ).decode()
-                        else:
-                            message_key = base64.b64encode(message)
+                        message_key = base64.b64encode(bytes(message, "utf-8")).decode()
                         if self._buffer[message_key]:
                             log.info(
                                 '"%s" seems to be already buffered, skipping',

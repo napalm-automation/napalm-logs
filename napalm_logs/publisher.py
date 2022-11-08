@@ -188,7 +188,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                 address=self.address,
                 port=self.port,
             ).inc()
-            if not napalm_logs.ext.check_whitelist_blacklist(
+            if not napalm_logs.utils.check_whitelist_blacklist(
                 obj["error"],
                 whitelist=self.error_whitelist,
                 blacklist=self.error_blacklist,

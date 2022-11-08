@@ -17,7 +17,6 @@ import yaml
 # Import napalm-logs
 import napalm_logs
 import napalm_logs.config as defaults
-import napalm_logs.ext.six as six
 
 log = logging.getLogger(__name__)
 
@@ -238,7 +237,7 @@ class NLOptionParser(OptionParser, object):
 
     def convert_env_dict(self, d):
         for k, v in d.items():
-            if isinstance(v, six.string_type):
+            if isinstance(v, str):
                 if not v.startswith("${") or not v.endswith("}"):
                     continue
                 if not os.environ.get(v[2:-1]):
@@ -255,7 +254,7 @@ class NLOptionParser(OptionParser, object):
 
     def convert_env_list(self, lst):
         for name, value in enumerate(lst):
-            if isinstance(value, six.string_type):
+            if isinstance(value, str):
                 if not value.startswith("${") or not value.endswith("}"):
                     continue
                 if not os.environ.get(value[2:-1]):
@@ -339,11 +338,11 @@ class NLOptionParser(OptionParser, object):
             if isinstance(listener_cfg, dict):
                 for listener_name, listener_opts in listener_cfg.items():
                     listener.append({listener_name: listener_opts})
-            elif isinstance(listener_cfg, six.string_type):
+            elif isinstance(listener_cfg, str):
                 listener = [{listener_cfg: {}}]
             elif isinstance(listener_cfg, list):
                 for lst_cfg in listener_cfg:
-                    if isinstance(lst_cfg, six.string_type):
+                    if isinstance(lst_cfg, str):
                         listener.append({lst_cfg: {}})
                     elif isinstance(lst_cfg, dict):
                         listener.append(lst_cfg)
@@ -358,11 +357,11 @@ class NLOptionParser(OptionParser, object):
             if isinstance(publisher_cfg, dict):
                 for publisher_name, publisher_opts in publisher_cfg.items():
                     publisher.append({publisher_name: publisher_opts})
-            elif isinstance(publisher_cfg, six.string_type):
+            elif isinstance(publisher_cfg, str):
                 publisher = [{publisher_cfg: {}}]
             elif isinstance(publisher_cfg, list):
                 for lst_cfg in publisher_cfg:
-                    if isinstance(lst_cfg, six.string_type):
+                    if isinstance(lst_cfg, str):
                         publisher.append({lst_cfg: {}})
                     elif isinstance(lst_cfg, dict):
                         publisher.append(lst_cfg)

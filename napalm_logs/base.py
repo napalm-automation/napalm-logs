@@ -247,7 +247,7 @@ class NapalmLogs:
         depending on the whitelist-blacklist logic
         configured by the user.
         """
-        return napalm_logs.ext.check_whitelist_blacklist(
+        return napalm_logs.utils.check_whitelist_blacklist(
             os_name, whitelist=self.device_whitelist, blacklist=self.device_blacklist
         )
 

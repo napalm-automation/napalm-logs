@@ -7,7 +7,6 @@ from __future__ import absolute_import
 import os
 import tempfile
 import logging
-import napalm_logs.ext.six as six
 
 # config
 ROOT_DIR = "/"
@@ -61,17 +60,17 @@ LOGGING_LEVEL = {
 }
 
 VALID_CONFIG = {
-    "prefixes": [{"values": {"tag": six.string_type}, "line": six.string_type}],
+    "prefixes": [{"values": {"tag": str}, "line": str}],
     "messages": [
         {
             # 'error' should be unique and vendor agnostic.
             # Currently we are using the JUNOS syslog message name as the canonical name.
             # This may change if we are able to find a more well defined naming system.
-            "error": six.string_type,
-            "tag": six.string_type,
+            "error": str,
+            "tag": str,
             "values": dict,
-            "line": six.string_type,
-            "model": six.string_type,
+            "line": str,
+            "model": str,
             "mapping": {"variables": dict, "static": dict},
         }
     ],
