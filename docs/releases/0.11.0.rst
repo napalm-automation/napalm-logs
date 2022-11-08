@@ -1,0 +1,10 @@
+.. _release-0.11.0:
+
+==============================
+Release 0.11.0 - Codename Rasp
+==============================
+
+Support for Python 3.6 and earlier versions has been dropped, and similarly 
+ZeroMQ 2 is no longer supported. Please upgrade your environment and 
+dependencies to continue using *napalm-logs*.
+
