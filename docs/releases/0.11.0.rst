@@ -8,3 +8,23 @@ Support for Python 3.6 and earlier versions has been dropped, and similarly
 ZeroMQ 2 is no longer supported. Please upgrade your environment and 
 dependencies to continue using *napalm-logs*.
 
+New features
+------------
+
+Added two new optional configuration bits for :ref:`device-profiles`, namely 
+``state`` and ``state_tag``, that are helpful to process and flag appropriately 
+messages that have a counter-part, e.g., ``MAJOR_ALARM_CLEARED`` 
+/ ``MAJOR_ALARM_SET``.
+
+Enabled support for [Sentry](https://sentry.io/). Simply by adding the Sentry 
+DSN under the ``sentry_dsn`` configuration key, or as the ``SENTRY_DSN`` 
+environment variable, *napalm-logs* will send error traces to your Sentry 
+server. See :ref:`configuration-options-sentry-dsn` for more details.
+
+New Structured Messages
+-----------------------
+
+The following have been added for Junos:
+
+- :ref:`INTERFACE_UP`
+- :ref:`FAILED_ALLOCATING_PACKET_BUFFER`
