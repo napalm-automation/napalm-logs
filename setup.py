@@ -6,7 +6,7 @@ The setup script for napalm-logs
 import codecs
 from setuptools import setup, find_packages
 
-__author__ = "Mircea Ulinic <mircea.ulinic@gmail.com>"
+__author__ = "Mircea Ulinic <ping@mirceaulinic.net>"
 
 with codecs.open("README.rst", "r", encoding="utf8") as file:
     long_description = file.read()
@@ -16,10 +16,10 @@ with open("requirements.txt", "r") as fs:
 
 setup(
     name="napalm-logs",
-    version="0.10.0",
+    version="0.11.0",
     packages=find_packages(),
     author="Mircea Ulinic",
-    author_email="mircea.ulinic@gmail.com",
+    author_email="ping@mirceaulinic.net",
     description="Network Automation and Programmability Abstraction Layer with Multivendor support: syslog parser",
     long_description=long_description,
     classifiers=[
