@@ -87,12 +87,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         self.sub = self.ctx.socket(zmq.SUB)
         self.sub.connect(PUB_IPC_URL)
         self.sub.setsockopt(zmq.SUBSCRIBE, b'')
-        try:
-            self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
-            # zmq 2
-        except AttributeError:
-            # zmq 3
-            self.sub.setsockopt(zmq.RCVHWM, self.opts['hwm'])
+        self.sub.setsockopt(zmq.RCVHWM, self.opts['hwm'])
 
     def _setup_transport(self):
         '''

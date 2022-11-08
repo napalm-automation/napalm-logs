@@ -61,27 +61,14 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
         # subscribe to device IPC
         log.debug('Creating the dealer IPC for %s', self._name)
         self.sub = self.ctx.socket(zmq.DEALER)
-        if six.PY2:
-            self.sub.setsockopt(zmq.IDENTITY, self._name)
-        elif six.PY3:
-            self.sub.setsockopt(zmq.IDENTITY, bytes(self._name, 'utf-8'))
-        try:
-            self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
-            # zmq 2
-        except AttributeError:
-            # zmq 3
-            self.sub.setsockopt(zmq.RCVHWM, self.opts['hwm'])
+        self.sub.setsockopt(zmq.IDENTITY, bytes(self._name, 'utf-8'))
+        self.sub.setsockopt(zmq.RCVHWM, self.opts['hwm'])
         # subscribe to the corresponding IPC pipe
         self.sub.connect(DEV_IPC_URL)
         # publish to the publisher IPC
         self.pub = self.ctx.socket(zmq.PUB)
         self.pub.connect(PUB_PX_IPC_URL)
-        try:
-            self.pub.setsockopt(zmq.HWM, self.opts['hwm'])
-            # zmq 2
-        except AttributeError:
-            # zmq 3
-            self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
+        self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
 
     def _compile_messages(self):
         '''
@@ -112,7 +99,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             # We will now figure out which position each value is in so we can use it with the match statement
             position = {}
             replace = {}
-            for key in values.keys():
+            for key in list(values.keys()):
                 if '|' in key:
                     new_key, replace[new_key] = key.replace(' ', '').split('|')
                     values[new_key] = values.pop(key)

@@ -69,12 +69,7 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         self.pub = self.ctx.socket(zmq.PUSH)
         self.pub.connect(LST_IPC_URL)
         log.debug('Setting HWM for the listener: %d', self.opts['hwm'])
-        try:
-            self.pub.setsockopt(zmq.HWM, self.opts['hwm'])
-            # zmq 2
-        except AttributeError:
-            # zmq 3
-            self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
+        self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
 
     def start(self):
         '''

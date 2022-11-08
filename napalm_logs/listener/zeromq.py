@@ -66,10 +66,7 @@ class ZMQListener(ListenerBase):
         self.sub = self.ctx.socket(skt_type)
         self.sub.connect(zmq_uri)
         if self.hwm is not None:
-            try:
-                self.sub.setsockopt(zmq.HWM, self.hwm)
-            except AttributeError:
-                self.sub.setsockopt(zmq.RCVHWM, self.hwm)
+            self.sub.setsockopt(zmq.RCVHWM, self.hwm)
         if self.recvtimeout is not None:
             log.debug('Setting RCVTIMEO to %d', self.recvtimeout)
             self.sub.setsockopt(zmq.RCVTIMEO, self.recvtimeout)

@@ -61,31 +61,16 @@ class NapalmLogsServerProc(NapalmLogsProc):
         # subscribe to listener
         self.sub = self.ctx.socket(zmq.PULL)
         self.sub.bind(LST_IPC_URL)
-        try:
-            self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
-            # zmq 2
-        except AttributeError:
-            # zmq 3
-            self.sub.setsockopt(zmq.RCVHWM, self.opts['hwm'])
+        self.sub.setsockopt(zmq.RCVHWM, self.opts['hwm'])
         # device publishers
         log.debug('Creating the router ICP on the server')
         self.pub = self.ctx.socket(zmq.ROUTER)
         self.pub.bind(DEV_IPC_URL)
-        try:
-            self.pub.setsockopt(zmq.HWM, self.opts['hwm'])
-            # zmq 2
-        except AttributeError:
-            # zmq 3
-            self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
+        self.pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
         # Pipe to the publishers
         self.publisher_pub = self.ctx.socket(zmq.PUB)
         self.publisher_pub.connect(PUB_PX_IPC_URL)
-        try:
-            self.publisher_pub.setsockopt(zmq.HWM, self.opts['hwm'])
-            # zmq 2
-        except AttributeError:
-            # zmq 3
-            self.publisher_pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
+        self.publisher_pub.setsockopt(zmq.SNDHWM, self.opts['hwm'])
 
     def _cleanup_buffer(self):
         '''

@@ -48,22 +48,12 @@ class NapalmLogsPublisherProxy(NapalmLogsProc):
         self.sub.bind(PUB_PX_IPC_URL)
         self.sub.setsockopt(zmq.SUBSCRIBE, b'')
         log.debug('Setting HWM for the proxy frontend: %d', self.hwm)
-        try:
-            self.sub.setsockopt(zmq.HWM, self.hwm)
-            # zmq 2
-        except AttributeError:
-            # zmq 3
-            self.sub.setsockopt(zmq.SNDHWM, self.hwm)
+        self.sub.setsockopt(zmq.SNDHWM, self.hwm)
         # Backend
         self.pub = self.ctx.socket(zmq.PUB)
         self.pub.bind(PUB_IPC_URL)
         log.debug('Setting HWM for the proxy backend: %d', self.hwm)
-        try:
-            self.pub.setsockopt(zmq.HWM, self.hwm)
-            # zmq 2
-        except AttributeError:
-            # zmq 3
-            self.pub.setsockopt(zmq.SNDHWM, self.hwm)
+        self.pub.setsockopt(zmq.SNDHWM, self.hwm)
 
     def start(self):
         '''
