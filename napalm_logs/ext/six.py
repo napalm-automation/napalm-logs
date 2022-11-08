@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 Python 2-3 compatibility.
-'''
+"""
 from __future__ import absolute_import
 from __future__ import unicode_literals
 

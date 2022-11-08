@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 Kafka transport for napalm-logs.
-'''
+"""
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
@@ -24,22 +24,22 @@ log = logging.getLogger(__name__)
 
 
 class KafkaTransport(TransportBase):
-    '''
+    """
     Kafka transport class.
-    '''
+    """
 
     def __init__(self, address, port, **kwargs):
-        if kwargs.get('address'):
-            address = kwargs['address']
-        if kwargs.get('port'):
-            address = kwargs['port']
-        if kwargs.get('no_encrypt'):
-            self.NO_ENCRYPT = kwargs['no_encrypt']
-        if kwargs.get('bootstrap_servers'):
-            self.bootstrap_servers = kwargs['bootstrap_servers']
+        if kwargs.get("address"):
+            address = kwargs["address"]
+        if kwargs.get("port"):
+            address = kwargs["port"]
+        if kwargs.get("no_encrypt"):
+            self.NO_ENCRYPT = kwargs["no_encrypt"]
+        if kwargs.get("bootstrap_servers"):
+            self.bootstrap_servers = kwargs["bootstrap_servers"]
         else:
-            self.bootstrap_servers = '{}:{}'.format(address, port)
-        self.kafka_topic = kwargs.get('topic', 'napalm-logs')
+            self.bootstrap_servers = "{}:{}".format(address, port)
+        self.kafka_topic = kwargs.get("topic", "napalm-logs")
 
     def start(self):
         try:
@@ -54,5 +54,5 @@ class KafkaTransport(TransportBase):
         self.producer.send(self.kafka_topic, obj)
 
     def stop(self):
-        if hasattr(self, 'producer'):
+        if hasattr(self, "producer"):
             self.producer.close()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 In-memory buffer interface.
-'''
+"""
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
@@ -13,9 +13,9 @@ log = logging.getLogger(__name__)
 
 
 class MemoryBuffer(object):
-    '''
+    """
     Memory buffer class.
-    '''
+    """
 
     def __init__(self, expire_time, **kwargs):
         self.expire_time = expire_time
@@ -24,7 +24,7 @@ class MemoryBuffer(object):
         self._cache = {}
 
     def __setitem__(self, key, val):
-        self._cache[key] = {'data': val, 'timestamp': datetime.datetime.utcnow()}
+        self._cache[key] = {"data": val, "timestamp": datetime.datetime.utcnow()}
 
     def __contains__(self, key):
         return True if key in self._cache else False
@@ -34,8 +34,8 @@ class MemoryBuffer(object):
             item = self._cache[key]
         except KeyError:
             return None
-        if datetime.datetime.utcnow() - item['timestamp'] < self.expire_time_delta:
-            return item['data']
+        if datetime.datetime.utcnow() - item["timestamp"] < self.expire_time_delta:
+            return item["data"]
         else:
             del self._cache[key]
             return None
