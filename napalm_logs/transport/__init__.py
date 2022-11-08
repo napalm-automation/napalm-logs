@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 napalm-logs pluggable publisher.
-'''
+"""
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
@@ -37,44 +37,44 @@ from napalm_logs.transport.prometheus import PrometheusTransport
 log = logging.getLogger(__file__)
 
 TRANSPORT_LOOKUP = {
-    'zeromq': ZMQTransport,
-    'zmq': ZMQTransport,
-    'cli': CLITransport,
-    'print': CLITransport,
-    'console': CLITransport,
-    'log': LogTransport,
-    'prometheus': PrometheusTransport,
+    "zeromq": ZMQTransport,
+    "zmq": ZMQTransport,
+    "cli": CLITransport,
+    "print": CLITransport,
+    "console": CLITransport,
+    "log": LogTransport,
+    "prometheus": PrometheusTransport,
     # 'rmq': RabbitMQransport,
     # 'rabbitmq': RabbitMQransport,
-    '*': ZMQTransport,
+    "*": ZMQTransport,
 }
 
 if HAS_KAFKA:
     log.info(
-        'Kafka dependency seems to be installed, making kafka transport available.'
+        "Kafka dependency seems to be installed, making kafka transport available."
     )
-    TRANSPORT_LOOKUP['kafka'] = KafkaTransport
+    TRANSPORT_LOOKUP["kafka"] = KafkaTransport
 
 if HAS_REQUESTS or HAS_TORNADO:
-    TRANSPORT_LOOKUP['http'] = HTTPTransport
+    TRANSPORT_LOOKUP["http"] = HTTPTransport
 
 if HAS_REQUESTS or HAS_TORNADO:
-    TRANSPORT_LOOKUP['alerta'] = AlertaTransport
+    TRANSPORT_LOOKUP["alerta"] = AlertaTransport
 
 
 def get_transport(name):
-    '''
+    """
     Return the transport class.
-    '''
+    """
     try:
-        log.debug('Using %s as transport', name)
+        log.debug("Using %s as transport", name)
         return TRANSPORT_LOOKUP[name]
     except KeyError:
-        msg = 'Transport {} is not available. Are the dependencies installed?'.format(
+        msg = "Transport {} is not available. Are the dependencies installed?".format(
             name
         )
         log.error(msg, exc_info=True)
         raise InvalidTransportException(msg)
 
 
-__all__ = ('get_transport',)
+__all__ = ("get_transport",)

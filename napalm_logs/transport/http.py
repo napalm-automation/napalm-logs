@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 HTTP(s) transport for napalm-logs.
-'''
+"""
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
@@ -40,59 +40,59 @@ log = logging.getLogger(__name__)
 
 
 class HTTPTransport(TransportBase):
-    '''
+    """
     HTTP transport class.
-    '''
+    """
 
     NO_ENCRYPT = True
     # This tells the publisher to not encrypt the messages
     #   published over this channel.
 
     def __init__(self, address, port, **kwargs):
-        if kwargs.get('address'):
-            self.address = kwargs['address']
+        if kwargs.get("address"):
+            self.address = kwargs["address"]
         else:
             self.address = address
-        self.method = kwargs.get('method', 'POST')
-        log.debug('Publishing to %s using method %s', self.address, self.method)
-        self.auth = kwargs.get('auth')
-        self.username = kwargs.get('username')
-        self.password = kwargs.get('password')
+        self.method = kwargs.get("method", "POST")
+        log.debug("Publishing to %s using method %s", self.address, self.method)
+        self.auth = kwargs.get("auth")
+        self.username = kwargs.get("username")
+        self.password = kwargs.get("password")
         if not self.auth:
             if self.username and self.password:
                 self.auth = (self.username, self.password)
-        self.headers = kwargs.get('headers', {})
-        self.verify_ssl = kwargs.get('verify_ssl', True)
-        self.params = kwargs.get('params')
-        self.max_clients = kwargs.get('max_clients', 10)
-        self.backend = kwargs.get('backend')
+        self.headers = kwargs.get("headers", {})
+        self.verify_ssl = kwargs.get("verify_ssl", True)
+        self.params = kwargs.get("params")
+        self.max_clients = kwargs.get("max_clients", 10)
+        self.backend = kwargs.get("backend")
         if not self.backend:
-            log.info('No explicit backend requested')
+            log.info("No explicit backend requested")
             if HAS_TORNADO:
-                self.backend = 'tornado'
-                log.info('Tornado seems to be installed, so will use')
+                self.backend = "tornado"
+                log.info("Tornado seems to be installed, so will use")
             elif HAS_REQUESTS:
-                self.backend = 'requests'
-                log.info('Requests seems to be installed, so will use')
+                self.backend = "requests"
+                log.info("Requests seems to be installed, so will use")
 
     def start(self):
         # Throw errors if backend it not properly configured
-        if self.backend not in ('requests', 'tornado'):
-            raise TransportException('Invalid HTTP backend: %s', self.backend)
-        if self.backend == 'requests' and not HAS_REQUESTS:
+        if self.backend not in ("requests", "tornado"):
+            raise TransportException("Invalid HTTP backend: %s", self.backend)
+        if self.backend == "requests" and not HAS_REQUESTS:
             raise TransportException(
-                'Trying to use Requests as backend, but it is not installed'
+                "Trying to use Requests as backend, but it is not installed"
             )
-        if self.backend == 'tornado' and not HAS_TORNADO:
+        if self.backend == "tornado" and not HAS_TORNADO:
             raise TransportException(
-                'Trying to use Tornado as backend, but it is not installed'
+                "Trying to use Tornado as backend, but it is not installed"
             )
         # Prepare the tornado backend
-        if self.backend == 'tornado':
+        if self.backend == "tornado":
             self.tornado_client = tornado.httpclient.AsyncHTTPClient(
                 max_clients=self.max_clients
             )
-        elif self.backend == 'requests':
+        elif self.backend == "requests":
             # When using requests, we start a threaded pool
             #   with the size specified using max_clients.
             # Tornado already has this feature built-in.
@@ -112,7 +112,7 @@ class HTTPTransport(TransportBase):
 
     def publish(self, obj):
         data = napalm_logs.utils.unserialize(obj)
-        if self.backend == 'tornado':
+        if self.backend == "tornado":
             self.tornado_client.fetch(
                 self.address,
                 callback=self._handle_tornado_response,
@@ -125,7 +125,7 @@ class HTTPTransport(TransportBase):
                 allow_nonstandard_methods=True,
                 decompress_response=False,
             )
-        elif self.backend == 'requests':
+        elif self.backend == "requests":
             # Queue the publish object async
             self._publish_queue.put_nowait(data)
 
@@ -151,8 +151,8 @@ class HTTPTransport(TransportBase):
                     self.method, self.address, params=self.params, data=json.dumps(data)
                 )
                 if not result.ok:
-                    log.error('Unable to publish to %s', self.address)
-                    log.error('Status code: %d', result.status_code)
+                    log.error("Unable to publish to %s", self.address)
+                    log.error("Status code: %d", result.status_code)
                     log.error(result.text)
                 else:
                     log.debug(result.text)
@@ -163,14 +163,14 @@ class HTTPTransport(TransportBase):
 
     def _handle_tornado_response(self, response):
         if response.error:
-            log.error('Unable to publish to %s', self.address)
+            log.error("Unable to publish to %s", self.address)
             log.error(response.error)
         else:
             log.debug(response.body)
 
     def stop(self):
-        if self.backend == 'tornado':
+        if self.backend == "tornado":
             self.tornado_client.close()
-        elif self.backend == 'requests':
+        elif self.backend == "requests":
             for thread in self._pool:
                 thread.join()

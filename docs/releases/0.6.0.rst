@@ -16,7 +16,7 @@ The implementation is fully compliant with Prometheus scraping, so you need
 only point your Prometheus server to the exposed metrics to scrape them.
 
 See :ref:`metrics` for further details and configuration options, as well as 
-the new options: :ref:`onfiguration-options-enable-metrics`,
+the new options: :ref:`configuration-options-enable-metrics`,
 :ref:`configuration-options-metrics-address`, 
 :ref:`configuration-options-metrics-port`, and 
 :ref:`configuration-options-metrics-dir`.
