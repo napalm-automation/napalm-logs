@@ -2,5 +2,6 @@ pyzmq
 pyyaml
 pynacl
 dateparser
+sentry_sdk
 u-msgpack-python
 prometheus_client

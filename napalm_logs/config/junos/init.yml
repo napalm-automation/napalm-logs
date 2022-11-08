@@ -58,6 +58,14 @@ prefixes:
       # Some logs have data which can be inside brackets or parenthesis
       additionalData: (?:(?:\[|\()(.+)(?:\]|\)))?
     line: '{date} {time} {hostPrefix}{host} fpc{fpcId} fpc{fpcId2} dcpfe: {tag}{additionalData}:'
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\w+\s+\d+)
+      time: (\d\d:\d\d:\d\d)
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      tag: (fpc\d)
+    line: '{date} {time} {hostPrefix}{host} {tag}'
 
   # Same structures as above, but to match the ISO8601 date-time format.
     # jlaunchd doesn't have proper tags. Override the match to use jlaunchd as the tag instead.
@@ -114,3 +122,11 @@ prefixes:
       # Some logs have data which can be inside brackets or parenthesis
       additionalData: (?:(?:\[|\()(.+)(?:\]|\)))?
     line: '{date}T{time} {hostPrefix}{host} fpc{fpcId} fpc{fpcId2} dcpfe: {tag}{additionalData}:'
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\d{4}-\d{2}-\d{2})
+      time: (\d{2}:\d{2}:\d{2}[\.\d{3}]?[\+|-]\d{2}:\d{2})
+      hostPrefix: (re\d.)?
+      host: ([^ ]+)
+      tag: (fpc\d)
+    line: '{date}T{time} {hostPrefix}{host} {tag}'

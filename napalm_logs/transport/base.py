@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 napalm-logs transport base.
-'''
+"""
 
 
 class TransportBase:
-    '''
+    """
     The base class for the transport.
-    '''
+    """
 
     def __init__(self, address, port, **kwargs):
         pass

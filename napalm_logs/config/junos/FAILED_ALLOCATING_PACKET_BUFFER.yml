@@ -1,0 +1,9 @@
+messages:
+  - error: FAILED_ALLOCATING_PACKET_BUFFER
+    tag: fpc0
+    values: {}
+    line: '(buf alloc) failed allocating packet buffer'
+    model: NO_MODEL
+    mapping:
+      static: {}
+      variables: {}

@@ -213,6 +213,41 @@ should be placed. There are two options, ``variables`` and ``static``.
 ``variables`` should be used when the value being set is taken from the message,
 and ``static`` should be used when the value is manually set.
 
+``state``
+---------
+
+``state`` is an optional config bit which may be useful when defining messages 
+that have a counter-part. For example: ``MAJOR_ALARM_SET`` 
+/ ``MAJOR_ALARM_CLEARED``. The idea behind this is to have pairs or groups of 
+notifications that have a specific significance mapping out to a desired value
+(e.g., the state value for ``MAJOR_ALARM_SET`` can be 1, while the state value
+for ``MAJOR_ALARM_CLEARED`` can be 0). The value can be any number, not only 
+binary, when the group is larger than two notifications.
+
+It is equally important to not that when using the :ref:`publisher-prometheus` 
+Publisher, when using this field, an additional metric is being exposed, 
+providing the state value, besides the usual counter.
+
+The metric name is derived from the base name of the notification, by stripping 
+the last part (after underscore) and replacing it with ``_state``. For 
+instance, continuing the example above, ``MAJOR_ALARM_SET`` and 
+``MAJOR_ALARM_CLEARED`` would both set the same Gauge metric 
+``napalm_logs_major_alarm_state``. If the notification groups don't have 
+a common base name for whatever reason, you can define individual state tags 
+using the ``state_tag`` option (see below).
+
+``state_tag``
+-------------
+
+This option provides a custom name for the state metric on groups of 
+notifications. By default, this is not necessary, as it's assumed a group has
+the same base name, but it may not always be the case.
+
+Based on the example above, ``MAJOR_ALARM_SET`` and ``MAJOR_ALARM_CLEARED`` 
+would, by default, set the ``napalm_logs_major_alarm_state`` Gauge metric, 
+however, by providing the value ``state_tag: system_alarm_state`` (for both), the 
+metric becomes: ``napalm_logs_system_alarm_state``.
+
 Pure Python profiles
 ++++++++++++++++++++
 
