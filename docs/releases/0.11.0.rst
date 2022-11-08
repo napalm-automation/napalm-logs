@@ -8,6 +8,10 @@ Support for Python 3.6 and earlier versions has been dropped, and similarly
 ZeroMQ 2 is no longer supported. Please upgrade your environment and 
 dependencies to continue using *napalm-logs*.
 
+The Docker image built and published on the Docker Hub, 
+https://hub.docker.com/r/napalmautomation/napalm-logs is now based on Debian 
+Buster and Python 3.9.
+
 New features
 ------------
 
