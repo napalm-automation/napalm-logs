@@ -7,7 +7,9 @@ messages:
     values:
       agent: ([\w-]+)
       pid|int: (\d+)
-    line: ": '{agent}' starting with PID={pid} (PPID=2030) -- execing '/usr/bin/Bgp'"
+      ppid|int: (\d+)
+      path: ([\w\:\-\/]+)
+    line: ": '{agent}' starting with PID={pid} (PPID={ppid}) -- execing '{path}'"
     model: NO_MODEL
     mapping:
       variables:
