@@ -1,0 +1,43 @@
+# This error tag corresponds to syslog messages notifying that the configured
+# bfd session has gone down
+# <13>Jul  6 21:55:43 HOSTNAME BFD: Session DOWN for 127.1.1.1 on ve 55 Reason:Administratively Down
+# <13>Jul  6 21:55:43 HOSTNAME BFD: Session DOWN for 127.1.1.1 on ve 55 Reason:Detection Time Expired
+# <13>Jul  6 21:58:54 HOSTNAME BFD: Session UP for 127.1.1.1 on ve 55
+messages:
+  - error: BFD_STATE_CHANGE
+    tag: BFD
+    values:
+      peer: ([\d.]{7,15})
+      interface: (.+)
+    line: 'Session DOWN for {peer} on {interface} Reason:Administratively Down'
+    model: openconfig-bfd
+    mapping:
+      variables:
+        bfd//interfaces//interface//id: interface
+      static:
+        bfd//interfaces//interface//peers//peer//state//session-state: ADMIN_DOWN
+  - error: BFD_STATE_CHANGE
+    tag: BFD
+    values:
+      peer: ([\d.]{7,15})
+      interface: (.+)
+      reason: (.*)
+    line: 'Session DOWN for {peer} on {interface} Reason:{reason}'
+    model: openconfig-bfd
+    mapping:
+      variables:
+        bfd//interfaces//interface//id: interface
+      static:
+        bfd//interfaces//interface//peers//peer//state//session-state: DOWN
+  - error: BFD_STATE_CHANGE
+    tag: BFD
+    values:
+      peer: ([\d.]{7,15})
+      interface: (.+)
+    line: 'Session UP for {peer} on {interface}'
+    model: openconfig-bfd
+    mapping:
+      variables:
+        bfd//interfaces//interface//id: interface
+      static:
+        bfd//interfaces//interface//peers//peer//state//session-state: UP
