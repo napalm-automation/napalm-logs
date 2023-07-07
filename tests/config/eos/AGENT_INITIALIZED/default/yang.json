@@ -1,0 +1,35 @@
+{
+  "yang_message": {
+    "system": {
+      "processes": {
+        "process": {
+          "7104": {
+            "state": {
+              "up-time": 0,
+              "name": "Rib"
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 6,
+    "facility": 20,
+    "pri": "166",
+    "processName": "Rib",
+    "host": "edge01.bru01",
+    "tag": "AGENT-6-INITIALIZED",
+    "time": "14:39:03",
+    "date": "Oct 18",
+    "message": ": Agent 'Rib' initialized; pid=7104"
+  },
+  "facility": 20,
+  "ip": "127.0.0.1",
+  "error": "AGENT_INITIALIZED",
+  "host": "edge01.bru01",
+  "yang_model": "NO_MODEL",
+  "timestamp": 1539873543,
+  "os": "eos",
+  "severity": 6
+}

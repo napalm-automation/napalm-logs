@@ -1,0 +1,1 @@
+<165>Jan  2 16:32:04 HOSTNAME Rib: %BGP-5-ADJCHANGE: peer 1.2.3.4 (AS 12345) old state Established event Stop new state Idle

@@ -76,6 +76,101 @@ Configuration file example:
 
   auth_port: 2022
 
+.. _configuration-options-enable-metrics:
+
+``enable-metrics``
+------------------
+
+.. versionadded:: 0.6.0
+
+Enable metrics collection exposition (Prometheus metrics).
+
+Default: ``false``
+
+CLI usgae example:
+
+.. code-block:: bash
+
+  $ napalm-logs --enable-metrics
+
+Configuration file example:
+
+.. code-block:: yaml
+
+  metrics_enabled: true
+
+.. _configuration-options-metrics-address:
+
+``metrics-address``
+-------------------
+
+.. versionadded:: 0.6.0
+
+The IP address to use to listen for all incoming metrics requests. This is the
+address that the Prometheus HTTP server exposes metrics from.
+
+Default: ``0.0.0.0``.
+
+CLI usage example:
+
+.. code-block:: bash
+
+  $ napalm-logs --metrics-address 172.17.17.1
+
+Configuration file example:
+
+.. code-block:: yaml
+
+  metrics_address: 172.17.17.1
+
+.. _configuration-options-metrics-port:
+
+``metrics-port``
+----------------
+
+.. versionadded:: 0.6.0
+
+The port to listen on for incoming metrics requests. This is the port that
+the Prometheus HTTP server exposes metrics from.
+
+Default: ``9443``
+
+CLI usgae example:
+
+.. code-block:: bash
+
+  $ napalm-logs --metrics-port 2022
+
+Configuration file example:
+
+.. code-block:: yaml
+
+  metrics_port: 2022
+
+.. _configuration-options-metrics-dir:
+
+``metrics-dir``
+---------------
+
+.. versionadded:: 0.6.0
+
+The directory used by the processes for metrics collection. This directory must
+be writable. If the directory does not exist, we attempt to create it.
+
+Default: ``/tmp/napalm_logs_metrics``
+
+CLI usgae example:
+
+.. code-block:: bash
+
+  $ napalm-logs --metrics-dir /tmp/a_new_dir_for_metrics
+
+Configuration file example:
+
+.. code-block:: yaml
+
+  metrics_dir: /tmp/a_new_dir_for_metrics
+
 .. _configuration-options-certificate:
 
 ``certificate``

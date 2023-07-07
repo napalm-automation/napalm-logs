@@ -48,8 +48,8 @@ _RGX_PARTS = [
 _RGX_PARTS = OrderedDict(_RGX_PARTS)
 
 _RGX = (
-    'pam_unix\(dcos_sshd:session\): session opened for user '
-    '{0[user]} by \(uid={0[uid]}\) - dcos_sshd\[{0[sshPid]}\]'
+    r'pam_unix\(dcos_sshd:session\): session opened for user '
+    r'{0[user]} by \(uid={0[uid]}\) - dcos_sshd\[{0[sshPid]}\]'
 ).format(_RGX_PARTS)  # ATTENTION to escape the parans
 
 

@@ -1,0 +1,1 @@
+<189>24: test-ztp: May 23 15:49:32.302: %SYS-5-CONFIG_I: Configured from tftp://10.83.21.224//cisco-bootstrap by console

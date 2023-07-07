@@ -1,0 +1,1 @@
+<189>1440: test-switch1: Jun  1 13:35:45.562: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/2, changed state to up

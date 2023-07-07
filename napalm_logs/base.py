@@ -21,10 +21,12 @@ import nacl.utils
 import nacl.secret
 import nacl.signing
 import nacl.encoding
+from prometheus_client import start_http_server, CollectorRegistry, multiprocess
 
 # Import napalm-logs pkgs
 import napalm_logs.utils
 import napalm_logs.config as CONFIG
+import napalm_logs.buffer
 # processes
 from napalm_logs.auth import NapalmLogsAuthProc
 from napalm_logs.device import NapalmLogsDeviceProc
@@ -48,6 +50,10 @@ class NapalmLogs:
                  publish_port=49017,
                  auth_address='0.0.0.0',
                  auth_port=49018,
+                 metrics_enabled=False,
+                 metrics_address='0.0.0.0',
+                 metrics_port='9215',
+                 metrics_dir='/tmp/napalm_logs_metrics',
                  certificate=None,
                  keyfile=None,
                  disable_security=False,
@@ -61,7 +67,8 @@ class NapalmLogs:
                  device_whitelist=[],
                  hwm=None,
                  device_worker_processes=1,
-                 serializer='msgpack'):
+                 serializer='msgpack',
+                 buffer=None):
         '''
         Init the napalm-logs engine.
 
@@ -80,6 +87,10 @@ class NapalmLogs:
         self.publish_port = publish_port
         self.auth_address = auth_address
         self.auth_port = auth_port
+        self.metrics_enabled = metrics_enabled
+        self.metrics_address = metrics_address
+        self.metrics_port = metrics_port
+        self.metrics_dir = metrics_dir
         self.certificate = certificate
         self.keyfile = keyfile
         self.disable_security = disable_security
@@ -94,12 +105,17 @@ class NapalmLogs:
         self.serializer = serializer
         self.device_worker_processes = device_worker_processes
         self.hwm = hwm
+        self._buffer_cfg = buffer
+        self._buffer = None
         self.opts = {}
         # Setup the environment
         self._setup_log()
         self._build_config()
         self._verify_config()
         self._post_preparation()
+        # Start the Prometheus metrics server
+        self._setup_metrics()
+        self._setup_buffer()
         # Private vars
         self.__priv_key = None
         self.__signing_key = None
@@ -114,6 +130,51 @@ class NapalmLogs:
         if exc_type is not None:
             log.error('Exiting due to unhandled exception', exc_info=True)
             self.__raise_clean_exception(exc_type, exc_value, exc_traceback)
+
+    def _setup_buffer(self):
+        '''
+        Setup the buffer subsystem.
+        '''
+        if not self._buffer_cfg or not isinstance(self._buffer_cfg, dict):
+            return
+        buffer_name = list(self._buffer_cfg.keys())[0]
+        buffer_class = napalm_logs.buffer.get_interface(buffer_name)
+        log.debug('Setting up buffer interface "%s"', buffer_name)
+        if 'expire_time' not in self._buffer_cfg[buffer_name]:
+            self._buffer_cfg[buffer_name]['expire_time'] = CONFIG.BUFFER_EXPIRE_TIME
+        self._buffer = buffer_class(**self._buffer_cfg[buffer_name])
+
+    def _setup_metrics(self):
+        """
+        Start metric exposition
+        """
+        path = os.environ.get("prometheus_multiproc_dir")
+        if not os.path.exists(self.metrics_dir):
+            try:
+                log.info("Creating metrics directory")
+                os.makedirs(self.metrics_dir)
+            except OSError:
+                log.error("Failed to create metrics directory!")
+                raise ConfigurationException("Failed to create metrics directory!")
+            path = self.metrics_dir
+        elif path != self.metrics_dir:
+            path = self.metrics_dir
+        os.environ['prometheus_multiproc_dir'] = path
+        log.info("Cleaning metrics collection directory")
+        log.debug("Metrics directory set to: {}".format(path))
+        files = os.listdir(path)
+        for f in files:
+            if f.endswith(".db"):
+                os.remove(os.path.join(path, f))
+            log.debug("Starting metrics exposition")
+        if self.metrics_enabled:
+            registry = CollectorRegistry()
+            multiprocess.MultiProcessCollector(registry)
+            start_http_server(
+                port=self.metrics_port,
+                addr=self.metrics_address,
+                registry=registry
+            )
 
     def _setup_log(self):
         '''
@@ -355,7 +416,7 @@ class NapalmLogs:
            'values' not in value or\
            '__python_fun__' not in value:  # Check looks good when using a Python-defined profile.
             return
-        from_line = re.findall('\{(\w+)\}', config['line'])
+        from_line = re.findall(r'\{(\w+)\}', config['line'])
         if set(from_line) == set(config['values']):
             return
         if config.get('error'):
@@ -419,7 +480,7 @@ class NapalmLogs:
                 continue
             # Compare the valid opts with the conifg
             self._verify_config_dict(CONFIG.VALID_CONFIG, dev_config, dev_os)
-        log.debug('Read the config without error \o/')
+        log.debug('Read the config without error')
 
     def _build_config(self):
         '''
@@ -491,7 +552,8 @@ class NapalmLogs:
         log.debug('Starting the server process')
         server = NapalmLogsServerProc(self.opts,
                                       self.config_dict,
-                                      started_os_proc)
+                                      started_os_proc,
+                                      buffer=self._buffer)
         proc = Process(target=server.start)
         proc.start()
         proc.description = 'Server process'
@@ -567,7 +629,7 @@ class NapalmLogs:
         # publisher process start
         pub_id = 0
         for pub in self.publisher:
-            publisher_type, publisher_opts = pub.items()[0]
+            publisher_type, publisher_opts = list(pub.items())[0]
             proc = self._start_pub_proc(publisher_type,
                                         publisher_opts,
                                         pub_id)
@@ -592,7 +654,7 @@ class NapalmLogs:
         self._processes.append(self._start_srv_proc(started_os_proc))
         # start listener process
         for lst in self.listener:
-            listener_type, listener_opts = lst.items()[0]
+            listener_type, listener_opts = list(lst.items())[0]
             proc = self._start_lst_proc(listener_type,
                                         listener_opts)
             self._processes.append(proc)

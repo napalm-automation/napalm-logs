@@ -1,0 +1,37 @@
+{
+  "yang_message": {
+    "bgp": {
+      "neighbors": {
+        "neighbor": {
+          "1.2.3.4": {
+            "state": {
+              "peer_as": "12345",
+              "session-state-change-event": "Stop",
+              "session-state": "IDLE",
+              "session-state-old": "ESTABLISHED"
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 5,
+    "date": "Jan  2",
+    "pri": "165",
+    "host": "HOSTNAME",
+    "tag": "BGP-5-ADJCHANGE",
+    "time": "16:32:04",
+    "message": ": peer 1.2.3.4 (AS 12345) old state Established event Stop new state Idle",
+    "facility": 20,
+    "processName": "Rib"
+  },
+  "yang_model": "openconfig-bgp",
+  "os": "eos",
+  "facility": 20,
+  "severity": 5,
+  "error": "BGP_NEIGHBOR_STATE_CHANGED",
+  "host": "HOSTNAME",
+  "ip": "127.0.0.1",
+  "timestamp": 1526706119764
+}

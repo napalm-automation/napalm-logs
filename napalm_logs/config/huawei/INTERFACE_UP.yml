@@ -1,0 +1,13 @@
+# %%01IFNET/4/IF_STATE(l)[8211]:Interface Ethernet0/0/48 has turned into UP state.
+
+messages:
+  - error: INTERFACE_UP
+    tag: 01IFNET/4/IF_STATE
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+    line: 'Interface {interface} has turned into UP state.'
+    model: openconfig-interfaces
+    mapping:
+      variables: {}
+      static:
+        interfaces//interface//{interface}//state//oper_status: UP

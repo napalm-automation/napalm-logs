@@ -1,0 +1,34 @@
+{
+  "yang_message": {
+    "bgp": {
+      "neighbors": {
+        "neighbor": {
+          "10.65.5.25": {
+            "state": {
+              "session-state-change-event": "ESTABLISHED",
+              "session-state": "ESTABLISHED"
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "date": "May 22",
+    "time": "09:20:00",
+    "host": "HOSTNAME",
+    "tag": "BGP",
+    "pri": "13",
+    "message": "Peer (VRF: VRF-NAME) 10.65.5.25 UP (ESTABLISHED)",
+    "facility": 1,
+    "severity": 5
+  },
+  "yang_model": "openconfig-bgp",
+  "os": "netiron",
+  "facility": 1,
+  "severity": 5,
+  "error": "BGP_NEIGHBOR_STATE_CHANGED",
+  "host": "HOSTNAME",
+  "ip": "127.0.0.1",
+  "timestamp": 1526980800
+}

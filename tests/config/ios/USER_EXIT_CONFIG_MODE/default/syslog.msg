@@ -1,0 +1,1 @@
+<189>30: test-ztp: May 23 13:56:15.055: %SYS-5-CONFIG_I: Configured from console by admin on vty0 (10.31.0.24)

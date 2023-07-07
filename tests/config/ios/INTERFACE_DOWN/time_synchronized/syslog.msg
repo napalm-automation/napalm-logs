@@ -1,0 +1,1 @@
+<189>117: NetAuto_CSRv-03: May  9 12:49:27.098: %LINK-5-CHANGED: Interface GigabitEthernet2, changed state to administratively down

@@ -1,0 +1,14 @@
+messages:
+  - error: ISIS_NEIGHBOR_UP
+    tag: RPD_ISIS_ADJUP
+    values:
+      neighbor: ([^ ]+)
+      interface: ([^ ]+)
+      level: (L\d)
+    line: 'IS-IS new {level} adjacency to {neighbor} on {interface}'
+    model: openconfig-isis
+    mapping:
+      variables: {}
+      static:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state: UP
+

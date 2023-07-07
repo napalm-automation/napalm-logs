@@ -1,0 +1,38 @@
+{
+  "facility": 23,
+  "yang_model": "openconfig-interfaces",
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "Ethernet1/33": {
+          "ethernet": {
+            "switched_vlan": {
+              "state": {
+                "interface_mode": "TRUNK"
+              }
+            }
+          },
+          "state": {
+            "admin_status": "UP"
+          }
+        }
+      }
+    }
+  },
+  "ip": "127.0.0.1",
+  "host": "nexus-switch",
+  "message_details": {
+    "facility": 23,
+    "pri": "190",
+    "date": "2018 Apr 20",
+    "message": "Interface Ethernet1/33 is up in mode trunk",
+    "severity": 6,
+    "time": "13:15:38",
+    "host": "nexus-switch",
+    "tag": "ETHPORT-5-IF_UP"
+  },
+  "severity": 6,
+  "os": "nxos",
+  "error": "INTERFACE_UP",
+  "timestamp": 1524230138
+}

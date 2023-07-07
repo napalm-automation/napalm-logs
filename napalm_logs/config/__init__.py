@@ -30,6 +30,10 @@ LOG_FORMAT = '%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message
 LOG_FILE = os.path.join(ROOT_DIR, 'var', 'log', 'napalm', 'logs')
 LOG_FILE_CLI_OPTIONS = ('cli', 'screen')
 ZMQ_INTERNAL_HWM = 1000
+METRICS_ADDRESS = '0.0.0.0'
+METRICS_PORT = 9443
+METRICS_DIR = "/tmp/napalm_logs_metrics"
+BUFFER_EXPIRE_TIME = 5
 
 # Allowed names for the init files.
 OS_INIT_FILENAMES = (
@@ -96,6 +100,7 @@ VALID_CONFIG = {
 
 # listener
 BUFFER_SIZE = 1024
+REUSE_PORT = False
 TIMEOUT = 60
 
 # device

@@ -1,0 +1,19 @@
+# This message is sent when the isis neighbor is down
+#Mar  4 09:15:48 HOSTNAME ISIS: L2 Neighbor 2080.6521.2083 Down on ve 172 due to BFD Trigger
+#Mar  4 17:15:33 HOSTNAME ISIS: L2 Neighbor 1920.0000.2001 Down on eth 2/1 due to Interface Down
+messages:
+  - error: ISIS_NEIGHBOR_DOWN
+    tag: ISIS
+    values:
+      neighbor: (\S+)
+      interface: (\S+)
+      instance: (\S+)
+      level: (L\d)
+      downReason: (.*)
+    line: '{level} Neighbor {neighbor} Down on {interface} {instance} due to {downReason}'
+    model: openconfig-isis
+    mapping:
+      variables:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}{instance}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state-change-reason-message: downReason
+      static:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}{instance}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state: DOWN

@@ -1,0 +1,37 @@
+{
+  "yang_message": {
+    "bgp": {
+      "neighbors": {
+        "neighbor": {
+          "192.0.2.2": {
+            "state": {
+              "peer_as": "12345",
+              "session-state-change-event": "AdminReset",
+              "session-state": "IDLE",
+              "session-state-old": "ESTABLISHED"
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 5,
+    "date": "Dec 14",
+    "pri": "13",
+    "host": "HOSTNAME",
+    "tag": "BGP-5-ADJCHANGE",
+    "time": "12:08:59",
+    "message": ": peer 192.0.2.2 (VRF default AS 12345) old state Established event AdminReset new state Idle",
+    "facility": 1,
+    "processName": "Bgp"
+  },
+  "yang_model": "openconfig-bgp",
+  "os": "eos",
+  "facility": 1,
+  "severity": 5,
+  "error": "BGP_NEIGHBOR_STATE_CHANGED",
+  "host": "HOSTNAME",
+  "ip": "127.0.0.1",
+  "timestamp": 1526706119764
+}

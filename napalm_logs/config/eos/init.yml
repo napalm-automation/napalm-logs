@@ -4,6 +4,7 @@
 # Matching white space in `values`
 #
 prefixes:
+  # First set of prefixes without Instance
   - time_format: "%b %d %H:%M:%S"
     values:
       date: (\w+ +\d+)
@@ -12,4 +13,30 @@ prefixes:
       processName: (\w+)
       tag: ([\w-]+)
     line: '{date} {time} {host} {processName}: %{tag}'
-
+  # ISO8601 date-time format
+  - values:
+      date: (\d{4}-\d{2}-\d{2})
+      time: (\d{2}:\d{2}:\d{2}[\.\d{3}]?[\+|-]\d{2}:\d{2})
+      host: ([^ ]+)
+      processName: (\w+)
+      tag: ([\w-]+)
+    line: '{date}T{time} {host} {processName}: %{tag}'
+  # Second set of prefixes including Instance
+  - time_format: "%b %d %H:%M:%S"
+    values:
+      date: (\w+ +\d+)
+      time: (\d\d:\d\d:\d\d)
+      host: ([^ ]+)
+      processName: (\w+)
+      instanceName: (Instance \d+)
+      tag: ([\w-]+)
+    line: '{date} {time} {host} {processName}: {instanceName}: %{tag}'
+  # ISO8601 date-time format
+  - values:
+      date: (\d{4}-\d{2}-\d{2})
+      time: (\d{2}:\d{2}:\d{2}[\.\d{3}]?[\+|-]\d{2}:\d{2})
+      host: ([^ ]+)
+      processName: (\w+)
+      instanceName: (Instance \d+)
+      tag: ([\w-]+)
+    line: '{date}T{time} {host} {processName}: {instanceName}: %{tag}'

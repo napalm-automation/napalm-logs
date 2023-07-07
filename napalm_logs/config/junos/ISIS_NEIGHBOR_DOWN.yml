@@ -1,0 +1,16 @@
+# This message is sent when the isis neighbor is down
+messages:
+  - error: ISIS_NEIGHBOR_DOWN
+    tag: RPD_ISIS_ADJDOWN
+    values:
+      neighbor: (\S+)
+      interface: (\S+)
+      level: (L\d)
+      downReason: (.*)
+    line: 'IS-IS lost {level} adjacency to {neighbor} on {interface}, reason: {downReason}'
+    model: openconfig-isis
+    mapping:
+      variables:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state-change-reason-message: downReason
+      static:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state: DOWN

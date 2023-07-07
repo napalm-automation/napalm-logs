@@ -44,7 +44,7 @@ class NapalmLogsPublisherProxy(NapalmLogsProc):
         # Frontend
         self.sub = self.ctx.socket(zmq.SUB)
         self.sub.bind(PUB_PX_IPC_URL)
-        self.sub.setsockopt(zmq.SUBSCRIBE, '')
+        self.sub.setsockopt(zmq.SUBSCRIBE, b'')
         log.debug('Setting HWM for the proxy frontend: %d', self.hwm)
         try:
             self.sub.setsockopt(zmq.HWM, self.hwm)

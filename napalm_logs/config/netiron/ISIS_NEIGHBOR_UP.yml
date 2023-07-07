@@ -1,0 +1,16 @@
+# This message is sent when the isis neighbor is up
+#Mar  4 09:15:48 HOSTNAME ISIS: L2 Neighbor 1932.0308.0030 Up on ve 53
+messages:
+  - error: ISIS_NEIGHBOR_UP
+    tag: ISIS
+    values:
+      neighbor: (\S+)
+      interface: (\S+)
+      instance: (\S+)
+      level: (L\d)
+    line: '{level} Neighbor {neighbor} Up on {interface} {instance}'
+    model: openconfig-isis
+    mapping:
+      static:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}{instance}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state: UP
+      variables: {}

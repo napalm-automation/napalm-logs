@@ -15,6 +15,7 @@ import zmq
 import umsgpack
 import nacl.utils
 import nacl.secret
+from prometheus_client import Counter
 
 # Import napalm-logs pkgs
 import napalm_logs.utils
@@ -60,6 +61,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         if not disable_security:
             self.__safe = nacl.secret.SecretBox(private_key)
             self.__signing_key = signing_key
+        self._strip_message_details = publisher_opts.pop('strip_message_details', False)
         self._setup_transport()
 
     def _exit_gracefully(self, signum, _):
@@ -76,7 +78,7 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         log.debug('Setting up the %s publisher subscriber #%d', self._transport_type, self.pub_id)
         self.sub = self.ctx.socket(zmq.SUB)
         self.sub.connect(PUB_IPC_URL)
-        self.sub.setsockopt(zmq.SUBSCRIBE, '')
+        self.sub.setsockopt(zmq.SUBSCRIBE, b'')
         try:
             self.sub.setsockopt(zmq.HWM, self.opts['hwm'])
             # zmq 2
@@ -131,6 +133,22 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
         '''
         Listen to messages and publish them.
         '''
+        # metrics
+        napalm_logs_publisher_received_messages = Counter(
+            'napalm_logs_publisher_received_messages',
+            "Count of messages received by the publisher",
+            ['publisher_type', 'address', 'port']
+        )
+        napalm_logs_publisher_whitelist_blacklist_check_fail = Counter(
+            'napalm_logs_publisher_whitelist_blacklist_check_fail',
+            "Count of messages which fail the whitelist/blacklist check",
+            ['publisher_type', 'address', 'port']
+        )
+        napalm_logs_publisher_messages_published = Counter(
+            'napalm_logs_publisher_messages_published',
+            "Count of published messages",
+            ['publisher_type', 'address', 'port']
+        )
         self._setup_ipc()
         # Start suicide polling thread
         thread = threading.Thread(target=self._suicide_when_without_parent, args=(os.getppid(),))
@@ -149,6 +167,14 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                     log.error(error, exc_info=True)
                     raise NapalmLogsExit(error)
             obj = umsgpack.unpackb(bin_obj)
+            if self._strip_message_details:
+                obj.pop('message_details', None)
+                bin_obj = self.serializer_fun(obj)
+            napalm_logs_publisher_received_messages.labels(
+                publisher_type=self._transport_type,
+                address=self.address,
+                port=self.port
+            ).inc()
             if not napalm_logs.ext.check_whitelist_blacklist(obj['error'],
                                                              whitelist=self.error_whitelist,
                                                              blacklist=self.error_blacklist):
@@ -158,6 +184,11 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                           obj['error'],
                           self._transport_type,
                           self.pub_id)
+                napalm_logs_publisher_whitelist_blacklist_check_fail.labels(
+                    publisher_type=self._transport_type,
+                    address=self.address,
+                    port=self.port
+                ).inc()
                 continue
             serialized_obj = self._serialize(obj, bin_obj)
             log.debug('Publishing the OC object')
@@ -165,6 +196,11 @@ class NapalmLogsPublisherProc(NapalmLogsProc):
                 # Encrypt only when needed.
                 serialized_obj = self._prepare(serialized_obj)
             self.transport.publish(serialized_obj)
+            napalm_logs_publisher_messages_published.labels(
+                publisher_type=self._transport_type,
+                address=self.address,
+                port=self.port
+            ).inc()
 
     def stop(self):
         log.info('Stopping publisher process %s (publisher #%d)', self._transport_type, self.pub_id)

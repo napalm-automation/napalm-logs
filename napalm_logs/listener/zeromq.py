@@ -13,7 +13,7 @@ import logging
 try:
     import zmq
     HAS_ZMQ = True
-except ImportError as err:
+except ImportError:
     HAS_ZMQ = False
 
 # Import napalm-logs pkgs

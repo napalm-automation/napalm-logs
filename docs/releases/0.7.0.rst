@@ -1,0 +1,51 @@
+.. _release-0.7.0:
+
+=============================
+Release 0.7.0 - Codename Froe
+=============================
+
+A new pluggable interface: buffer
+---------------------------------
+
+By design, syslog messages can be fired spuriously, and the same information 
+may be sent multiple times within a short period of time.
+
+The new :ref:`buffer` can cache the messages for a number of seconds and 
+prevent firing the same messages redundantly.
+
+The Buffer interface is pluggable subsystem and can be enabled from the 
+configuration file, under the buffer block, for example:
+
+.. code-block:: yaml
+
+  buffer:
+    redis:
+      host: 127.0.0.1
+      db: 4
+
+For further details and configuration options, please check :ref:`buffer`.
+
+New features
+------------
+
+Added :ref:`publisher-opts-strip-message-details` Publisher configuration
+option to remove the ``message_details`` key from the object to be published.
+``message_details`` contains the raw chunks of data resulted from the
+napalm-logs parsing, before mapping to the associated YANG model.
+
+
+New Structured Messages
+-----------------------
+
+- :ref:`AGENT_INITIALIZED` when a system process is (re-)initialized.
+- :ref:`USER_WRITE_CONFIG` added by George Pickering (@bigpick) which is a
+  notification sent when the user saves the startup config (though not
+  necessarily updating the running config).
+
+The following messages were already defined, now extending the list of 
+supported platforms:
+
+- :ref:`OSPF_NEIGHBOR_UP` and :ref: `OSPF_NEIGHBOR_DOWN` added for 
+  :ref:`device-configuration-netiron` thanks to Johan van den Dorpe (@johanek).
+- :ref:`USER_ENTER_CONFIG_MODE` and :ref:`USER_EXIT_CONFIG_MODE` added for
+  :ref:`device-configuration-eos` thanks to George Pickering (@bigpick).

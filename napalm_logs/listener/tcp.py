@@ -21,6 +21,7 @@ import threading
 # Import napalm-logs pkgs
 from napalm_logs.config import TIMEOUT
 from napalm_logs.config import BUFFER_SIZE
+from napalm_logs.config import REUSE_PORT
 from napalm_logs.config import MAX_TCP_CLIENTS
 from napalm_logs.listener.base import ListenerBase
 # exceptions
@@ -44,6 +45,7 @@ class TCPListener(ListenerBase):
         else:
             self.port = port
         self.buffer_size = kwargs.get('buffer_size', BUFFER_SIZE)
+        self.reuse_port = kwargs.get('reuse_port', REUSE_PORT)
         self.socket_timeout = kwargs.get('socket_timeout', TIMEOUT)
         self.max_clients = kwargs.get('max_clients', MAX_TCP_CLIENTS)
         self.buffer = queue.Queue()
@@ -100,6 +102,12 @@ class TCPListener(ListenerBase):
             self.skt = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         else:
             self.skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if self.reuse_port:
+            self.skt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            if hasattr(socket, 'SO_REUSEPORT'):
+                self.skt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+            else:
+                log.error('SO_REUSEPORT not supported')
         try:
             self.skt.bind((self.address, int(self.port)))
         except socket.error as msg:

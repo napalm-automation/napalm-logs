@@ -1,0 +1,1 @@
+<14>Nov  6 13:36:28 HOSTNAME System: Interface ethernet 3/8, state down - remote fault 

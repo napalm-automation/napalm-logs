@@ -1,0 +1,15 @@
+# Interface Ethernet1/33 is up in mode trunk
+
+messages:
+  - error: INTERFACE_UP
+    tag: ETHPORT-5-IF_UP
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+      mode|upper: (\w+)
+    line: 'Interface {interface} is up in mode {mode}'
+    model: openconfig-interfaces
+    mapping:
+      variables:
+        interfaces//interface//{interface}//ethernet//switched_vlan//state//interface_mode: mode
+      static:
+        interfaces//interface//{interface}//state//admin_status: UP

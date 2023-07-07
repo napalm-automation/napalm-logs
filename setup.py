@@ -3,25 +3,23 @@
 '''
 The setup script for napalm-logs
 '''
-import uuid
 import codecs
-
 from setuptools import setup, find_packages
-from pip.req import parse_requirements
 
 __author__ = 'Mircea Ulinic <mircea.ulinic@gmail.com>'
 
-install_reqs = parse_requirements('requirements.txt', session=uuid.uuid1())
-reqs = [str(ir.req) for ir in install_reqs]
+with open('VERSION', 'r') as fp_:
+    version = fp_.read()
 
 with codecs.open('README.rst', 'r', encoding='utf8') as file:
     long_description = file.read()
 
-print(long_description)
+with open("requirements.txt", "r") as fs:
+    reqs = [r for r in fs.read().splitlines() if (len(r) > 0 and not r.startswith("#"))]
 
 setup(
     name='napalm-logs',
-    version='0.4.2',
+    version=version,
     packages=find_packages(),
     author='Mircea Ulinic',
     author_email='mircea.ulinic@gmail.com',

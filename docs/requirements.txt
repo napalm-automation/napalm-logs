@@ -1,5 +1,9 @@
 jinja2
--e ../
+pyzmq
+pyyaml
+pynacl
+u-msgpack-python
 sphinx
 sphinx-rtd-theme
 sphinxcontrib-napoleon
+prometheus_client

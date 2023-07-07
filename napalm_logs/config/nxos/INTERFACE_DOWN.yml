@@ -1,0 +1,37 @@
+# Interface Ethernet1/33 is down (Link failure)
+
+messages:
+  - error: INTERFACE_DOWN
+    tag: ETHPORT-5-IF_DOWN_LINK_FAILURE
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+      reason: (.*)
+    line: 'Interface {interface} is down ({reason})'
+    model: openconfig-interfaces
+    mapping:
+      variables:
+        interfaces//interface//{interface}//state//change_reason: reason
+      static:
+        interfaces//interface//{interface}//state//admin_status: DOWN
+  - error: INTERFACE_DOWN
+    tag: ETH_PORT_CHANNEL-5-PORT_INDIVIDUAL_DOWN
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+    line: 'individual port {interface} is down'
+    model: openconfig-interfaces
+    mapping:
+      variables: {}
+      static:
+        interfaces//interface//{interface}//state//admin_status: DOWN
+  - error: INTERFACE_DOWN
+    tag: ETHPORT-5-IF_DOWN_ERROR_DISABLED
+    values:
+      interface: (\w+[\.\-\d\/\w+]+)
+      reason: (.*)
+    line: 'Interface {interface} is down ({reason})'
+    model: openconfig-interfaces
+    mapping:
+      variables:
+        interfaces//interface//{interface}//state//change_reason: reason
+      static:
+        interfaces//interface//{interface}//state//admin_status: DOWN

@@ -1,0 +1,43 @@
+{
+    "yang_message": {
+        "security": {
+            "flow": {
+                "created": {
+                    "source_address": "172.16.0.1",
+                    "source_port": "27",
+                    "destination_address": "8.8.8.8",
+                    "destination_port": "28713",
+                    "service_name": "icmp",
+                    "nat_source_address": "172.16.0.2",
+                    "nat_source_port": "27",
+                    "nat_destination_address": "8.8.8.8",
+                    "nat_destination_port": "28713",
+                    "src_nat_rule_name": null,
+                    "protocol_id": "1",
+                    "misc_data": "allow-any-from-probe SZ-PUBLIC SZ-PUBLIC 20805406 N/A(N/A) ge-0/0/0.0 UNKNOWN UNKNOWN UNKNOWN"
+                }
+            }
+        }
+    },
+    "message_details": {
+        "processId": null,
+        "severity": 6,
+        "facility": 1,
+        "hostPrefix": null,
+        "pri": "14",
+        "processName": "RT_FLOW",
+        "host": "srx-firewall",
+        "tag": "RT_FLOW_SESSION_CREATE",
+        "time": "13:12:00",
+        "date": "Dec 13",
+        "message": "session created 172.16.0.1/27->8.8.8.8/28713 icmp 172.16.0.2/27->8.8.8.8/28713 N/A N/A N/A N/A 1 allow-any-from-probe SZ-PUBLIC SZ-PUBLIC 20805406 N/A(N/A) ge-0/0/0.0 UNKNOWN UNKNOWN UNKNOWN"
+    },
+    "timestamp": 1500587040,
+    "facility": 1,
+    "ip": "127.0.0.1",
+    "host": "srx-firewall",
+    "yang_model": "NO_MODEL",
+    "error": "NAT_SESSION_CREATED",
+    "os": "junos",
+    "severity": 6
+}

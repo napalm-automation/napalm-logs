@@ -305,15 +305,18 @@ daemon):
    :maxdepth: 1
 
    installation/index
+   docker/index
    device_config/index
    options/index
    clients/index
    messages/index
+   metrics/index
    authentication/index
    listener/index
    publisher/index
    serializer/index
    logger/index
+   buffer/index
    syslog/index
    developers/index
    releases/index

@@ -14,6 +14,7 @@ import logging
 
 # Import napalm-logs pkgs
 from napalm_logs.config import BUFFER_SIZE
+from napalm_logs.config import REUSE_PORT
 from napalm_logs.listener.base import ListenerBase
 # exceptions
 from napalm_logs.exceptions import BindException
@@ -36,6 +37,7 @@ class UDPListener(ListenerBase):
         else:
             self.port = port
         self.buffer_size = kwargs.get('buffer_size', BUFFER_SIZE)
+        self.reuse_port = kwargs.get('reuse_port', REUSE_PORT)
         log.debug('Buffer size: %d', self.buffer_size)
 
     def start(self):
@@ -46,6 +48,12 @@ class UDPListener(ListenerBase):
             self.skt = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
         else:
             self.skt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        if self.reuse_port:
+            self.skt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            if hasattr(socket, 'SO_REUSEPORT'):
+                self.skt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+            else:
+                log.error('SO_REUSEPORT not supported')
         try:
             self.skt.bind((self.address, int(self.port)))
         except socket.error as msg:

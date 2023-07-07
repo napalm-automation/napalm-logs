@@ -65,6 +65,20 @@ class InvalidSerializerException(SerializerException):
     pass
 
 
+class BufferException(NapalmLogsException):
+    '''
+    Raised in case of buffer errors.
+    '''
+    pass
+
+
+class InvalidBufferException(BufferException):
+    '''
+    Raised when the user selects a buffer interface that is not available.
+    '''
+    pass
+
+
 class ConfigurationException(NapalmLogsException):
     '''
     Exception thrown when the user configuration is not correct.

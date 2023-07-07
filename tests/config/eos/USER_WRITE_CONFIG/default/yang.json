@@ -1,0 +1,32 @@
+{
+	"host": "GeorgeSwitch",
+	"yang_message": {
+		"users": {
+			"user": {
+				"admin": {
+					"action": {
+						"write_config": true
+					}
+				}
+			}
+		}
+	},
+	"message_details": {
+		"facility": 20,
+		"pri": "165",
+		"processName": "ConfigAgent",
+		"host": "GeorgeSwitch",
+		"tag": "SYS-5-CONFIG_STARTUP",
+		"time": "12:22:50",
+		"date": "Oct 23",
+		"message": ": Startup config saved from system:/running-config by admin on vty3 (127.0.0.1).",
+		"severity": 5
+	},
+	"timestamp": 1540297370,
+	"error": "USER_WRITE_CONFIG",
+	"ip": "127.0.0.1",
+	"facility": 20,
+	"os": "eos",
+	"yang_model": "NO_MODEL",
+	"severity": 5
+}

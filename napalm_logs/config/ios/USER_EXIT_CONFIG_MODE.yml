@@ -1,0 +1,18 @@
+# <189>24: test-ztp: May 23 15:49:32.302: %SYS-5-CONFIG_I: Configured from tftp://10.83.21.224//cisco-bootstrap by console
+# <189>30: test-ztp: May 23 13:56:15.055: %SYS-5-CONFIG_I: Configured from console by admin on vty0 (10.31.0.24)
+messages:
+  - error: USER_EXIT_CONFIG_MODE
+    tag: SYS-5-CONFIG_I
+    values:
+      configuredfrom: (\w+[\W\w]+)
+      user: (\w+)
+      placeholder: ( on )?
+      vty: (.*)
+    line: 'Configured from {configuredfrom} by {user}{placeholder}{vty}'
+    model: NO_MODEL
+    mapping:
+      static:
+        users//user//{user}//action//exit_config_mode: true
+      variables:
+        users//user//{user}//action//from: configuredfrom
+        users//user//{user}//action//vty: vty

@@ -1,0 +1,15 @@
+messages:
+  # 'error' should be unique and vendor agnostic. Currently we are using the JUNOS syslog message name as the canonical name.
+  # This may change if we are able to find a more well defined naming system.
+  - error: AGENT_INITIALIZED
+    tag: AGENT-6-INITIALIZED
+    values:
+      agent: ([a-zA-Z]+)
+      pid|str: (\d+)
+    line: "Agent '{agent}' initialized; pid={pid}"
+    model: NO_MODEL
+    mapping:
+      variables:
+        system//processes//process//{pid}//state//name: agent
+      static:
+        system//processes//process//{pid}//state//up-time: 0

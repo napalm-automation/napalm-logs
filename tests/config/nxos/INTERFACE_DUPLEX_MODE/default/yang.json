@@ -1,0 +1,33 @@
+{
+  "severity": 6,
+  "yang_message": {
+    "interfaces": {
+      "interface": {
+        "Ethernet1/33": {
+          "ethernet": {
+            "state": {
+              "duplex_mode": "FULL"
+            }
+          }
+        }
+      }
+    }
+  },
+  "yang_model": "openconfig-interfaces",
+  "ip": "127.0.0.1",
+  "facility": 23,
+  "host": "nexus-switch",
+  "error": "INTERFACE_DUPLEX_MODE",
+  "os": "nxos",
+  "message_details": {
+    "date": "2018 Apr 20",
+    "message": "Interface Ethernet1/33, operational duplex mode changed to Full",
+    "facility": 23,
+    "host": "nexus-switch",
+    "severity": 6,
+    "pri": "190",
+    "tag": "ETHPORT-5-IF_DUPLEX",
+    "time": "13:15:15"
+  },
+  "timestamp": 1524230115
+}

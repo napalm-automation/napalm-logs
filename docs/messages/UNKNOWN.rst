@@ -19,15 +19,15 @@ Example:
 
 .. code-block:: json
 
-	{
-	  "message_details": {
-		"message": "<28>Jul 10 10:32:00 vmx1 inetd[2397]: /usr/sbin/sshd[89736]: exited, status 255\n"
-	  },
-	  "timestamp": 1501685287,
-	  "ip": "127.0.0.1",
-	  "host": "unknown",
-	  "error": "UNKNOWN",
-	  "os": "unknown",
-	  "model_name": "unknown"
-	}
+    {
+      "message_details": {
+        "message": "<28>Jul 10 10:32:00 vmx1 inetd[2397]: /usr/sbin/sshd[89736]: exited, status 255\n"
+      },
+      "timestamp": 1501685287,
+      "ip": "127.0.0.1",
+      "host": "unknown",
+      "error": "UNKNOWN",
+      "os": "unknown",
+      "model_name": "unknown"
+    }
 

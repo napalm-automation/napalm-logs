@@ -1,0 +1,1 @@
+<14>Dec 13 13:12:00 srx-firewall RT_FLOW: RT_FLOW_SESSION_CLOSE: session closed idle Timeout: 172.16.0.1/27->8.8.8.8/28713 icmp 172.16.0.2/27->8.8.8.8/28713 N/A N/A N/A N/A 1 allow-any-from-probe SZ-PUBLIC SZ-PUBLIC 20805406 N/A(N/A) ge-0/0/0.0 UNKNOWN UNKNOWN UNKNOWN

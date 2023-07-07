@@ -1,0 +1,1 @@
+<190>2018 Oct 31 08:12:52 sw01.test %ETHPORT-5-IF_DOWN_ERROR_DISABLED: Interface Ethernet1/3 is down (Error disabled. Reason:Received REINIT_NO_FLAP request)

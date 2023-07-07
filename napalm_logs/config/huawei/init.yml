@@ -1,0 +1,19 @@
+# Prefix profiler for Huawei devices.
+# This profiler matches messages having the following form:
+#
+# .. code-block:: text
+#
+#   2018-7-19 11:58:03.150.1 this-is-my-hostname %%01LLDP/4/BAD_PACKET(l)[87319]:4 invalid packets were received after
+#   latest notification. The last invalid packet came from interface Ethernet0/0/25.
+#
+prefixes:
+  - time_format: "%Y-%m-%d %H:%M:%S"
+    values:
+      date: (\d+-\d+-\d+)
+      time: (\d+:\d+:\d+)
+      milliseconds: (\d{3})
+      host: ([^ ]+)
+      tag: (\w+\/\w+\/\w+)
+      informationType: (\(\w+\))
+      messageId: \[(\d+)\]
+    line: '{date} {time}.{milliseconds}.1 {host} %%{tag}{informationType}{messageId}:'

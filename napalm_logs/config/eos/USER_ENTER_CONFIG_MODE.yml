@@ -1,0 +1,15 @@
+messages:
+  # 'error' should be unique and vendor agnostic.
+  - error: USER_ENTER_CONFIG_MODE
+    tag: SYS-5-CONFIG_E
+    values:
+      user: (\w+)
+      vterm: (\w+) 
+      ip4: ([\w\d:\.]+)
+    line: ': Enter configuration mode from console by {user} on {vterm} ({ip4})'
+    model: NO_MODEL
+    mapping:
+      variables: {}
+      static:
+        users//user//{user}//action//enter_config_mode: True
+

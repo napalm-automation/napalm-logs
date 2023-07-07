@@ -1,0 +1,18 @@
+#<189>521: router1: *Mar 15 10:05:53.044: %OSPF-5-ADJCHG: Process 1, Nbr 172.16.46.4 on GigabitEthernet2.45 from INIT to DOWN, Neighbor Down: Dead timer expired
+
+messages:
+  - error: OSPF_NEIGHBOR_DOWN
+    tag: OSPF-5-ADJCHG
+    values:
+      neighborIP: ([\w\d:\.]+)
+      interface: ([\w\d\.]+)
+      adjacencyStateChangeReasonMessage: ([\w+\s?]+)
+      initStatus: (\w+)
+    line: 'Nbr {neighborIP} on {interface} from {initStatus} to DOWN, Neighbor Down: {adjacencyStateChangeReasonMessage}'
+    model: openconfig-ospf
+    mapping:
+      variables:
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//area//interfaces//interface//{interface}//neighbors//neighbor//{neighborIP}//state//adjacency-state-change-reason-message: adjacencyStateChangeReasonMessage
+      static:
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//area//interfaces//interface//{interface}//neighbors//neighbor//{neighborIP}//state//adjacency-state: DOWN
+        network-instances//network-instance//global//protocols//protocol//ospf//ospfv2//areas//area//area//interfaces//interface//{interface}//neighbors//neighbor//{neighborIP}//state//adjacency-state-change-reason: INACTIVE_TIMER

@@ -27,6 +27,7 @@ from nacl.exceptions import BadSignatureError
 
 # Import napalm-logs pkgs
 import napalm_logs.config as defaults
+import napalm_logs.ext.six as six
 from napalm_logs.exceptions import ClientConnectException
 from napalm_logs.exceptions import CryptoException
 from napalm_logs.exceptions import BadSignatureException
@@ -209,6 +210,14 @@ def bgp_state_convert(state):
     return state_dict.get(state, state.upper())
 
 
+def bfd_state_convert(state):
+    """
+    Given a matched BFD state, map it to a vendor agnostic version.
+    """
+    state_dict = {'AdminDown': 'ADMIN_DOWN'}
+    return state_dict.get(state, state.upper())
+
+
 def unserialize(binary):
     '''
     Unpack the original OpenConfig object,
@@ -259,10 +268,7 @@ def setval(key, val, dict_=None, delim=defaults.DEFAULT_DELIM):
     prev_hier = dict_
     dict_hier = key.split(delim)
     for each in dict_hier[:-1]:
-        try:
-            idx = int(each)  # noqa
-        except ValueError:
-            # not int
+        if isinstance(each, six.string_type):
             if each not in prev_hier:
                 prev_hier[each] = {}
             prev_hier = prev_hier[each]
@@ -284,9 +290,7 @@ def traverse(data, key, delim=defaults.DEFAULT_DELIM):
     '''
     for each in key.split(delim):
         if isinstance(data, list):
-            try:
-                idx = int(each)
-            except ValueError:
+            if isinstance(each, six.string_type):
                 embed_match = False
                 # Index was not numeric, lets look at any embedded dicts
                 for embedded in (x for x in data if isinstance(x, dict)):
@@ -301,7 +305,7 @@ def traverse(data, key, delim=defaults.DEFAULT_DELIM):
                     return None
             else:
                 try:
-                    data = data[idx]
+                    data = data[int(each)]
                 except IndexError:
                     return None
         else:

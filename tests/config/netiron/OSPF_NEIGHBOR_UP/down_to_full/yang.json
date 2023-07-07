@@ -1,0 +1,57 @@
+{
+  "yang_message": {
+    "network-instances": {
+      "network-instance": {
+        "global": {
+          "protocols": {
+            "protocol": {
+              "ospf": {
+                "ospfv2": {
+                  "areas": {
+                    "area": {
+                      "area": {
+                        "interfaces": {
+                          "interface": {
+                            "interface": {
+                              "neighbors": {
+                                "neighbor": {
+                                  "10.10.228.70": {
+                                    "state": {
+                                      "adjacency-state": "FULL"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "date": "Oct 15",
+    "time": "12:17:17",
+    "host": "HOSTNAME",
+    "pri": "13",
+    "message": "nbr state changed, rid 10.10.80.14, nbr addr 10.10.228.70, nbr rid 10.10.80.17, state full",
+    "facility": 1,
+    "severity": 5,
+    "tag": "OSPF"
+  },
+  "yang_model": "openconfig-ospf",
+  "os": "netiron",
+  "facility": 1,
+  "severity": 5,
+  "error": "OSPF_NEIGHBOR_UP",
+  "host": "HOSTNAME",
+  "ip": "127.0.0.1",
+  "timestamp": 1521108353
+}
