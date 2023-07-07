@@ -1,0 +1,36 @@
+{
+  "host": "HOSTNAME",
+  "yang_message": {
+    "bfd": {
+      "interfaces": {
+        "interface": {
+          "peers": {
+            "peer": {
+              "state": {
+                "session-state": "UP"
+              }
+            }
+          },
+          "id": "ve 55"
+        }
+      }
+    }
+  },
+  "message_details": {
+    "facility": 1,
+    "pri": "13",
+    "host": "HOSTNAME",
+    "tag": "BFD",
+    "time": "21:58:54",
+    "date": "Jul  6",
+    "message": "Session UP for 127.1.1.1 on ve 55",
+    "severity": 5
+  },
+  "timestamp": 1688680734,
+  "error": "BFD_STATE_CHANGE",
+  "ip": "127.0.0.1",
+  "facility": 1,
+  "os": "netiron",
+  "yang_model": "openconfig-bfd",
+  "severity": 5
+}
