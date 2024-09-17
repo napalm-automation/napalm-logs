@@ -1,5 +1,6 @@
 # This message is sent when the isis neighbor is down
 #Jul 28 09:20:48 HOSTNAME Isis: Instance 0: %ISIS-4-ISIS_ADJCHG: L2 Neighbor State Change for SystemID 1851.1605.6021 on et7 to DOWN: interface went down or no IP address on interface
+#Sep 15 15:10:36 HOSTNAME Isis: Instance 0: %ISIS-4-ISIS_ADJCHG: L2 Neighbor State Change for 1851.1605.6061 (AR-7280SR248YC6-I-1-LDP11-GB) on Et52/1 to DOWN: interface went down or no IP address on interface
 messages:
   - error: ISIS_NEIGHBOR_DOWN
     tag: ISIS-4-ISIS_ADJCHG
@@ -9,6 +10,21 @@ messages:
       level: (L\d)
       downReason: (.*)
     line: '{level} Neighbor State Change for SystemID {neighbor} on {interface} to DOWN: {downReason}'
+    model: openconfig-isis
+    mapping:
+      variables:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state-change-reason-message: downReason
+      static:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state: DOWN
+  - error: ISIS_NEIGHBOR_DOWN
+    tag: ISIS-4-ISIS_ADJCHG
+    values:
+      neighbor: (\S+)
+      interface: (\S+)
+      peername: (\S+)
+      level: (L\d)
+      downReason: (.*)
+    line: '{level} Neighbor State Change for {neighbor} ({peername}) on {interface} to DOWN: {downReason}'
     model: openconfig-isis
     mapping:
       variables:
