@@ -12,7 +12,7 @@ messages:
     values:
       peer: ([\w\d:\.]+)
       asn: (\d+)
-      vrf: (\w+)
+      vrf: ([\w-]+)
       event: (\w+)
       oldState|bgp_state_convert: (\w+)
       newState|bgp_state_convert: (\w+)
