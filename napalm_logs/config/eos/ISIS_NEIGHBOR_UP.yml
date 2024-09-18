@@ -19,6 +19,18 @@ messages:
     values:
       neighbor: (\S+)
       interface: (\S+)
+      level: (L\d)
+    line: '{level} Neighbor State Change for {neighbor} on {interface} to UP'
+    model: openconfig-isis
+    mapping:
+      static:
+        network-instances//network-instance//global//protocols//protocol//isis//interfaces//interface//{interface}//levels//level//{level}//adjacencies//adjacency//{neighbor}//state//adjacency-state: UP
+      variables: {}
+  - error: ISIS_NEIGHBOR_UP
+    tag: ISIS-4-ISIS_ADJCHG
+    values:
+      neighbor: (\S+)
+      interface: (\S+)
       peername: (\S+)
       level: (L\d)
     line: '{level} Neighbor State Change for {neighbor} ({peername}) on {interface} to UP'
