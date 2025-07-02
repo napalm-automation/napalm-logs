@@ -74,7 +74,7 @@ class UDPListener(ListenerBase):
         except socket.error as error:
             log.error("Received listener socket error: %s", error, exc_info=True)
             raise ListenerException(error)
-        log.debug("[%s] Received %s from %s", msg, addr, time.time())
+        log.debug("[%s] Received from udp %s from %s", msg, addr, time.time())
         return msg, addr[0]
 
     def stop(self):

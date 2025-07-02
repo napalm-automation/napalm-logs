@@ -220,11 +220,25 @@ e.g.: the CLI option ``auth-address`` becomes ``auth_address`` in the
           - 10.10.10.1
           - 10.10.10.2
           - 10.10.10.3
+        opts:
+          batch_size: 16384
+          max_request_size: 1048576
+          buffer_memory: 33554432
+          send_buffer_bytes: 131072
+          max_in_flight_requests_per_connection: 5
+          retries: 0
+          max_block_ms: 60000
+          linger_ms: 1000
 
 The configuration above listens to the syslog messages from the Kafka bootstrap
 servers ``10.10.10.1``, ``10.10.10.2`` and ``10.10.10.3`` then publishes the
 structured objects encrypted and serialized via ZeroMQ, serving them at the
 address ``172.17.17.2``, port ``49017``.
+
+The opts listed there are the kafka producer options that the napalm-logs exposes
+They are directly named in the same way as the kafka python3 package:
+https://kafka-python.readthedocs.io/en/master/apidoc/KafkaProducer.html
+These opts are optional - you can chose to add them completely, only partially or not at all.
 
 Check the complete list of configuration options under
 :ref:`configuration-options`.

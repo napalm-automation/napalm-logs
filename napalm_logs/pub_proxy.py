@@ -29,8 +29,9 @@ class NapalmLogsPublisherProxy(NapalmLogsProc):
     Internal IPC proxy sub-process class.
     """
 
-    def __init__(self, hwm):
+    def __init__(self, hwm, backlog):
         self.hwm = hwm
+        self.backlog = backlog
         self.__up = False
 
     def _exit_gracefully(self, signum, _):
@@ -49,6 +50,7 @@ class NapalmLogsPublisherProxy(NapalmLogsProc):
         self.sub.setsockopt(zmq.SUBSCRIBE, b"")
         log.debug("Setting HWM for the proxy frontend: %d", self.hwm)
         self.sub.setsockopt(zmq.SNDHWM, self.hwm)
+        self.sub.setsockopt(zmq.BACKLOG, self.backlog)
         # Backend
         self.pub = self.ctx.socket(zmq.PUB)
         self.pub.bind(PUB_IPC_URL)

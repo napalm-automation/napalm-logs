@@ -100,6 +100,8 @@ class NapalmLogsListenerProc(NapalmLogsProc):
         while self.__up:
             try:
                 log_message, log_source = self.listener.receive()
+                if isinstance(log_source, bytes):
+                    log_source = log_source.decode()
             except ListenerException as lerr:
                 if self.__up is False:
                     log.info("Exiting on process shutdown")

@@ -344,6 +344,34 @@ Configuration file example:
 
   hwm: 0
 
+.. _configuration-backlog:
+
+``backlog``: 100
+-------------
+
+.. versionadded:: 0.11.0
+
+The zmq backlog option shall set the maximum length of the queue of outstanding peer 
+connections for the specified socket; this only applies to connection-oriented transports.
+This is used for both external zmq publishers but also but the internally defined zmq that 
+saves the messages before sending them to the configured publishers.
+
+This option can be used to tune the performances of the napalm-logs. 
+While the default limit should be generally enough, in environments with extremely high 
+density of syslog messages to be processed, it is recommended to increase this value.
+
+CLI usage example:
+
+.. code-block:: bash
+
+  $ napalm-logs --backlog 0
+
+Configuration file example:
+
+.. code-block:: yaml
+
+  backlog: 0
+
 .. _configuration-options-keyfile:
 
 ``keyfile``

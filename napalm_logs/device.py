@@ -177,13 +177,13 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
                 ret[key] = result
             return ret
         if error_present is True:
-            log.info(
+            log.debug(
                 "Configured regex did not match for os: %s tag %s",
                 self._name,
                 msg_dict.get("tag", ""),
             )
         else:
-            log.info(
+            log.debug(
                 "Syslog message not configured for os: %s tag %s",
                 self._name,
                 msg_dict.get("tag", ""),
@@ -248,7 +248,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             "Counter of failed OpenConfig object generations",
             ["device_os"],
         )
-        if self.opts.get("metrics_include_attributes", True):
+        if self.opts.get("metrics_include_attributes", False):
             napalm_logs_device_published_messages_attrs = Counter(
                 "napalm_logs_device_published_messages_attrs",
                 "Counter of published messages, with more granular selection",
@@ -355,7 +355,7 @@ class NapalmLogsDeviceProc(NapalmLogsProc):
             self.pub.send(umsgpack.packb(to_publish))
             # self._publish(to_publish)
             napalm_logs_device_published_messages.labels(device_os=self._name).inc()
-            if self.opts.get("metrics_include_attributes", True):
+            if self.opts.get("metrics_include_attributes", False):
                 napalm_logs_device_published_messages_attrs.labels(
                     device_os=self._name,
                     error=to_publish["error"],

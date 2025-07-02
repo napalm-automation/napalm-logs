@@ -254,7 +254,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
             "napalm_logs_server_messages_unknown_queued",
             "Count of messages queued as unknown",
         )
-        if self.opts.get("metrics_include_attributes", True):
+        if self.opts.get("metrics_include_attributes", False):
             napalm_logs_server_messages_attrs = Counter(
                 "napalm_logs_server_messages_attrs",
                 "Count of messages from the server process with their details",

@@ -72,7 +72,7 @@ class TCPListener(ListenerBase):
                     # log.debug('Received empty message from %s', addr)
                     # disabled ^ as it was too noisy
                     continue
-                log.debug("[%s] Received %s from %s", time.time(), msg, addr)
+                log.debug("[%s] Received from tcp %s from %s", time.time(), msg, addr)
                 messages = []
                 if isinstance(msg, bytes):
                     msg = msg.decode("utf-8")

@@ -29,6 +29,7 @@ LOG_FORMAT = "%(asctime)s,%(msecs)03.0f [%(name)-17s][%(levelname)-8s] %(message
 LOG_FILE = os.path.join(ROOT_DIR, "var", "log", "napalm", "logs")
 LOG_FILE_CLI_OPTIONS = ("cli", "screen")
 ZMQ_INTERNAL_HWM = 1000
+ZMQ_INTERNAL_BACKLOG = 100
 METRICS_ADDRESS = "0.0.0.0"
 METRICS_PORT = 9443
 METRICS_DIR = "/tmp/napalm_logs_metrics"

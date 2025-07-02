@@ -75,6 +75,7 @@ class NapalmLogs:
         device_blacklist=[],
         device_whitelist=[],
         hwm=None,
+        backlog=None,
         device_worker_processes=1,
         serializer="msgpack",
         buffer=None,
@@ -128,6 +129,7 @@ class NapalmLogs:
         self.serializer = serializer
         self.device_worker_processes = device_worker_processes
         self.hwm = hwm
+        self.backlog = backlog
         self._buffer_cfg = buffer
         self._buffer = None
         # Setup the environment
@@ -209,6 +211,7 @@ class NapalmLogs:
         already setup).
         """
         self.opts["hwm"] = CONFIG.ZMQ_INTERNAL_HWM if self.hwm is None else self.hwm
+        self.opts["backlog"] = CONFIG.ZMQ_INTERNAL_BACKLOG if self.backlog is None else self.backlog
         self.opts["_server_send_unknown"] = False
         for pub in self.publisher:
             pub_name = list(pub.keys())[0]
@@ -631,7 +634,7 @@ class NapalmLogs:
 
     def _start_pub_px_proc(self):
         """ """
-        px = NapalmLogsPublisherProxy(self.opts["hwm"])
+        px = NapalmLogsPublisherProxy(self.opts["hwm"], self.opts["backlog"])
         proc = Process(target=px.start)
         proc.start()
         proc.description = "Publisher proxy process"
