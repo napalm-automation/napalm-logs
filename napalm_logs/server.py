@@ -301,7 +301,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     if self._buffer:
                         message = "{dev_os}/{host}/{msg}".format(
                             dev_os=dev_os.decode(),
-                            host=msg_dict["host"],
+                            # Host is not always present (e.g IOS-XR by default doesn't include the hostname in the message)
+                            # This ensures the key is safely accessed and returns 'unknown' if not present.
+                            host=msg_dict.get("host", "unknown"),
                             msg=msg_dict["message"],
                         )
                         message_key = base64.b64encode(bytes(message, "utf-8")).decode()
@@ -327,7 +329,9 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     if self.opts.get("metrics_server_include_attributes", True):
                         napalm_logs_server_messages_attrs.labels(
                             device_os=dev_os.decode(),
-                            host=msg_dict["host"],
+                            # Host is not always present (e.g IOS-XR by default doesn't include the hostname in the message).
+                            # This ensures the key is safely accessed and returns 'unknown' if not present.
+                            host=msg_dict.get("host", "unknown"),
                             tag=msg_dict["tag"],
                         ).inc()
 
