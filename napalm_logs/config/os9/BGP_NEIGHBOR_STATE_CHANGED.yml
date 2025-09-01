@@ -1,0 +1,27 @@
+messages:
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    # %BGP-5-ADJCHANGE: VRF VRF-1 Neighbor 192.168.245.49 Up
+    tag: BGP-5-ADJCHANGE
+    values:
+      instance: ([\w-]+)
+      peer: ([\w\d:\.]+)
+    line: 'VRF {instance} Neighbor {peer} Up'
+    model: openconfig-bgp
+    mapping:
+      variables: {}
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: ESTABLISHED
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    # %BGP-5-ADJCHANGE: VRF VRF-1 Session closed by neighbor 192.168.245.49 (Hold time expired) 
+    tag: BGP-5-ADJCHANGE
+    values:
+      instance: ([\w-]+)
+      peer: ([\w\d:\.]+)
+      reason: (.*)
+    line: 'VRF {isntance} Session closed by neighbor {peer} {reason}'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//session-state-change-event: reason
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: IDLE

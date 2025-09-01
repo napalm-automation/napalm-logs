@@ -1,0 +1,27 @@
+messages:
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    # %BGP_NBR_NOTIFY_EST_STATE: BGP FSM established state change Notification State Changed to Established for nbr:192.168.245.48 in VRF:VRF-1
+    tag: BGP-5-ADJCHANGE
+    values:
+      instance: ([\w-]+)
+      peer: ([\w\d:\.]+)
+    line: 'BGP FSM established state change Notification State Changed to Established for nbr:{peer} in VRF:{instance}'
+    model: openconfig-bgp
+    mapping:
+      variables: {}
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: ESTABLISHED
+  - error: BGP_NEIGHBOR_STATE_CHANGED
+    # %BGP_NBR_BKWD_STATE_CHG: Backward state change occurred ADJCHANGE: Session down for Nbr:192.168.245.48 VRF:VRF-1
+    tag: BGP-5-ADJCHANGE
+    values:
+      instance: ([\w-]+)
+      peer: ([\w\d:\.]+)
+      reason: (.*)
+    line: 'Backward state change occurred ADJCHANGE: {reason} for Nbr:{peer} VRF:{instance}'
+    model: openconfig-bgp
+    mapping:
+      variables:
+        bgp//neighbors//neighbor//{peer}//state//session-state-change-event: reason
+      static:
+        bgp//neighbors//neighbor//{peer}//state//session-state: IDLE
