@@ -22,7 +22,7 @@
     "host": "HOSTNAME",
     "tag": "BGP-5-ADJCHANGE",
     "time": "12:08:59",
-    "message": ": peer 192.0.2.2 (VRF default AS 12345) old state Established event AdminReset new state Idle",
+    "message": "peer 192.0.2.2 (VRF default AS 12345) old state Established event AdminReset new state Idle",
     "facility": 1,
     "processName": "Bgp"
   },

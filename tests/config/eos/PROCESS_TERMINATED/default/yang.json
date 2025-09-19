@@ -19,7 +19,7 @@
   "tag": "PROCMGR-6-PROCESS_TERMINATED",
   "time": "02:50:31",
   "date": "Jan 24",
-  "message": ": 'Tmp75-system' (PID=6170, status=9) has terminated."
+  "message": "'Tmp75-system' (PID=6170, status=9) has terminated."
 },
 "facility": 20,
 "ip": "127.0.0.1",

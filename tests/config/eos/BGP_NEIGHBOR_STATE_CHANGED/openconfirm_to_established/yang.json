@@ -22,7 +22,7 @@
     "host": "HOSTNAME",
     "tag": "BGP-5-ADJCHANGE",
     "time": "12:09:00",
-    "message": ": peer 192.0.2.2 (VRF default AS 12345) old state OpenConfirm event Established new state Established",
+    "message": "peer 192.0.2.2 (VRF default AS 12345) old state OpenConfirm event Established new state Established",
     "facility": 1,
     "processName": "Bgp"
   },

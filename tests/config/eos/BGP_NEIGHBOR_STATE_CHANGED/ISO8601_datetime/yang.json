@@ -9,7 +9,7 @@
     "date": "2020-03-31", 
     "facility": 1, 
     "host": "some-switch", 
-    "message": ": peer 192.0.2.2 (VRF default AS 12345) old state Established event AdminReset new state Idle"
+    "message": "peer 192.0.2.2 (VRF default AS 12345) old state Established event AdminReset new state Idle"
   }, 
   "os": "eos", 
   "timestamp": 1585644119, 
