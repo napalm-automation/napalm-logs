@@ -1,0 +1,21 @@
+# Infinera syslog format (RFC5424 style via netsyslog relay)
+# Supported message types per vendor documentation:
+#   - ALARM: alarm notifications with severity, duration, service-affect
+#   - EVENT: system events with entity and attributes
+#   - CONFIGURATION: config changes with user, result, attributes
+#   - SECURITY: authentication events (login/logout)
+#
+# Example log:
+# Jan 20 05:01:59.657539 73dm8 netsyslog: <85>1 2026-01-20T05:02:17+00:00 dci01.abc01@:: SECURITY 401 [meta sequenceId="735"] "time-stamp":...
+#
+prefixes:
+  - time_format: "%Y-%m-%dT%H:%M:%S"
+    values:
+      date: (\d{4}-\d{2}-\d{2})
+      time: (\d{2}:\d{2}:\d{2})
+      timezone: ([\+\-]\d{2}:\d{2})
+      host: '([\w\.\-]+)@::'
+      tag: (ALARM|EVENT|CONFIGURATION|SECURITY)
+      messageId: (\d+)
+      structuredData: (\[.*?\])
+    line: '1 {date}T{time}{timezone} {host} {tag} {messageId} {structuredData} '

@@ -1,0 +1,15 @@
+# Infinera SECURITY messages for user login events
+messages:
+  - error: USER_LOGIN
+    tag: SECURITY
+    values:
+      timestamp: (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?)
+      sessionId: ([^;]+)
+      sessionType: (\w+)
+      user: ([^;]+)
+    line: '"time-stamp":{timestamp};"session-id":{sessionId};"session-type":{sessionType};"user-name":{user};"event/action":logged in'
+    model: openconfig-system
+    mapping:
+      variables:
+        system//aaa//authentication//users//user//{user}//state//username: user
+      static: {}
