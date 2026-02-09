@@ -20,7 +20,7 @@
   "tag": "PROCMGR-6-PROCESS_STARTED",
   "time": "02:50:31",
   "date": "Jan 24",
-  "message": ": 'Bgp' starting with PID=6186 (PPID=2030) -- execing '/usr/bin/Bgp'"
+  "message": "'Bgp' starting with PID=6186 (PPID=2030) -- execing '/usr/bin/Bgp'"
 },
 "facility": 20,
 "ip": "127.0.0.1",

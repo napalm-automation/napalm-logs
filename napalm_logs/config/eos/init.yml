@@ -11,7 +11,7 @@ prefixes:
       host: ([^ ]+)
       processName: ([\w-]+)
       tag: ([\w-]+)
-    line: '{date} {time} {host} {processName}: %{tag}'
+    line: '{date} {time} {host} {processName}: %{tag}: '
   # ISO8601 date-time format
   - values:
       date: (\d{4}-\d{2}-\d{2})
@@ -19,4 +19,4 @@ prefixes:
       host: ([^ ]+)
       processName: ([\w-]+)
       tag: ([\w-]+)
-    line: '{date}T{time} {host} {processName}: %{tag}'
+    line: '{date}T{time} {host} {processName}: %{tag}: '

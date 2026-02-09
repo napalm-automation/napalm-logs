@@ -22,7 +22,7 @@
     "host": "HOSTNAME",
     "tag": "BFD-5-STATE_CHANGE",
     "time": "22:22:26",
-    "message": ": peer (vrf:default, ip:18.11.5.1, intf:Ethernet50/1, srcIp:0.0.0.0, type:normal) changed state from Up to Down diag None",
+    "message": "peer (vrf:default, ip:18.11.5.1, intf:Ethernet50/1, srcIp:0.0.0.0, type:normal) changed state from Up to Down diag None",
     "facility": 20,
     "processName": "Bfd"
   },

@@ -19,7 +19,7 @@
     "tag": "LINEPROTO-5-UPDOWN",
     "time": "09:42:36",
     "date": "Feb  6",
-    "message": ": Line protocol on Interface Ethernet28, changed state to down"
+    "message": "Line protocol on Interface Ethernet28, changed state to down"
   },
   "facility": 20,
   "ip": "127.0.0.1",

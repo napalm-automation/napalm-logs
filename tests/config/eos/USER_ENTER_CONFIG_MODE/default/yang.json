@@ -19,7 +19,7 @@
 		"tag": "SYS-5-CONFIG_E",
 		"time": "12:20:55",
 		"date": "Oct 23",
-		"message": ": Enter configuration mode from console by admin on vty3 (127.0.0.1)",
+		"message": "Enter configuration mode from console by admin on vty3 (127.0.0.1)",
 		"severity": 5
 	},
 	"timestamp": 1540297255,

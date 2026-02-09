@@ -22,7 +22,7 @@
     "tag": "AGENT-6-INITIALIZED",
     "time": "14:39:03",
     "date": "Oct 18",
-    "message": ": Agent 'Rib' initialized; pid=7104"
+    "message": "Agent 'Rib' initialized; pid=7104"
   },
   "facility": 20,
   "ip": "127.0.0.1",

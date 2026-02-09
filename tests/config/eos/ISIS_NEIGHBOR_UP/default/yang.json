@@ -44,7 +44,7 @@
         "tag": "ISIS-4-ISIS_ADJCHG",
         "time": "12:08:12",
         "date": "Dec 14",
-        "message": ": L1 Neighbor State Change for SystemID 1920.0000.2006 on et7 to UP"
+        "message": "L1 Neighbor State Change for SystemID 1920.0000.2006 on et7 to UP"
       },
       "facility": 3,
       "ip": "127.0.0.1",
