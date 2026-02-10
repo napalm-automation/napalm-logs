@@ -1,0 +1,40 @@
+{
+  "yang_message": {
+    "system": {
+      "aaa": {
+        "authentication": {
+          "users": {
+            "user": {
+              "admin": {
+                "state": {
+                  "username": "admin"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "message_details": {
+    "severity": 5,
+    "facility": 10,
+    "pri": "85",
+    "host": "dci01.waw02",
+    "tag": "SECURITY",
+    "date": "2026-01-20",
+    "time": "05:02:17",
+    "timezone": "+00:00",
+    "messageId": "401",
+    "structuredData": "[meta sequenceId=\"735\"]",
+    "message": "\"time-stamp\":2026-01-20T05:02:17Z;\"session-id\":sess-12345;\"session-type\":CLI;\"user-name\":admin;\"event/action\":logged in"
+  },
+  "timestamp": 1768978937,
+  "facility": 10,
+  "ip": "127.0.0.1",
+  "host": "dci01.waw02",
+  "yang_model": "openconfig-system",
+  "error": "USER_LOGIN",
+  "os": "infinera",
+  "severity": 5
+}

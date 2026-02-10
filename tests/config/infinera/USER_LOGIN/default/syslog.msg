@@ -1,0 +1,1 @@
+<85>1 2026-01-20T05:02:17+00:00 dci01.waw02@:: SECURITY 401 [meta sequenceId="735"] "time-stamp":2026-01-20T05:02:17Z;"session-id":sess-12345;"session-type":CLI;"user-name":admin;"event/action":logged in
