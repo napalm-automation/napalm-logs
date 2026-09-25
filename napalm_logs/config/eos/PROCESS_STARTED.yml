@@ -9,7 +9,7 @@ messages:
       pid|int: (\d+)
       ppid|int: (\d+)
       path: ([\w\:\-\/]+)
-    line: ": '{agent}' starting with PID={pid} (PPID={ppid}) -- execing '{path}'"
+    line: "'{agent}' starting with PID={pid} (PPID={ppid}) -- execing '{path}'"
     model: NO_MODEL
     mapping:
       variables:
