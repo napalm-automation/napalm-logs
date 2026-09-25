@@ -7,7 +7,7 @@ messages:
     values:
       agent: ([\w-]+)
       pid|int: (\d+)
-    line: ": '{agent}' (PID={pid}, status=9) has terminated."
+    line: "'{agent}' (PID={pid}, status=9) has terminated."
     model: NO_MODEL
     mapping:
       variables:

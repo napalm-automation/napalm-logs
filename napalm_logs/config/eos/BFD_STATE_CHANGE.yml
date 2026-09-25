@@ -11,7 +11,7 @@ messages:
       diag: (\w+)
       oldState: (\w+)
       newState|bfd_state_convert: (\w+)
-    line: ': peer (vrf:{vrf}, ip:{ip}, intf:{interface}, srcIp:{srcip}, type:{type}) changed state from {oldState} to {newState} diag {diag}'
+    line: 'peer (vrf:{vrf}, ip:{ip}, intf:{interface}, srcIp:{srcip}, type:{type}) changed state from {oldState} to {newState} diag {diag}'
     model: openconfig-bfd
     mapping:
       variables:

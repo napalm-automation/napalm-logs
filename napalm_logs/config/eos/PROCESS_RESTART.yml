@@ -7,7 +7,7 @@ messages:
     values:
       agent: ([\w-]+)
       pid|int: (\d+)
-    line: ": Restarting '{agent}' immediately (it had PID={pid})"
+    line: "Restarting '{agent}' immediately (it had PID={pid})"
     model: NO_MODEL
     mapping:
       variables:
