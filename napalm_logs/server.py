@@ -326,7 +326,7 @@ class NapalmLogsServerProc(NapalmLogsProc):
                     napalm_logs_server_messages_device_queued.labels(
                         device_os=dev_os.decode()
                     ).inc()
-                    if self.opts.get("metrics_server_include_attributes", True):
+                    if self.opts.get("metrics_include_attributes", False):
                         napalm_logs_server_messages_attrs.labels(
                             device_os=dev_os.decode(),
                             # Host is not always present (e.g IOS-XR by default doesn't include the hostname in the message).
