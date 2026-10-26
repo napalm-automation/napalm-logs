@@ -129,9 +129,14 @@ class ClientAuth:
         else:
             skt_ver = socket.AF_INET
         skt = socket.socket(skt_ver, socket.SOCK_STREAM)
-        self.ssl_skt = ssl.wrap_socket(
-            skt, ca_certs=self.certificate, cert_reqs=ssl.CERT_REQUIRED
-        )
+        # ssl.wrap_socket() was removed in Python 3.12. As before, the server
+        # certificate must be signed by (or be) the configured certificate;
+        # the hostname is not checked.
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_REQUIRED
+        context.load_verify_locations(cafile=self.certificate)
+        self.ssl_skt = context.wrap_socket(skt)
         try:
             self.ssl_skt.connect((self.address, self.port))
             self.auth_try_id = 0
