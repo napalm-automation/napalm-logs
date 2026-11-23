@@ -7,7 +7,7 @@ from __future__ import absolute_import
 # Import std lib
 import os
 import re
-import imp
+import importlib.util
 import sys
 import time
 import yaml
@@ -349,8 +349,9 @@ class NapalmLogs:
                             raise IOError(yamlexc)
                 elif file_extension == "py":
                     log.debug("Lazy loading Python module %s", file_)
-                    mod_fp, mod_file, mod_data = imp.find_module(file_name, [os_dir])
-                    mod = imp.load_module(file_name, mod_fp, mod_file, mod_data)
+                    spec = importlib.util.spec_from_file_location(file_name, filepath)
+                    mod = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(mod)
                     if file_name in CONFIG.OS_INIT_FILENAMES:
                         # Init file defined as Python module
                         log.debug("%s seems to be a Python profiler", filepath)
